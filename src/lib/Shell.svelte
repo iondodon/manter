@@ -6,55 +6,52 @@
   import "xterm/css/xterm.css"
 
   onMount(async () => {
-    var term;
-    var websocket = new WebSocket("ws://127.0.0.1:7703" );
-    websocket.binaryType = "arraybuffer";
+    const websocket = new WebSocket("ws://127.0.0.1:7703" )
+    websocket.binaryType = "arraybuffer"
 
 
     function ab2str(buf) {
-      return String.fromCharCode.apply(null, new Uint8Array(buf));
+      return String.fromCharCode.apply(null, new Uint8Array(buf))
     }
 
     websocket.onopen = function(evt) {
       const fitAddon = new FitAddon()
 
-      term = new Terminal({
-        // screenKeys: true,
-        // useStyle: true,
+      const terminal = new Terminal({
         cursorBlink: true,
         cursorStyle: 'bar',
         cursorWidth: 6
       });
 
-      term.loadAddon(fitAddon)
+      terminal.loadAddon(fitAddon)
 
-      term.onData(function(data) {
-        websocket.send(new TextEncoder().encode("\x00" + data));
-      });
+      terminal.onData(function(data) {
+        websocket.send(new TextEncoder().encode("\x00" + data))
+      })
 
-      term.onResize(function(evt) {
+      terminal.onResize(function(evt) {
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify({cols: evt.cols, rows: evt.rows})))
-      });
+      })
 
-      term.buffer.onBufferChange((buf) => {console.log(buf.type)})
+      terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
-      term.onTitleChange(function(title) {
-        document.title = title;
-      });
+      terminal.onTitleChange(function(title) {
+        document.title = title
+      })
 
-      term.open(document.getElementById('terminal'));
+      terminal.open(document.getElementById('terminal'))
         fitAddon.fit()
         websocket.onmessage = function(evt) {
         if (evt.data instanceof ArrayBuffer) {
-          term.write(ab2str(evt.data.slice(1)));
+          terminal.write(ab2str(evt.data.slice(1)))
         } else {
           alert(evt.data)
         }
       }
 
       websocket.onclose = function(evt) {
-        term.write("Session terminated");
-        term.destroy();
+        terminal.write("Session terminated")
+        terminal.dispose()
       }
 
       websocket.onerror = function(evt) {
