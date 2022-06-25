@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
 
   import { onMount } from 'svelte'
-  import { Terminal } from "xterm"
-  import { FitAddon } from 'xterm-addon-fit'
+  import { Terminal }  from 'xterm'
+  import { FitAddon }   from 'xterm-addon-fit'
   import "xterm/css/xterm.css"
 
   onMount(async () => {
@@ -15,18 +15,20 @@
     }
 
     websocket.onopen = function(evt) {
-      const fitAddon = new FitAddon()
+      const fitAddon: FitAddon = new FitAddon()
 
-      const terminal = new Terminal({
+      const terminal: Terminal = new Terminal({
         cursorBlink: true,
         cursorStyle: 'bar',
         cursorWidth: 6
-      });
+      })
 
       terminal.loadAddon(fitAddon)
 
       terminal.onData(function(data) {
-        websocket.send(new TextEncoder().encode("\x00" + data))
+        let encodedData = new TextEncoder().encode("\x00" + data)
+        console.log(encodedData)
+        websocket.send(encodedData)
       })
 
       terminal.onResize(function(evt) {
@@ -39,9 +41,12 @@
         document.title = title
       })
 
-      terminal.open(document.getElementById('terminal'))
-        fitAddon.fit()
-        websocket.onmessage = function(evt) {
+      const htmlTerminal = document.getElementById('terminal')
+      terminal.open(htmlTerminal)
+
+      fitAddon.fit()
+
+      websocket.onmessage = function(evt) {
         if (evt.data instanceof ArrayBuffer) {
           terminal.write(ab2str(evt.data.slice(1)))
         } else {
@@ -68,6 +73,6 @@
   <div id="terminal"></div>
 </div>
 
-<style>
+<style lang="scss">
 
 </style>
