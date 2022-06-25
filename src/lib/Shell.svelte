@@ -74,30 +74,31 @@
     return words[words.length - 1]
   }
 
-  const commands: object = {
-    'git': {
-      'name': "Git",
-      'description': "Git is a",
-      'next': {
-        'commit': {
-          'name': "Commit",
-          'description': "Commit changes to the current repository",
-          'next': {
-            '-m': {
-              'name': "Message",
-              'description': "Message description",
-              'next': () => {
-                  return 'Enter a message'
-              }
-            }
-          }
-        }
-      }
+
+  const files: object = {
+    'file': () => {
+      return 'Get file script'
+    },
+    'next': [this]
+  }
+
+  const lsOptions: object = {
+    '-a': {
+      'name': 'all',
+      'description': 'ls all - description',
+      'next': [this, files]
     }
   }
 
-  let next: any = commands
-  let current: any
+  const commands: object = {
+    'ls': {
+      'name': "ls",
+      'description': "ls description",
+      'next': [lsOptions, files]
+    }
+  }
+
+  let next: any = [commands]
   const handleScript = (data: string) => {
     if (data.length < 0) {
       return
@@ -112,6 +113,9 @@
     }
     if (data === '\b' || data === '\x7f') {
       script = script.slice(0, -1)
+      if (script.length == 0) {
+        next = [commands]
+      }
       return
     }
 
@@ -120,17 +124,18 @@
     const lastWord = getLastWordsFromScript(script)
     console.log("last word ", lastWord)
     
-    if (lastWord in next) {
-      current = next[lastWord]
-      next = current['next']
+    for (let i = 0; i < next.length; i++) {
+      if (lastWord in next[i]) {
+        let current = next[i][lastWord]
+        next = current['next']
 
-      if (typeof next === 'function') {
-        console.log(next())
-      } 
+        console.log("current - ", current)
+        console.log("next - ", next)
 
-      console.log("current", current)
-      console.log("next", next)
+        break
+      }
     }
+
   }
 
 </script>
