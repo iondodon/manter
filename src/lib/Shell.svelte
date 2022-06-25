@@ -7,35 +7,6 @@
 
   let script: string = ''
 
-  const getLastWordsFromScript = (script: string): string => {
-    const words = script.split(' ')
-    return words[words.length - 1]
-  }
-
-  const handleScript = (data) => {
-    if (data.length < 0) {
-      return
-    }
-    if (data === '\n') {
-      script = ''
-      return
-    }
-    if (data === '\r') {
-      script = ''
-      return
-    }
-    // is backspace or delete key then remove last character
-    if (data === '\b' || data === '\x7f') {
-      script = script.slice(0, -1)
-      return
-    }
-
-    script += data
-    console.log(script)
-    const lastWord = getLastWordsFromScript(script)
-    console.log(lastWord)
-  }
-
   onMount(async () => {
     const websocket = new WebSocket("ws://127.0.0.1:7703")
     websocket.binaryType = "arraybuffer"
@@ -56,7 +27,7 @@
       terminal.loadAddon(fitAddon)
 
 
-      terminal.onData(function(data) {
+      terminal.onData(function(data: string) {
         handleScript(data)
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
@@ -97,6 +68,65 @@
       }
     }
   })
+
+  const getLastWordsFromScript = (script: string): string => {
+    const words = script.trim().split(' ')
+    return words[words.length - 1]
+  }
+
+  const commands: object = {
+    'git': {
+      'name': "Git",
+      'description': "Git is a",
+      'next': {
+        'commit': {
+          'name': "Commit",
+          'description': "Commit changes to the current repository",
+          'next': {
+            '-m': {
+              'name': "Message",
+              'description': "Message description",
+              'next': () => {
+                  return 'Enter a message'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  let next: any = commands
+  let current: any
+  const handleScript = (data: string) => {
+    if (data.length < 0) {
+      return
+    }
+    if (data === '\n') {
+      script = ''
+      return
+    }
+    if (data === '\r') {
+      script = ''
+      return
+    }
+    if (data === '\b' || data === '\x7f') {
+      script = script.slice(0, -1)
+      return
+    }
+
+    script += data
+    console.log("script ", script)
+    const lastWord = getLastWordsFromScript(script)
+    console.log("last word ", lastWord)
+    
+    if (lastWord in next) {
+      current = next[lastWord]
+      next = current['next']
+      console.log("current", current)
+      console.log("next", next)
+    }
+  }
 
 </script>
 
