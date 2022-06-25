@@ -10,11 +10,13 @@
     websocket.binaryType = "arraybuffer"
 
 
-    function ab2str(buf) {
+    function ab2str(buf: ArrayBuffer) {
       return String.fromCharCode.apply(null, new Uint8Array(buf))
     }
 
     websocket.onopen = function(evt) {
+      console.log(evt)
+
       const fitAddon: FitAddon = new FitAddon()
 
       const terminal: Terminal = new Terminal({
@@ -55,6 +57,7 @@
       }
 
       websocket.onclose = function(evt) {
+        console.log(evt)
         terminal.write("Session terminated")
         terminal.dispose()
       }
