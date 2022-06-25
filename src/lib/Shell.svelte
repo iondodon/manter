@@ -14,11 +14,8 @@
       return String.fromCharCode.apply(null, new Uint8Array(buf))
     }
 
-    websocket.onopen = function(evt) {
-      console.log(evt)
-
+    websocket.onopen = function(_evt) {
       const fitAddon: FitAddon = new FitAddon()
-
       const terminal: Terminal = new Terminal({
         cursorBlink: true,
         cursorStyle: 'bar',
@@ -56,8 +53,7 @@
         }
       }
 
-      websocket.onclose = function(evt) {
-        console.log(evt)
+      websocket.onclose = function(_evt) {
         terminal.write("Session terminated")
         terminal.dispose()
       }
