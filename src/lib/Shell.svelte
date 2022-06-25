@@ -123,6 +123,11 @@
     if (lastWord in next) {
       current = next[lastWord]
       next = current['next']
+
+      if (typeof next === 'function') {
+        console.log(next())
+      } 
+
       console.log("current", current)
       console.log("next", next)
     }
