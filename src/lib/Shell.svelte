@@ -79,14 +79,14 @@
     'file': () => {
       return 'Get file script'
     },
-    'next': [this]
+    'getNext': function() {return [this] }
   }
 
   const lsOptions: object = {
     '-a': {
       'name': 'all',
       'description': 'ls all - description',
-      'next': [this, files]
+      'getNext': function() {return [this, files] }
     }
   }
 
@@ -94,7 +94,7 @@
     'ls': {
       'name': "ls",
       'description': "ls description",
-      'next': [lsOptions, files]
+      'getNext': function() { return [lsOptions, files] }
     }
   }
 
@@ -127,7 +127,7 @@
     for (let i = 0; i < next.length; i++) {
       if (lastWord in next[i]) {
         let current = next[i][lastWord]
-        next = current['next']
+        next = current['getNext']()
 
         console.log("current - ", current)
         console.log("next - ", next)
