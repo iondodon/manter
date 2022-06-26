@@ -86,6 +86,7 @@
     '-a': {
       'name': 'all',
       'description': 'ls all - description',
+      'synonims': ['--all'],
       'getNext': function() {return [this, files] }
     }
   }
