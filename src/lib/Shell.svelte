@@ -86,8 +86,8 @@
     '-a': {
       'name': 'all',
       'description': 'ls all - description',
-      'synonims': ['--all'],
-      'getNext': function() {return [this, files] }
+      'getNext': function() {return [this, files] },
+      'synonims': ['--all']
     }
   }
 
@@ -125,14 +125,30 @@
     const lastWord = getLastWordsFromScript(script)
     console.log("last word ", lastWord)
     
+    const findAndSelect = (lastWord, obj) => {
+      if (obj[lastWord]) {
+        return obj[lastWord]
+      }
+      
+      for (const key of Object.keys(obj)) {
+        if (obj[key]['synonims']) {
+          for (const synonim of obj[key]['synonims']) {
+            if (synonim === lastWord) {
+              return obj[key]
+            }
+          }
+        }
+      }
+
+      return null
+    }
+
     for (let i = 0; i < next.length; i++) {
-      if (lastWord in next[i]) {
-        let current = next[i][lastWord]
-        next = current['getNext']()
-
-        console.log("current - ", current)
-        console.log("next - ", next)
-
+      let selected: object = findAndSelect(lastWord, next[i])
+      console.log('selected - ', selected)
+      if (selected) {
+        next = selected['getNext']()
+        console.log('current - ', next)
         break
       }
     }
