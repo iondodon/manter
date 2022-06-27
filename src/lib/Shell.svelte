@@ -82,7 +82,12 @@
           {
             'symbols': ['file1.txt'],
             'description': 'description of first file',
-            'getNext': function() { return [this] }
+            'getNext': function() { return [...files['scriptPostProcessor']()] }
+          },
+          {
+            'symbols': ['file2.txt'],
+            'description': 'description of second file',
+            'getNext': function() { return [...files['scriptPostProcessor']()] }
           }
         ]
       }
