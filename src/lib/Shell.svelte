@@ -54,8 +54,9 @@
         // for each suggestion, create a div and append it to the suggestions div
         suggestions.forEach(suggestion => {
           const suggestionDiv = document.createElement('div')
+          // add class
+          suggestionDiv.style.border = '2px solid black'
           suggestionDiv.innerHTML = suggestion['names'] + ' - ' + suggestion['description']
-          suggestionDiv.classList.add('suggestion')
           suggestionsElement.appendChild(suggestionDiv)
         })
         
@@ -191,7 +192,7 @@
 
 <div>
   <div id="terminal">
-    <div id="suggestions">asdadsa</div>
+    <div id="suggestions"></div>
   </div>
 </div>
 
