@@ -16,12 +16,12 @@
       return String.fromCharCode.apply(null, new Uint8Array(buf))
     }
 
-    function updateSuggestionsDivLocation() {
+    function updateSuggestionsDivLocation(suggestions) {
       const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
       const rect = cursorHtml.getBoundingClientRect()
 
       const suggestionsElement = document.getElementById('suggestions')
-      suggestionsElement.innerHTML = ''
+      suggestionsElement.innerHTML = JSON.stringify(suggestions)
       suggestionsElement.style.top = `${rect.top + 20}px`
       suggestionsElement.style.left = `${rect.left + 10}px`
     }
@@ -36,21 +36,21 @@
 
       terminal.loadAddon(fitAddon)
 
-
+      let suggestions
       terminal.onData(function(data: string) {
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
 
-        let suggestions = getSuggestions(data)
+        suggestions = getSuggestions(data)
         console.log('suggestions - ', suggestions)
+      })
+
+      terminal.onCursorMove(() => {
+        updateSuggestionsDivLocation(suggestions)
       })
 
       terminal.onResize(function(evt) {
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify({cols: evt.cols, rows: evt.rows})))
-      })
-
-      terminal.onCursorMove(() => {
-        updateSuggestionsDivLocation()
       })
 
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
@@ -183,8 +183,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100px;
-    height: 100px;
+    width: 500px;
+    height: 200px;
     background-color: rgb(19, 11, 127);
     color: rgb(218, 17, 17);
     font-size: 1.2em;
