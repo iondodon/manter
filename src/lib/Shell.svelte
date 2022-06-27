@@ -51,10 +51,8 @@
         suggestionsElement.style.display = 'block'
 
         suggestionsElement.innerHTML = ''
-        // for each suggestion, create a div and append it to the suggestions div
         suggestions.forEach(suggestion => {
           const suggestionDiv = document.createElement('div')
-          // add class
           suggestionDiv.style.border = '2px solid black'
           suggestionDiv.innerHTML = suggestion['names'] + ' - ' + suggestion['description']
           suggestionsElement.appendChild(suggestionDiv)
@@ -209,5 +207,6 @@
     font-size: 1.2em;
     font-family: monospace;
     border: 1px solid rgb(222, 21, 21);
+    display: none;
   }
 </style>
