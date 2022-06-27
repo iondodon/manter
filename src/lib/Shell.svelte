@@ -49,7 +49,17 @@
         }
 
         suggestionsElement.style.display = 'block'
-        suggestionsElement.innerHTML = JSON.stringify(suggestions)
+
+        suggestionsElement.innerHTML = ''
+        // for each suggestion, create a div and append it to the suggestions div
+        suggestions.forEach(suggestion => {
+          const suggestionDiv = document.createElement('div')
+          suggestionDiv.innerHTML = suggestion['names'] + ' - ' + suggestion['description']
+          suggestionDiv.classList.add('suggestion')
+          suggestionsElement.appendChild(suggestionDiv)
+        })
+        
+        
         suggestionsElement.style.top = `${rect.top + 20}px`
         suggestionsElement.style.left = `${rect.left + 10}px`
       }
