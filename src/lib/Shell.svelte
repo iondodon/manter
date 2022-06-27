@@ -75,31 +75,30 @@
   }
 
 
-  const files: object = {
-    'file': () => {
-      return 'Get file script'
-    },
-    'getNext': function() {return [this] }
-  }
+  const files = [
+    {
+      'symbols': ["file1.txt"],
+      'getNext': function() {return [this] }
+    }
+  ]
 
-  const lsOptions: object = {
-    '-a': {
-      'name': 'all',
+  const lsOptions = [
+    {
+      'symbols': ['-a', '--all'],
       'description': 'ls all - description',
-      'getNext': function() {return [this, files] },
-      'synonims': ['--all']
+      'getNext': function() { return [this, ...files] }
     }
-  }
+  ]
 
-  const commands: object = {
-    'ls': {
-      'name': "ls",
+  const commands = [
+    {
+      'symbols': ['ls'],
       'description': "ls description",
-      'getNext': function() { return [lsOptions, files] }
+      'getNext': function() { return [...lsOptions, ...files] }
     }
-  }
+  ]
 
-  let next: any = [commands]
+  let next: any = [...commands]
   const handleScript = (data: string) => {
     if (data.length < 0) {
       return
@@ -124,31 +123,21 @@
     console.log("script ", script)
     const lastWord = getLastWordsFromScript(script)
     console.log("last word ", lastWord)
-    
-    const findAndSelect = (lastWord, obj) => {
-      if (obj[lastWord]) {
-        return obj[lastWord]
-      }
-      
-      for (const key of Object.keys(obj)) {
-        if (obj[key]['synonims']) {
-          for (const synonim of obj[key]['synonims']) {
-            if (synonim === lastWord) {
-              return obj[key]
-            }
-          }
+
+    for (const obj of next) {
+      let selected = null
+
+      for (const symbol of obj['symbols']) {
+        if (symbol == lastWord) {
+          selected = obj
+          break
         }
       }
 
-      return null
-    }
-
-    for (let i = 0; i < next.length; i++) {
-      let selected: object = findAndSelect(lastWord, next[i])
       console.log('selected - ', selected)
       if (selected) {
         next = selected['getNext']()
-        console.log('current - ', next)
+        console.log('next - ', next)
         break
       }
     }
