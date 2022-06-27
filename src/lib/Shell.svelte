@@ -16,6 +16,16 @@
       return String.fromCharCode.apply(null, new Uint8Array(buf))
     }
 
+    function updateSuggestionsDivLocation() {
+      const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
+      const rect = cursorHtml.getBoundingClientRect()
+
+      const suggestionsElement = document.getElementById('suggestions')
+      suggestionsElement.innerHTML = ''
+      suggestionsElement.style.top = `${rect.top + 20}px`
+      suggestionsElement.style.left = `${rect.left + 10}px`
+    }
+
     websocket.onopen = function(_evt) {
       const fitAddon: FitAddon = new FitAddon()
       const terminal: Terminal = new Terminal({
@@ -33,12 +43,14 @@
 
         let suggestions = getSuggestions(data)
         console.log('suggestions - ', suggestions)
-
-        console.log(terminal)
       })
 
       terminal.onResize(function(evt) {
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify({cols: evt.cols, rows: evt.rows})))
+      })
+
+      terminal.onCursorMove(function() {
+        console.log('cursor move - ')
       })
 
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
@@ -160,9 +172,23 @@
 </script>
 
 <div>
-  <div id="terminal"></div>
+  <div id="terminal">
+    <div id="suggestions">asdadsa</div>
+  </div>
 </div>
 
 <style lang="scss">
-
+  #suggestions {
+    z-index: 1000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    background-color: rgb(19, 11, 127);
+    color: rgb(218, 17, 17);
+    font-size: 1.2em;
+    font-family: monospace;
+    border: 1px solid rgb(222, 21, 21);
+  }
 </style>
