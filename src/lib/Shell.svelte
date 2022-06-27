@@ -16,16 +16,6 @@
       return String.fromCharCode.apply(null, new Uint8Array(buf))
     }
 
-    function updateSuggestionsDivLocation(suggestions) {
-      const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
-      const rect = cursorHtml.getBoundingClientRect()
-
-      const suggestionsElement = document.getElementById('suggestions')
-      suggestionsElement.innerHTML = JSON.stringify(suggestions)
-      suggestionsElement.style.top = `${rect.top + 20}px`
-      suggestionsElement.style.left = `${rect.left + 10}px`
-    }
-
     websocket.onopen = function(_evt) {
       const fitAddon: FitAddon = new FitAddon()
       const terminal: Terminal = new Terminal({
@@ -36,6 +26,9 @@
 
       terminal.loadAddon(fitAddon)
 
+      terminal.open(document.getElementById('terminal'))
+      fitAddon.fit()
+
       let suggestions
       terminal.onData(function(data: string) {
         let encodedData = new TextEncoder().encode("\x00" + data)
@@ -44,6 +37,22 @@
         suggestions = getSuggestions(data)
         console.log('suggestions - ', suggestions)
       })
+
+      function updateSuggestionsDivLocation(suggestions) {
+        const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
+        const rect = cursorHtml.getBoundingClientRect()
+        const suggestionsElement = document.getElementById('suggestions')
+
+        if (script.length == 0) {
+          suggestionsElement.style.display = 'none'
+          return 
+        }
+
+        suggestionsElement.style.display = 'block'
+        suggestionsElement.innerHTML = JSON.stringify(suggestions)
+        suggestionsElement.style.top = `${rect.top + 20}px`
+        suggestionsElement.style.left = `${rect.left + 10}px`
+      }
 
       terminal.onCursorMove(() => {
         updateSuggestionsDivLocation(suggestions)
@@ -58,11 +67,6 @@
       terminal.onTitleChange(function(title) {
         document.title = title
       })
-
-      const htmlTerminal = document.getElementById('terminal')
-      terminal.open(htmlTerminal)
-
-      fitAddon.fit()
 
       websocket.onmessage = function(evt) {
         if (evt.data instanceof ArrayBuffer) {
@@ -129,26 +133,30 @@
   let next: any = [...commands]
   const getSuggestions = (data: string) => {
     if (data.length < 0) {
-      return [...commands]
+      return []
     }
-    if (data === '\n') {
+    if (data === '\n' || data === '\r') {
       script = ''
-      return [...commands]
-    }
-    if (data === '\r') {
-      script = ''
-      return [...commands]
+      next = [...commands]
+      return []
     }
     if (data === '\b' || data === '\x7f') {
       script = script.slice(0, -1)
       if (script.length == 0) {
-        next = [commands]
+        next = [...commands]
       }
-      return [...commands]
+      return next
     }
 
     script += data
+    console.log('script - ', script)
     const lastWord = getLastWordsFromScript(script)
+    console.log('lastWord - ', lastWord)
+
+    if (script.length == 0) {
+      next = [...commands]
+      return next
+    }
 
     for (const suggestionCandidate of next) {
       let selected = null
