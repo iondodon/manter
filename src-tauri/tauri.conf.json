@@ -16,6 +16,9 @@
       "all": true,
       "shell": {
         "open": true,
+        "all": true,
+        "execute": true,
+        "sidecar": true,
         "scope": [
           {
             "name": "sh",

@@ -4,6 +4,7 @@
   import { Terminal }  from "xterm"
   import { FitAddon }   from "xterm-addon-fit"
   import "xterm/css/xterm.css"
+  import { Command } from '@tauri-apps/api/shell'
 
   let script: string = ''
 
@@ -106,7 +107,18 @@
 
   const files = {
       'script': "file1.txt",
-      'scriptPostProcessor': function () {
+      'scriptPostProcessor': async function () {
+        const command = new Command("sh", "-c");
+        command.on('close', data => {
+          console.log(`command finished with code ${data.code} and signal ${data.signal}`)
+        });
+        command.on('error', error => console.error(`command error: "${error}"`));
+        command.stdout.on('data', line => console.log(`command stdout: "${line}"`));
+        command.stderr.on('data', line => console.log(`command stderr: "${line}"`));
+
+        const child = await command.spawn();
+        console.log('pid:', child.pid);
+
         return [
           {
             'names': ['file1.txt'],
