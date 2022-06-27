@@ -49,8 +49,8 @@
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify({cols: evt.cols, rows: evt.rows})))
       })
 
-      terminal.onCursorMove(function() {
-        console.log('cursor move - ')
+      terminal.onCursorMove(() => {
+        updateSuggestionsDivLocation()
       })
 
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
