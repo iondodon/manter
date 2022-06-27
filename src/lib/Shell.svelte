@@ -80,12 +80,12 @@
       'scriptPostProcessor': function () {
         return [
           {
-            'symbols': ['file1.txt'],
+            'names': ['file1.txt'],
             'description': 'description of first file',
             'getNext': function() { return [...files['scriptPostProcessor']()] }
           },
           {
-            'symbols': ['file2.txt'],
+            'names': ['file2.txt'],
             'description': 'description of second file',
             'getNext': function() { return [...files['scriptPostProcessor']()] }
           }
@@ -96,7 +96,7 @@
 
   const lsOptions = [
     {
-      'symbols': ['-a', '--all'],
+      'names': ['-a', '--all'],
       'description': 'ls all - description',
       'getNext': function() { return [this, ...files['scriptPostProcessor']()] }
     }
@@ -104,7 +104,7 @@
 
   const commands = [
     {
-      'symbols': ['ls'],
+      'names': ['ls'],
       'description': "ls description",
       'getNext': function() { return [...lsOptions, ...files['scriptPostProcessor']()] }
     }
@@ -136,12 +136,12 @@
     const lastWord = getLastWordsFromScript(script)
     console.log("last word ", lastWord)
 
-    for (const obj of next) {
+    for (const suggestionCandidate of next) {
       let selected = null
 
-      for (const symbol of obj['symbols']) {
-        if (symbol == lastWord) {
-          selected = obj
+      for (const name of suggestionCandidate['names']) {
+        if (name == lastWord) {
+          selected = suggestionCandidate
           break
         }
       }
