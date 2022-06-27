@@ -75,18 +75,25 @@
   }
 
 
-  const files = [
-    {
-      'symbols': ["file1.txt"],
-      'getNext': function() {return [this] }
-    }
-  ]
+  const files = {
+      'script': "file1.txt",
+      'scriptPostProcessor': function () {
+        return [
+          {
+            'symbols': ['file1.txt'],
+            'description': 'description of first file',
+            'getNext': function() { return [this] }
+          }
+        ]
+      }
+  }
+  
 
   const lsOptions = [
     {
       'symbols': ['-a', '--all'],
       'description': 'ls all - description',
-      'getNext': function() { return [this, ...files] }
+      'getNext': function() { return [this, ...files['scriptPostProcessor']()] }
     }
   ]
 
@@ -94,7 +101,7 @@
     {
       'symbols': ['ls'],
       'description': "ls description",
-      'getNext': function() { return [...lsOptions, ...files] }
+      'getNext': function() { return [...lsOptions, ...files['scriptPostProcessor']()] }
     }
   ]
 
