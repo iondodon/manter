@@ -28,9 +28,13 @@
 
 
       terminal.onData(function(data: string) {
-        handleScript(data)
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
+
+        let suggestions = getSuggestions(data)
+        console.log('suggestions - ', suggestions)
+
+        console.log(terminal)
       })
 
       terminal.onResize(function(evt) {
@@ -111,30 +115,28 @@
   ]
 
   let next: any = [...commands]
-  const handleScript = (data: string) => {
+  const getSuggestions = (data: string) => {
     if (data.length < 0) {
-      return
+      return [...commands]
     }
     if (data === '\n') {
       script = ''
-      return
+      return [...commands]
     }
     if (data === '\r') {
       script = ''
-      return
+      return [...commands]
     }
     if (data === '\b' || data === '\x7f') {
       script = script.slice(0, -1)
       if (script.length == 0) {
         next = [commands]
       }
-      return
+      return [...commands]
     }
 
     script += data
-    console.log("script ", script)
     const lastWord = getLastWordsFromScript(script)
-    console.log("last word ", lastWord)
 
     for (const suggestionCandidate of next) {
       let selected = null
@@ -146,14 +148,13 @@
         }
       }
 
-      console.log('selected - ', selected)
       if (selected) {
         next = selected['getNext']()
-        console.log('next - ', next)
         break
       }
     }
 
+    return next
   }
 
 </script>
