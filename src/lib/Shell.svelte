@@ -55,7 +55,7 @@
         suggestions.forEach(suggestion => {
           const suggestionDiv = document.createElement('div')
           suggestionDiv.style.border = '2px solid black'
-          suggestionDiv.innerHTML = suggestion['names'] + ' - ' + suggestion['description']
+          suggestionDiv.innerHTML = JSON.stringify(suggestion)
           suggestionsElement.appendChild(suggestionDiv)
         })
         
@@ -106,65 +106,61 @@
 
 
   const files = {
-      'script': "file1.txt",
-      'scriptPostProcessor': async function () {
-        const command = new Command("sh", "-c");
-        command.on('close', data => {
-          console.log(`command finished with code ${data.code} and signal ${data.signal}`)
-        });
-        command.on('error', error => console.error(`command error: "${error}"`));
-        command.stdout.on('data', line => console.log(`command stdout: "${line}"`));
-        command.stderr.on('data', line => console.log(`command stderr: "${line}"`));
-
-        const child = await command.spawn();
-        console.log('pid:', child.pid);
-
+      type: "dynamic",
+      script: "file1.txt",
+      candidates: function () {
         return [
           {
             'names': ['file1.txt'],
             'description': 'description of first file',
-            'getNext': function() { return [...files['scriptPostProcessor']()] }
+            'getNext': function() { return [files] }
           },
           {
             'names': ['file2.txt'],
             'description': 'description of second file',
-            'getNext': function() { return [...files['scriptPostProcessor']()] }
+            'getNext': function() { return [files] }
           }
         ]
       }
   }
   
 
-  const lsOptions = [
-    {
-      'names': ['-a', '--all'],
-      'description': 'ls all - description',
-      'getNext': function() { return [this, ...files['scriptPostProcessor']()] }
-    }
-  ]
+  const lsOptions = {
+    type: "static",
+    candidates: [
+      {
+        'names': ['-a', '--all'],
+        'description': 'ls all - description',
+        'getNext': function() { return [this, files] }
+      }
+    ]
+  }
 
-  const commands = [
-    {
-      'names': ['ls'],
-      'description': "ls description",
-      'getNext': function() { return [...lsOptions, ...files['scriptPostProcessor']()] }
-    }
-  ]
+  const commands = {
+    type: "static",
+    candidates: [
+      {
+        'names': ['ls'],
+        'description': "ls description",
+        'getNext': function() { return [lsOptions, files] }
+      }
+    ]
+  }
 
-  let next: any = [...commands]
+  let next: any = [commands]
   const getSuggestions = (data: string) => {
     if (data.length < 0) {
       return []
     }
     if (data === '\n' || data === '\r') {
       script = ''
-      next = [...commands]
+      next = [commands]
       return []
     }
     if (data === '\b' || data === '\x7f') {
       script = script.slice(0, -1)
       if (script.length == 0) {
-        next = [...commands]
+        next = [commands]
       }
       return next
     }
@@ -175,17 +171,22 @@
     console.log('lastWord - ', lastWord)
 
     if (script.length == 0) {
-      next = [...commands]
+      next = [commands]
       return next
     }
 
-    for (const suggestionCandidate of next) {
+    for (const candidatesWrapper of next) {
       let selected = null
 
-      for (const name of suggestionCandidate['names']) {
-        if (name == lastWord) {
-          selected = suggestionCandidate
-          break
+      const candidates = candidatesWrapper['type'] == "static" ? 
+        candidatesWrapper['candidates'] : candidatesWrapper['candidates']()
+
+      for (const candidate of candidates) {
+        for (const name of candidate['names']) {
+          if (name == lastWord) {
+            selected = candidate
+            break
+          }
         }
       }
 
