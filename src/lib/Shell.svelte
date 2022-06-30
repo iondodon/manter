@@ -143,6 +143,11 @@
         'names': ['ls'],
         'description': "ls description",
         'getNext': function() { return [lsOptions, files] }
+      },
+      {
+        'names': ['sudo'],
+        'description': "super user do",
+        'getNext': function() { return [commands] }
       }
     ]
   }
