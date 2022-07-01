@@ -7,6 +7,7 @@
   import { Command } from '@tauri-apps/api/shell'
 
   let script: string = ''
+  let arr = []
 
   onMount(async () => {
     const websocket = new WebSocket("ws://127.0.0.1:7703")
@@ -152,11 +153,11 @@
 
   let next: any = [commands]
   const getSuggestions = (data: string) => {
-    if (data.length < 0) {
-      return []
-    }
+    console.log("arr - ", arr)
+
     if (data === '\n' || data === '\r' || data == '\x03') {
       script = ''
+      arr = []
       next = [commands]
       return []
     }
@@ -164,6 +165,10 @@
       script = script.slice(0, -1)
       if (script.length == 0) {
         next = [commands]
+        arr = []
+      }
+      if (arr[script.length] != undefined) {
+        return arr[script.length]
       }
       return next
     }
@@ -175,7 +180,8 @@
 
     if (script.length == 0) {
       next = [commands]
-      return next
+      arr = []
+      return []
     }
 
     for (const candidatesWrapper of next) {
@@ -192,10 +198,14 @@
             break
           }
         }
+        if (selected) {
+          break
+        }
       }
 
       if (selected) {
         next = selected['getNext']()
+        arr[script.length] = next
 
         for (const wrapper of next) {
           if (typeof wrapper['values'] == 'function') {
@@ -206,6 +216,8 @@
         return next
       }
     }
+
+    arr[script.length] = next
 
     return next
   }
