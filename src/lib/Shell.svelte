@@ -194,8 +194,6 @@
         }
       }
 
-      console.log("selected - ", selected)
-
       if (selected) {
         next = selected['getNext']()
 
