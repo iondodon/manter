@@ -106,9 +106,9 @@
 
 
   const files = {
-      type: "dynamic",
-      script: "file1.txt",
-      candidates: function () {
+      values: function () {
+        const script = "this is the script"
+
         return [
           {
             'names': ['file1.txt'],
@@ -126,19 +126,17 @@
   
 
   const lsOptions = {
-    type: "static",
-    candidates: [
+    values: [
       {
         'names': ['-a', '--all'],
         'description': 'ls all - description',
-        'getNext': function() { return [this, files] }
+        'getNext': function() { return [lsOptions, files] }
       }
     ]
   }
 
   const commands = {
-    type: "static",
-    candidates: [
+    values: [
       {
         'names': ['ls'],
         'description': "ls description",
@@ -157,7 +155,7 @@
     if (data.length < 0) {
       return []
     }
-    if (data === '\n' || data === '\r') {
+    if (data === '\n' || data === '\r' || data == '\x03') {
       script = ''
       next = [commands]
       return []
@@ -182,9 +180,10 @@
 
     for (const candidatesWrapper of next) {
       let selected = null
-
-      const candidates = candidatesWrapper['type'] == "static" ? 
-        candidatesWrapper['candidates'] : candidatesWrapper['candidates']()
+      let candidates = candidatesWrapper['values']
+      if (typeof candidates == "function") {
+        candidates = candidates()
+      }
 
       for (const candidate of candidates) {
         for (const name of candidate['names']) {
@@ -195,9 +194,18 @@
         }
       }
 
+      console.log("selected - ", selected)
+
       if (selected) {
         next = selected['getNext']()
-        break
+
+        for (const wrapper of next) {
+          if (typeof wrapper['values'] == 'function') {
+            wrapper['values'] = wrapper['values']()
+          }
+        }
+
+        return next
       }
     }
 
@@ -218,7 +226,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 500px;
+    width: 800px;
     height: 200px;
     background-color: rgb(19, 11, 127);
     color: rgb(218, 17, 17);
