@@ -6,9 +6,19 @@
   import "xterm/css/xterm.css"
   import { Command } from '@tauri-apps/api/shell'
 
-  let script: string = ''
+  export let script: string = '' 
+  export let lastWord = ''
   let history = []
   export let suggestions = []
+
+  export const isVisible = (suggestion) => {
+    for (const name of suggestion["names"]) {
+      if (name == lastWord || name.startsWith(lastWord)) {
+        return true
+      }
+    }
+    return false
+  }
 
   onMount(async () => {
     const websocket = new WebSocket("ws://127.0.0.1:7703")
@@ -166,7 +176,7 @@
 
     script += data
     console.log('script - ', script)
-    const lastWord = getLastWordsFromScript(script)
+    lastWord = getLastWordsFromScript(script)
     console.log('lastWord - ', lastWord)
 
     if (script.length == 0) {
@@ -222,9 +232,11 @@
       {#each suggestions as wrapper}
         <div class="suggestions-wrapper">
           {#each wrapper['values'] as suggestion}
-            <div class="suggestion">
-              {JSON.stringify(suggestion)}
-            </div>
+            {#if isVisible(suggestion) || script[script.length - 1] == " "}
+              <div class="suggestion">
+                  {JSON.stringify(suggestion)}
+              </div>
+            {/if}
           {/each}
         </div>
       {/each}
