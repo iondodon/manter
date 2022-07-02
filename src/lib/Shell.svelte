@@ -219,9 +219,13 @@
 <div>
   <div id="terminal">
     <div id="suggestions">
-      {#each suggestions as suggestion}
-        <div class="suggestion">
-          {JSON.stringify(suggestion)}
+      {#each suggestions as wrapper}
+        <div class="suggestions-wrapper">
+          {#each wrapper['values'] as suggestion}
+            <div class="suggestion">
+              {JSON.stringify(suggestion)}
+            </div>
+          {/each}
         </div>
       {/each}
     </div>
@@ -246,5 +250,9 @@
 
   .suggestion {
     border-bottom: 1px solid rgb(26, 12, 12);
+  }
+
+  .suggestions-wrapper {
+    border-bottom: 1px solid rgb(13, 242, 5);
   }
 </style>
