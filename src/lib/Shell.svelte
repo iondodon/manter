@@ -232,7 +232,7 @@
       {#each suggestions as wrapper}
         <div class="suggestions-wrapper">
           {#each wrapper['values'] as suggestion}
-            {#if isVisible(suggestion) || script[script.length - 1] == " "}
+            {#if script[script.length - 1] == " " || isVisible(suggestion)}
               <div class="suggestion">
                   {JSON.stringify(suggestion)}
               </div>
