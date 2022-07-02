@@ -7,7 +7,7 @@
   import { Command } from '@tauri-apps/api/shell'
 
   let script: string = ''
-  let arr = []
+  let history = []
 
   onMount(async () => {
     const websocket = new WebSocket("ws://127.0.0.1:7703")
@@ -153,22 +153,23 @@
 
   let next: any = [commands]
   const getSuggestions = (data: string) => {
-    console.log("arr - ", arr)
+    console.log("history - ", history)
+    console.log("next - ", next)
 
     if (data === '\n' || data === '\r' || data == '\x03') {
       script = ''
-      arr = []
+      history = []
       next = [commands]
-      return []
+      return next
     }
     if (data === '\b' || data === '\x7f') {
       script = script.slice(0, -1)
       if (script.length == 0) {
+        history = []
         next = [commands]
-        arr = []
       }
-      if (arr[script.length] != undefined) {
-        return arr[script.length]
+      if (history[script.length] != undefined) {
+        return history[script.length]
       }
       return next
     }
@@ -179,18 +180,19 @@
     console.log('lastWord - ', lastWord)
 
     if (script.length == 0) {
+      history = []
       next = [commands]
-      arr = []
-      return []
+      return next
     }
 
     for (const candidatesWrapper of next) {
-      let selected = null
-      let candidates = candidatesWrapper['values']
-      if (typeof candidates == "function") {
-        candidates = candidates()
+      if (candidatesWrapper['values'] == "function") {
+        candidatesWrapper['values'] = candidatesWrapper['values']()
       }
 
+      
+      let candidates = candidatesWrapper['values']
+      let selected = null
       for (const candidate of candidates) {
         for (const name of candidate['names']) {
           if (name == lastWord) {
@@ -205,7 +207,7 @@
 
       if (selected) {
         next = selected['getNext']()
-        arr[script.length] = next
+        history[script.length] = next
 
         for (const wrapper of next) {
           if (typeof wrapper['values'] == 'function') {
@@ -217,7 +219,7 @@
       }
     }
 
-    arr[script.length] = next
+    history[script.length] = next
 
     return next
   }
