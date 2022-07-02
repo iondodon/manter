@@ -46,7 +46,8 @@
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
 
-        suggestions = getSuggestions(data)
+        getSuggestions(data)
+        suggestions = history[script.length]
         console.log('suggestions - ', suggestions)
       })
 
@@ -151,45 +152,31 @@
     ]
   }
 
-  let next: any = [commands]
+  history[0] = [ commands ]
   const getSuggestions = (data: string) => {
     console.log("history - ", history)
-    console.log("next - ", next)
 
     if (data === '\n' || data === '\r' || data == '\x03') {
       script = ''
-      history = []
-      next = [commands]
-      return next
+      return
     }
-    if (data === '\b' || data === '\x7f') {
+    if (script.length > 0 && (data === '\b' || data === '\x7f')) {
       script = script.slice(0, -1)
-      if (script.length == 0) {
-        history = []
-        next = [commands]
-      }
-      if (history[script.length] != undefined) {
-        return history[script.length]
-      }
-      return next
     }
 
     script += data
-    console.log('script - ', script)
     lastWord = getLastWordsFromScript(script)
+    console.log('script - ', script)
     console.log('lastWord - ', lastWord)
 
     if (script.length == 0) {
-      history = []
-      next = [commands]
-      return next
+      return
     }
 
-    for (const candidatesWrapper of next) {
+    for (const candidatesWrapper of history[script.length - 1]) {
       if (candidatesWrapper['values'] == "function") {
         candidatesWrapper['values'] = candidatesWrapper['values']()
       }
-
       
       let candidates = candidatesWrapper['values']
       let selected = null
@@ -206,22 +193,18 @@
       }
 
       if (selected) {
-        next = selected['getNext']()
-        history[script.length] = next
-
-        for (const wrapper of next) {
+        history[script.length] = selected['getNext']()
+        for (const wrapper of history[script.length]) {
           if (typeof wrapper['values'] == 'function') {
             wrapper['values'] = wrapper['values']()
           }
         }
-
-        return next
+        return
       }
+
+      history[script.length] = history[script.length - 1]
     }
 
-    history[script.length] = next
-
-    return next
   }
 
 </script>
