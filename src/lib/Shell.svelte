@@ -8,6 +8,7 @@
 
   let script: string = ''
   let history = []
+  export let suggestions = []
 
   onMount(async () => {
     const websocket = new WebSocket("ws://127.0.0.1:7703")
@@ -31,7 +32,6 @@
       terminal.open(document.getElementById('terminal'))
       fitAddon.fit()
 
-      let suggestions
       terminal.onData(function(data: string) {
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
@@ -51,16 +51,6 @@
         }
 
         suggestionsElement.style.display = 'block'
-
-        suggestionsElement.innerHTML = ''
-        suggestions.forEach(suggestion => {
-          const suggestionDiv = document.createElement('div')
-          suggestionDiv.style.border = '2px solid black'
-          suggestionDiv.innerHTML = JSON.stringify(suggestion)
-          suggestionsElement.appendChild(suggestionDiv)
-        })
-        
-        
         suggestionsElement.style.top = `${rect.top + 20}px`
         suggestionsElement.style.left = `${rect.left + 10}px`
       }
@@ -228,7 +218,13 @@
 
 <div>
   <div id="terminal">
-    <div id="suggestions"></div>
+    <div id="suggestions">
+      {#each suggestions as suggestion}
+        <div class="suggestion">
+          {JSON.stringify(suggestion)}
+        </div>
+      {/each}
+    </div>
   </div>
 </div>
 
@@ -246,5 +242,9 @@
     font-family: monospace;
     border: 1px solid rgb(222, 21, 21);
     display: none;
+  }
+
+  .suggestion {
+    border-bottom: 1px solid rgb(26, 12, 12);
   }
 </style>
