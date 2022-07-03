@@ -10,8 +10,12 @@
   export let lastWord = ''
   let history = []
   export let suggestions = []
+  export let selected = null
 
   export const isVisible = (suggestion) => {
+    if (script[script.length - 1] == " ") {
+      return true
+    } 
     for (const name of suggestion["names"]) {
       if (name == lastWord || name.startsWith(lastWord)) {
         return true
@@ -162,8 +166,10 @@
       return
     }
 
-    if (script.length > 0 && (data === '\b' || data === '\x7f')) {
-      script = script.slice(0, -1)
+    if (data === '\b' || data === '\x7f') {
+      if (script.length > 0) {
+        script = script.slice(0, -1)
+      }
     } else {
       script += data
     }
@@ -183,7 +189,7 @@
       }
       
       let candidates = candidatesWrapper['values']
-      let selected = null
+      selected = null
       for (const candidate of candidates) {
         for (const name of candidate['names']) {
           if (name == lastWord) {
@@ -217,11 +223,16 @@
 <div>
   <div id="terminal">
     <div id="suggestions">
+      {#if selected}
+        <div id="selected-suggestion" class="suggestion-item">
+          {JSON.stringify(selected)}
+        </div>
+      {/if}
       {#each suggestions as wrapper}
-        <div class="suggestions-wrapper">
+        <div class="suggestions-wrapper suggestion-item">
           {#each wrapper['values'] as suggestion}
-            {#if script[script.length - 1] == " " || isVisible(suggestion)}
-              <div class="suggestion">
+            {#if isVisible(suggestion)}
+              <div class="suggestion suggestion-item">
                   {JSON.stringify(suggestion)}
               </div>
             {/if}
@@ -253,6 +264,14 @@
   }
 
   .suggestions-wrapper {
-    border-bottom: 1px solid rgb(13, 242, 5);
+    border-bottom: 1px solid rgb(7, 115, 3);
+  }
+
+  #selected-suggestion {
+    border-bottom: 1px solid rgb(2, 106, 175);
+  }
+
+  .suggestion-item {
+    margin: 2px;
   }
 </style>
