@@ -249,8 +249,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 800px;
-    height: 200px;
+    width: fit-content;
+    height: fit-content;
     background-color: rgb(19, 11, 127);
     color: rgb(218, 17, 17);
     font-size: 1.2em;
