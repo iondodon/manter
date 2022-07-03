@@ -1,4 +1,4 @@
-<script>
+<script type="ts">
   import Shell from './lib/Shell.svelte'
 </script>
 
@@ -6,7 +6,7 @@
     <Shell/>
 </main>
 
-<style>
+<style type="scss">
   :root {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
       Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;

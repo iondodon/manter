@@ -8,9 +8,8 @@
 
   export let script: string = '' 
   export let lastWord = ''
-  let history = []
   export let suggestions = []
-  export let selected = null
+  let history = []
 
   export const isVisible = (suggestion) => {
     if (script[script.length - 1] == " ") {
@@ -183,17 +182,18 @@
       return
     }
 
+    let selected = null
     for (const candidatesWrapper of history[script.length - 1]) {
       if (candidatesWrapper['values'] == "function") {
         candidatesWrapper['values'] = candidatesWrapper['values']()
       }
       
       let candidates = candidatesWrapper['values']
-      selected = null
       for (const candidate of candidates) {
         for (const name of candidate['names']) {
-          if (name == lastWord) {
+          if (!selected && name == lastWord) {
             selected = candidate
+            console.log("selected - ", selected)
             break
           }
         }
@@ -202,18 +202,18 @@
         }
       }
 
-      if (!selected) {
-        history[script.length] = history[script.length - 1]
-        return
-      }
+    }
 
-      history[script.length] = selected['getNext']()
-      for (const wrapper of history[script.length]) {
-        if (typeof wrapper['values'] == 'function') {
-          wrapper['values'] = wrapper['values']()
-        }
-      }
+    if (!selected) {
+      history[script.length] = history[script.length - 1]
+      return
+    }
 
+    history[script.length] = selected['getNext']()
+    for (const wrapper of history[script.length]) {
+      if (typeof wrapper['values'] == 'function') {
+        wrapper['values'] = wrapper['values']()
+      }
     }
 
   }
@@ -223,11 +223,6 @@
 <div>
   <div id="terminal">
     <div id="suggestions">
-      {#if selected}
-        <div id="selected-suggestion" class="suggestion-item">
-          {"Selected: " + JSON.stringify(selected["names"])}
-        </div>
-      {/if}
       {#each suggestions as wrapper}
         <div class="suggestions-wrapper suggestion-item">
           {#each wrapper['values'] as suggestion}
@@ -260,15 +255,11 @@
   }
 
   .suggestion {
-    border-bottom: 1px solid rgb(26, 12, 12);
+    border-bottom: 1px solid rgb(80, 79, 79);
   }
 
   .suggestions-wrapper {
     border-bottom: 1px solid rgb(7, 115, 3);
-  }
-
-  #selected-suggestion {
-    border-bottom: 1px solid rgb(2, 106, 175);
   }
 
   .suggestion-item {
