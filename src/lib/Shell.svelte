@@ -4,7 +4,7 @@
   import { Terminal }  from "xterm"
   import { FitAddon }   from "xterm-addon-fit"
   import "xterm/css/xterm.css"
-  import { Command } from '@tauri-apps/api/shell'
+  import { spawn } from "./command"
 
   export let script: string = '' 
   export let lastWord = ''
@@ -24,6 +24,8 @@
   }
 
   onMount(async () => {
+    console.log(spawn('ls -a'))
+
     const websocket = new WebSocket("ws://127.0.0.1:7703")
     websocket.binaryType = "arraybuffer"
 
