@@ -225,7 +225,7 @@
     <div id="suggestions">
       {#if selected}
         <div id="selected-suggestion" class="suggestion-item">
-          {JSON.stringify(selected)}
+          {"Selected: " + JSON.stringify(selected["names"])}
         </div>
       {/if}
       {#each suggestions as wrapper}
@@ -233,7 +233,7 @@
           {#each wrapper['values'] as suggestion}
             {#if isVisible(suggestion)}
               <div class="suggestion suggestion-item">
-                  {JSON.stringify(suggestion)}
+                  {JSON.stringify(suggestion["names"])}
               </div>
             {/if}
           {/each}
