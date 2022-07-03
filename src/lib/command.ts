@@ -20,9 +20,9 @@ function _getEnv() {
   }, {})
 }
 
-export function spawn(adHockScript) {
+export function spawn(adHocScript) {
   child = null
-  const command = new Command(cmd, [...args, adHockScript], { cwd: cwd || null, env: _getEnv() })
+  const command = new Command(cmd, [...args, adHocScript], { cwd: cwd || null, env: _getEnv() })
   command.on('close', data => {
     console.log(`command finished with code ${data.code} and signal ${data.signal}`)
     child = null

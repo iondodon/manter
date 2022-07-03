@@ -24,7 +24,7 @@
   }
 
   onMount(async () => {
-    console.log(spawn('ls -a'))
+    console.log(spawn('ls --all'))
 
     const websocket = new WebSocket("ws://127.0.0.1:7703")
     websocket.binaryType = "arraybuffer"
