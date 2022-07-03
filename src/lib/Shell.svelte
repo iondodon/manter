@@ -152,21 +152,25 @@
     ]
   }
 
-  history[0] = [ commands ]
+  history = [ [commands] ]
   const getSuggestions = (data: string) => {
     console.log("history - ", history)
 
     if (data === '\n' || data === '\r' || data == '\x03') {
+      history = [ [commands] ]
       script = ''
       return
     }
+
     if (script.length > 0 && (data === '\b' || data === '\x7f')) {
       script = script.slice(0, -1)
+    } else {
+      script += data
     }
 
-    script += data
-    lastWord = getLastWordsFromScript(script)
     console.log('script - ', script)
+
+    lastWord = getLastWordsFromScript(script)
     console.log('lastWord - ', lastWord)
 
     if (script.length == 0) {
@@ -192,17 +196,18 @@
         }
       }
 
-      if (selected) {
-        history[script.length] = selected['getNext']()
-        for (const wrapper of history[script.length]) {
-          if (typeof wrapper['values'] == 'function') {
-            wrapper['values'] = wrapper['values']()
-          }
-        }
+      if (!selected) {
+        history[script.length] = history[script.length - 1]
         return
       }
 
-      history[script.length] = history[script.length - 1]
+      history[script.length] = selected['getNext']()
+      for (const wrapper of history[script.length]) {
+        if (typeof wrapper['values'] == 'function') {
+          wrapper['values'] = wrapper['values']()
+        }
+      }
+
     }
 
   }
