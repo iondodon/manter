@@ -20,15 +20,25 @@ function _getEnv() {
   }, {})
 }
 
-export function spawn(adHocScript) {
+export function spawn(wrapper) {
+  let done = false
+  let res = []
+
   child = null
-  const command = new Command(cmd, [...args, adHocScript], { cwd: cwd || null, env: _getEnv() })
+  const command = new Command(cmd, [...args, wrapper['script']], { cwd: cwd || null, env: _getEnv() })
+
   command.on('close', data => {
     console.log(`command finished with code ${data.code} and signal ${data.signal}`)
+    done = true
     child = null
   })
+
   command.on('error', error => console.log(`command error: "${error}"`))
-  command.stdout.on('data', line => console.log(`command stdout: "${line}"`))
+
+  command.stdout.on('data', line => {
+    res.push(wrapper['processor'](line))
+  })
+
   command.stderr.on('data', line => console.log(`command stderr: "${line}"`))
   
   command.spawn()
@@ -36,6 +46,8 @@ export function spawn(adHocScript) {
       child = c
     })
     .catch(r => console.log(r))
+
+  return res
 }
 
 function kill() {

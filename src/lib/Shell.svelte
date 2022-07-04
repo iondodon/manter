@@ -24,8 +24,6 @@
   }
 
   onMount(async () => {
-    console.log(spawn('ls --all'))
-
     const websocket = new WebSocket("ws://127.0.0.1:7703")
     websocket.binaryType = "arraybuffer"
 
@@ -51,9 +49,9 @@
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
 
+        console.log("history", history)
         getSuggestions(data)
         suggestions = history[script.length]
-        console.log('suggestions - ', suggestions)
       })
 
       function updateSuggestionsDivLocation(suggestions) {
@@ -113,21 +111,13 @@
 
 
   const files = {
-      values: function () {
-        const script = "this is the script"
-
-        return [
-          {
-            'names': ['file1.txt'],
-            'description': 'description of first file',
-            'getNext': function() { return [files] }
-          },
-          {
-            'names': ['file2.txt'],
-            'description': 'description of second file',
-            'getNext': function() { return [files] }
-          }
-        ]
+      script: "ls -a",
+      processor: function (line) {
+        return {
+          'names': [line],
+          'description': 'description of first file',
+          'getNext': function() { return [files] }
+        }
       }
   }
   
@@ -158,9 +148,7 @@
   }
 
   history = [ [commands] ]
-  const getSuggestions = (data: string) => {
-    console.log("history - ", history)
-
+  const getSuggestions = async (data: string) => {
     if (data === '\n' || data === '\r' || data == '\x03') {
       history = [ [commands] ]
       script = ''
@@ -175,19 +163,16 @@
       script += data
     }
 
-    console.log('script - ', script)
-
     lastWord = getLastWordsFromScript(script)
-    console.log('lastWord - ', lastWord)
 
     if (script.length == 0) {
       return
     }
 
     let selected = null
-    for (const candidatesWrapper of history[script.length - 1]) {
-      if (candidatesWrapper['values'] == "function") {
-        candidatesWrapper['values'] = candidatesWrapper['values']()
+    for (let candidatesWrapper of history[script.length - 1]) {
+      if (candidatesWrapper['processor']) {
+        candidatesWrapper['values'] = spawn(candidatesWrapper)
       }
       
       let candidates = candidatesWrapper['values']
@@ -195,7 +180,6 @@
         for (const name of candidate['names']) {
           if (!selected && name == lastWord) {
             selected = candidate
-            console.log("selected - ", selected)
             break
           }
         }
@@ -212,9 +196,9 @@
     }
 
     history[script.length] = selected['getNext']()
-    for (const wrapper of history[script.length]) {
-      if (typeof wrapper['values'] == 'function') {
-        wrapper['values'] = wrapper['values']()
+    for (let wrapper of history[script.length]) {
+      if (wrapper['processor']) {
+        wrapper['values'] = spawn(wrapper)
       }
     }
 
@@ -225,6 +209,7 @@
 <div>
   <div id="terminal">
     <div id="suggestions">
+
       {#each suggestions as wrapper}
         <div class="suggestions-wrapper suggestion-item">
           {#each wrapper['values'] as suggestion}
