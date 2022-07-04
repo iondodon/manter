@@ -4,7 +4,6 @@ const windows = navigator.userAgent.includes('Windows')
 let cmd = windows ? 'cmd' : 'sh'
 let args = windows ? ['/C'] : ['-c']
 
-// let adHockScript = 'echo "hello world"'
 let cwd = null
 let env = 'SOMETHING=value ANOTHER=2'
 let stdin = ''
