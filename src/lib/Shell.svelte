@@ -172,7 +172,7 @@
     let selected = null
     for (let candidatesWrapper of history[script.length - 1]) {
       if (candidatesWrapper['processor']) {
-        candidatesWrapper['values'] = spawn(candidatesWrapper)
+        candidatesWrapper['values'] = await spawn(candidatesWrapper)
       }
       
       let candidates = candidatesWrapper['values']
@@ -198,7 +198,7 @@
     history[script.length] = selected['getNext']()
     for (let wrapper of history[script.length]) {
       if (wrapper['processor']) {
-        wrapper['values'] = spawn(wrapper)
+        wrapper['values'] = await spawn(wrapper)
       }
     }
 

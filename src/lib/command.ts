@@ -21,25 +21,14 @@ function _getEnv() {
 }
 
 export function spawn(wrapper) {
-  let done = false
   let res = []
 
   child = null
   const command = new Command(cmd, [...args, wrapper['script']], { cwd: cwd || null, env: _getEnv() })
-
-  command.on('close', data => {
-    console.log(`command finished with code ${data.code} and signal ${data.signal}`)
-    done = true
-    child = null
-  })
-
-  command.on('error', error => console.log(`command error: "${error}"`))
-
+  
   command.stdout.on('data', line => {
     res.push(wrapper['processor'](line))
   })
-
-  command.stderr.on('data', line => console.log(`command stderr: "${line}"`))
   
   command.spawn()
     .then(c => {
@@ -47,7 +36,16 @@ export function spawn(wrapper) {
     })
     .catch(r => console.log(r))
 
-  return res
+  return new Promise((resolve, reject) => {
+      command.on('close', data => {
+        console.log(`command finished with code ${data.code} and signal ${data.signal}`)
+        child = null
+        resolve(res)
+      })
+
+      command.on('error', error => reject(error))
+      command.stderr.on('data', line => reject(line))
+  })
 }
 
 function kill() {
