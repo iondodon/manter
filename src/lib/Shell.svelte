@@ -45,11 +45,11 @@
       terminal.open(document.getElementById('terminal'))
       fitAddon.fit()
 
-      terminal.onData(function(data: string) {
+      terminal.onData(async function(data: string) {
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
 
-        getSuggestions(data)
+        await getSuggestions(data)
         suggestions = history[script.length]
       })
 
