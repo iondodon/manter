@@ -247,11 +247,11 @@
   }
 
   .suggestion {
-    border-bottom: 1px solid rgb(80, 79, 79);
+    border-bottom: 1px solid rgb(0, 0, 0);
   }
 
   .suggestions-wrapper {
-    border-bottom: 1px solid rgb(7, 115, 3);
+    border-bottom: 3px solid rgb(7, 115, 3);
   }
 
   .suggestion-item {
