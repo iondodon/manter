@@ -49,7 +49,6 @@
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
 
-        console.log("history", history)
         getSuggestions(data)
         suggestions = history[script.length]
       })
@@ -173,6 +172,7 @@
     for (let candidatesWrapper of history[script.length - 1]) {
       if (candidatesWrapper['processor']) {
         candidatesWrapper['values'] = await spawn(candidatesWrapper)
+        console.log("finished receiving data top", candidatesWrapper['values'])
       }
       
       let candidates = candidatesWrapper['values']
@@ -199,6 +199,7 @@
     for (let wrapper of history[script.length]) {
       if (wrapper['processor']) {
         wrapper['values'] = await spawn(wrapper)
+        console.log("finished receiving data bottom", wrapper['values'])
       }
     }
 
@@ -209,18 +210,22 @@
 <div>
   <div id="terminal">
     <div id="suggestions">
-
-      {#each suggestions as wrapper}
-        <div class="suggestions-wrapper suggestion-item">
-          {#each wrapper['values'] as suggestion}
-            {#if isVisible(suggestion)}
-              <div class="suggestion suggestion-item">
-                  {JSON.stringify(suggestion["names"])}
-              </div>
+      
+      {#if suggestions}
+        {#each suggestions as wrapper}
+          <div class="suggestions-wrapper suggestion-item">
+            {#if wrapper["values"]}
+              {#each wrapper['values'] as suggestion}
+                {#if isVisible(suggestion)}
+                  <div class="suggestion suggestion-item">
+                      {JSON.stringify(suggestion["names"])}
+                  </div>
+                {/if}
+              {/each}
             {/if}
-          {/each}
-        </div>
-      {/each}
+          </div>
+        {/each}
+      {/if}
     </div>
   </div>
 </div>
