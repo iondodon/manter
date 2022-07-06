@@ -4,6 +4,8 @@
 )]
 
 use std::thread;
+use log::{debug, error};
+use mt_logger::*;
 
 mod pty;
 
@@ -11,6 +13,9 @@ fn main() {
   thread::spawn(|| {
     pty::server::main();
   });
+
+  // debug!("YOKLMN");
+
 
   let context = tauri::generate_context!();
   tauri::Builder::default()

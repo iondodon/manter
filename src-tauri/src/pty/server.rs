@@ -16,9 +16,11 @@ use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tokio_tungstenite::{accept_async, WebSocketStream};
 use tungstenite::Message;
 use super::lib::{PtyCommand, PtyMaster};
+use mt_logger::*;
 
 #[tokio::main]
 pub async fn main() {
+    mt_log!(Level::Debug, "YOKLMN");
     env_logger::init();
     let _ = ws_server()
         .await
