@@ -123,6 +123,8 @@ async fn handle_connection(stream: TcpStream) -> Result<(), anyhow::Error> {
     let pty_shell_writer = pty_master.clone();
     let pty_shell_reader = pty_master.clone();
 
+    
+
     let res = tokio::select! {
         res = handle_websocket_incoming(ws_incoming, pty_shell_writer, sender, stop_sender) => res,
         res = handle_pty_incoming(pty_shell_reader, ws_sender) => res,

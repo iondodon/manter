@@ -10,6 +10,8 @@ use std::sync::Arc;
 use tokio::io::unix::AsyncFd;
 use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt, Error, ReadBuf};
 use tokio::sync::mpsc;
+use std::fmt;
+use mt_logger::*;
 
 pub struct PtyMaster {
     inner: Arc<AsyncFd<File>>,
@@ -253,6 +255,7 @@ impl PtyCommand {
         }
 
         let mut child = self.inner.spawn()?;
+
         let mut master_cl = pty_master.clone();
         let fut = async move {
             let _ = tokio::select! {

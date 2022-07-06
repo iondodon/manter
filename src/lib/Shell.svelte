@@ -10,6 +10,7 @@
   export let lastWord = ''
   export let suggestions = []
   let history = []
+  export let cwd = null
 
   export const isVisible = (suggestion) => {
     if (script[script.length - 1] == " ") {
@@ -79,7 +80,10 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
-        document.title = title
+        if (title.includes('ion@acer:')) {
+          cwd = title.split('ion@acer:')[1]
+        }
+        console.log("title", title)
       })
 
       websocket.onmessage = function(evt) {
@@ -110,7 +114,7 @@
 
 
   const files = {
-      script: "ls -a",
+      script: "cd ~; ls -a",
       processor: function (line) {
         return {
           'names': [line],
@@ -171,7 +175,7 @@
     let selected = null
     for (let candidatesWrapper of history[script.length - 1]) {
       if (candidatesWrapper['processor']) {
-        candidatesWrapper['values'] = await spawn(candidatesWrapper)
+        candidatesWrapper['values'] = await spawn(candidatesWrapper, cwd)
         console.log("finished receiving data top", candidatesWrapper['values'])
       }
       
@@ -198,7 +202,7 @@
     history[script.length] = selected['getNext']()
     for (let wrapper of history[script.length]) {
       if (wrapper['processor']) {
-        wrapper['values'] = await spawn(wrapper)
+        wrapper['values'] = await spawn(wrapper, cwd)
         console.log("finished receiving data bottom", wrapper['values'])
       }
     }

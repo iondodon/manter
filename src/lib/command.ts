@@ -4,7 +4,6 @@ const windows = navigator.userAgent.includes('Windows')
 let cmd = windows ? 'cmd' : 'sh'
 let args = windows ? ['/C'] : ['-c']
 
-let cwd = null
 let env = 'SOMETHING=value ANOTHER=2'
 let stdin = ''
 let child
@@ -19,11 +18,11 @@ function _getEnv() {
   }, {})
 }
 
-export function spawn(wrapper) {
+export function spawn(wrapper, cwd) {
   let res = []
 
   child = null
-  const command = new Command(cmd, [...args, wrapper['script']], { cwd: cwd || null, env: _getEnv() })
+  const command = new Command(cmd, [...args, cwd+";"+wrapper['script']], { cwd: null || null, env: _getEnv() })
   
   command.stdout.on('data', line => {
     console.log("data")

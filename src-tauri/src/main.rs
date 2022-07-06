@@ -10,12 +10,10 @@ use mt_logger::*;
 mod pty;
 
 fn main() {
+  mt_new!(None, Level::Info, OutputStream::Both);
   thread::spawn(|| {
     pty::server::main();
   });
-
-  // debug!("YOKLMN");
-
 
   let context = tauri::generate_context!();
   tauri::Builder::default()
