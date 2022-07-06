@@ -10,7 +10,9 @@
   export let lastWord = ''
   export let suggestions = []
   let history = []
-  export let cwd = null
+  export let cwd = ''
+  export let title = ''
+  export let colleting = false
 
   export const isVisible = (suggestion) => {
     if (script[script.length - 1] == " ") {
@@ -79,15 +81,25 @@
 
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
-      terminal.onTitleChange(function(title) {
-        if (title.includes('ion@acer:')) {
-          cwd = title.split('ion@acer:')[1]
+      terminal.onTitleChange(function(ttle) {
+        colleting = false
+        console.log("cwd", cwd)
+        
+        if (ttle != title) {          
+          title = ttle
+          document.title = ttle
+          let encodedData = new TextEncoder().encode("\x00" + "pwd\r")
+          websocket.send(encodedData)
+          cwd = ''
+          colleting = true
         }
-        console.log("title", title)
       })
 
       websocket.onmessage = function(evt) {
         if (evt.data instanceof ArrayBuffer) {
+          if (colleting) {
+            cwd += ab2str(evt.data.slice(1))
+          }
           terminal.write(ab2str(evt.data.slice(1)))
         } else {
           alert(evt.data)
