@@ -247,13 +247,14 @@
     top: 0;
     left: 0;
     width: fit-content;
-    height: fit-content;
+    max-height: 200px;
     background-color: rgb(19, 11, 127);
     color: rgb(218, 17, 17);
     font-size: 1.2em;
     font-family: monospace;
     border: 1px solid rgb(222, 21, 21);
     display: none;
+    overflow-y: scroll;
   }
 
   .suggestion {
