@@ -20,7 +20,6 @@ use mt_logger::*;
 
 #[tokio::main]
 pub async fn main() {
-    mt_log!(Level::Debug, "YOKLMN");
     env_logger::init();
     let _ = ws_server()
         .await
