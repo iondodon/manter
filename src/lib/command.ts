@@ -7,6 +7,7 @@ let args = windows ? ['/C'] : ['-c']
 let env = 'SOMETHING=value ANOTHER=2'
 let stdin = ''
 let child
+let logged = false
 
 function _getEnv() {
   return env.split(' ').reduce((env, clause) => {
@@ -21,8 +22,27 @@ function _getEnv() {
 export function spawn(wrapper, cwd) {
   let res = []
 
+  // if (!logged) {
+  //   child = null
+  //   const cmdd = new Command(cmd, [...args, ''], { cwd: null || null, env: _getEnv() })
+  //   cmdd.stderr.on('data', line => console.log(line))
+  //   cmdd.on('close', data => {
+  //     console.log(`command finished with code ${data.code} and signal ${data.signal}`)
+  //     child = null
+      
+  //   })
+  //   cmdd.on('error', error => console.log(error))
+  //   cmdd.spawn()
+  //   .then(c => {
+  //     child = c
+  //   })
+  //   .catch(r => console.log(r))
+  //   // logged = true
+  // }
+
   child = null
-  const command = new Command(cmd, [...args, `cd ${cwd}; ` + wrapper['script']], { cwd: null || null, env: _getEnv() })
+  console.log("cwd", cwd)
+  const command = new Command(cmd, [...args, `cd ${cwd};` + wrapper['script']], { cwd: null || null, env: _getEnv() })
   
   command.stdout.on('data', line => {
     res.push(wrapper['processor'](line))

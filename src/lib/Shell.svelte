@@ -85,8 +85,8 @@
           title = ttle
           document.title = ttle
           console.log("ttle", ttle)
-          if (ttle.startsWith("ion@asus:")) {
-            cwd = ttle.substring(10)
+          if (ttle.includes(":")) {
+            cwd = ttle.substring(ttle.indexOf(":") + 1)
             console.log("cwd", cwd)
           }
         }
