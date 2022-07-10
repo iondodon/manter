@@ -17,7 +17,7 @@
   export const isVisible = (suggestion) => {
     if (script[script.length - 1] == " ") {
       return true
-    } 
+    }
     for (const name of suggestion["names"]) {
       if (name == lastWord || name.startsWith(lastWord)) {
         return true
@@ -84,7 +84,6 @@
       terminal.onTitleChange(function(title) {
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
-            console.log('title', title)
             promptContext = JSON.parse(title)
             return
         }

@@ -22,8 +22,7 @@ export function spawn(wrapper, cwd) {
   let res = []
 
   child = null
-  console.log("cwd", cwd)
-  const command = new Command(cmd, [...args, `cd ${cwd}; ` + wrapper['script']], { cwd: null || null, env: _getEnv() })
+  const command = new Command(cmd, [...args, wrapper['script']], { cwd: cwd || null, env: _getEnv() })
   
   command.stdout.on('data', line => {
     res.push(wrapper['processor'](line))
