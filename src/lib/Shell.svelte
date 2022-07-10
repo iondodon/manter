@@ -10,8 +10,9 @@
   export let lastWord = ''
   export let suggestions = []
   let history = []
-  export let cwd = "~"
-  export let title = ''
+  export let promptContext = {
+    cwd: "~"
+  }
 
   export const isVisible = (suggestion) => {
     if (script[script.length - 1] == " ") {
@@ -80,19 +81,14 @@
 
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
-      terminal.onTitleChange(function(ttle) {
-        if (title != ttle) {          
-          console.log("ttle", ttle)
-
-          if (!ttle.includes(":")) {
-            cwd = ttle
-            console.log("cwd", cwd)
+      terminal.onTitleChange(function(title) {
+        if (title.includes("[manter]")) {
+            title = title.replace("[manter]", "")
+            console.log('title', title)
+            promptContext = JSON.parse(title)
             return
-          }
-
-          title = ttle
-          document.title = ttle
         }
+        document.title = title
       })
 
       websocket.onmessage = function(evt) {
@@ -184,7 +180,7 @@
     let selected = null
     for (let candidatesWrapper of history[script.length - 1]) {
       if (candidatesWrapper['processor']) {
-        candidatesWrapper['values'] = await spawn(candidatesWrapper, cwd)
+        candidatesWrapper['values'] = await spawn(candidatesWrapper, promptContext["cwd"])
         console.log("finished receiving data top", candidatesWrapper['values'])
       }
       
@@ -211,7 +207,7 @@
     history[script.length] = selected['getNext']()
     for (let wrapper of history[script.length]) {
       if (wrapper['processor']) {
-        wrapper['values'] = await spawn(wrapper, cwd)
+        wrapper['values'] = await spawn(wrapper, promptContext["cwd"])
         console.log("finished receiving data bottom", wrapper['values'])
       }
     }

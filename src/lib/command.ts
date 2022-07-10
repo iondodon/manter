@@ -7,7 +7,6 @@ let args = windows ? ['/C'] : ['-c']
 let env = 'SOMETHING=value ANOTHER=2'
 let stdin = ''
 let child
-let logged = false
 
 function _getEnv() {
   return env.split(' ').reduce((env, clause) => {
