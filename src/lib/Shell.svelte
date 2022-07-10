@@ -82,13 +82,16 @@
 
       terminal.onTitleChange(function(ttle) {
         if (title != ttle) {          
+          console.log("ttle", ttle)
+
+          if (!ttle.includes(":")) {
+            cwd = ttle
+            console.log("cwd", cwd)
+            return
+          }
+
           title = ttle
           document.title = ttle
-          console.log("ttle", ttle)
-          if (ttle.includes(":")) {
-            cwd = ttle.substring(ttle.indexOf(":") + 1)
-            console.log("cwd", cwd)
-          }
         }
       })
 
