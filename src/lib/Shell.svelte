@@ -79,6 +79,10 @@
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify({cols: evt.cols, rows: evt.rows})))
       })
 
+      terminal.onSelectionChange(() => {
+        websocket.send(new TextEncoder().encode("\x03"))
+      })
+
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {

@@ -53,6 +53,9 @@ async fn handle_websocket_incoming(
                 2 => {
                     websocket_sender.send(Message::Binary(vec![1u8]))?;
                 }
+                3 => {
+                    mt_log!(Level::Info, "prepare env")
+                }
                 _ => (),
             },
             Message::Ping(data) => websocket_sender.send(Message::Pong(data))?,
@@ -110,10 +113,21 @@ async fn handle_connection(stream: TcpStream) -> Result<(), anyhow::Error> {
 
     let mut cmd = Command::new("su");
     let mut envs: HashMap<String, String> = HashMap::new();
-    envs.insert(
-        "PATH".to_owned(),
-        "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin".to_owned(),
-    );
+    // envs.insert(
+    //     "PATH".to_owned(),
+    //     "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin".to_owned(),
+    // );
+
+    // read all enviroment variables
+    for (key, value) in std::env::vars() {
+        envs.insert(key, value);
+    }
+
+    // print all enviroment variables
+    // for (key, value) in &envs {
+    //     mt_log!(Level::Info, "{}={}", key, value);
+    // }
+
     cmd.envs(&envs).args(&["-", "ion"]);
     let mut pty_cmd = PtyCommand::from(cmd);
     let (stop_sender, stop_receiver) = unbounded_channel();
