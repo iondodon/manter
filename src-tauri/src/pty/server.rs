@@ -68,6 +68,8 @@ async fn handle_websocket_incoming(
                         pty_shell_writer.write_all(format!("export {}={}\n", key, value).as_bytes()).await?;
                         std::thread::sleep(std::time::Duration::from_millis(100));
                     }
+                    let PROMPT_COMMAND = r#" export PROMPT_COMMAND='echo -en "\033]0; [manter] {\"cwd\": \"$(pwd)\"} \a"' \r"#;
+                    pty_shell_writer.write_all(PROMPT_COMMAND.as_bytes()).await?;
                 }
                 _ => (),
             },
