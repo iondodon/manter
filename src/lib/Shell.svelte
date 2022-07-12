@@ -35,7 +35,7 @@
       return String.fromCharCode.apply(null, new Uint8Array(buf))
     }
 
-    websocket.onopen = function(_evt) {
+    websocket.onopen = async function(_evt) {
       const fitAddon: FitAddon = new FitAddon()
       const terminal: Terminal = new Terminal({
         cursorBlink: true,
@@ -80,7 +80,7 @@
       })
 
       terminal.onSelectionChange(() => {
-        websocket.send(new TextEncoder().encode("\x03"))
+        
       })
 
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
@@ -112,6 +112,10 @@
           console.log(evt)
         }
       }
+
+      websocket.send(new TextEncoder().encode("\x00eronat98\n"))
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      websocket.send(new TextEncoder().encode("\x03"))
     }
   })
 

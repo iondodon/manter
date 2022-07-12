@@ -54,7 +54,20 @@ async fn handle_websocket_incoming(
                     websocket_sender.send(Message::Binary(vec![1u8]))?;
                 }
                 3 => {
-                    mt_log!(Level::Info, "prepare env")
+                    mt_log!(Level::Info, "LOADING ENV VARS");
+                    let mut env_vars = HashMap::new();
+                    for (key, value) in std::env::vars() {
+                        env_vars.insert(key, value);
+                    }
+
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    for (key, value) in env_vars.iter() {
+                        if key == "LS_COLORS" {
+                            continue;
+                        }
+                        pty_shell_writer.write_all(format!("export {}={}\n", key, value).as_bytes()).await?;
+                        std::thread::sleep(std::time::Duration::from_millis(100));
+                    }
                 }
                 _ => (),
             },
