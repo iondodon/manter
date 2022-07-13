@@ -64,30 +64,24 @@ async fn handle_websocket_incoming(
 
                     std::thread::sleep(std::time::Duration::from_secs(1));
 
-                    let mut export_cmd = String::from("export ");
-
-                    let mut env_vars_set = HashSet::new();
-                    env_vars_set.insert("LS_COLORS".to_string());
-                    env_vars_set.insert("PS1".to_string());
-                    env_vars_set.insert("PS2".to_string());
-                    env_vars_set.insert("PS3".to_string());
-                    env_vars_set.insert("TTY".to_string());
-                    env_vars_set.insert("PWD".to_string());
+                    let mut load_env_var_script = String::from("export ");
 
                     for (key, value) in env_vars.iter() {
-                        if env_vars_set.contains(key) {
-                            continue;
-                        }
-                        export_cmd.push_str(&format!("{}=\"{}\" ", key, value));
+                        load_env_var_script.push_str(&format!("{}=\"{}\" ", key, value));
                     }
                     
-                    let term_var = "TERM=xterm-256color ";
                     let prompt_commnd = r#"PROMPT_COMMAND='echo -en "\033]0; [manter] {\"cwd\": \"$(pwd)\"} \a"' "#;
-                    export_cmd.push_str(prompt_commnd);
-                    export_cmd.push_str(term_var);
-                    export_cmd.push_str("\n");
+                    load_env_var_script.push_str(prompt_commnd);
 
-                    pty_shell_writer.write_all(export_cmd.as_bytes()).await?;
+                    let term_var = "TERM=xterm-256color ";
+                    load_env_var_script.push_str(term_var);
+
+                    load_env_var_script.push_str("\n");
+                    pty_shell_writer.write_all(load_env_var_script.as_bytes()).await?;
+
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+
+                    pty_shell_writer.write_all("source ~/.bashrc \n".as_bytes()).await?;
                 }
                 _ => (),
             },
