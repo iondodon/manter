@@ -48,6 +48,13 @@
       terminal.open(document.getElementById('terminal'))
       fitAddon.fit()
 
+      document.getElementById('terminal-width').addEventListener('input', function(evt: any) {
+        let val = evt.target.value
+        const terminalHtmlElement = document.getElementById('terminal')
+        terminalHtmlElement.style.width = `${val}px`
+        fitAddon.fit()
+      })
+
       terminal.onData(async function(data: string) {
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
@@ -224,6 +231,9 @@
 </script>
 
 <div>
+  <div>
+    <input type="range" min="1" max="1300" value="1300" id="terminal-width">
+  </div>
   <div id="terminal">
     <div id="suggestions">
       
