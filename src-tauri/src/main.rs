@@ -20,7 +20,7 @@ pub enum Error {
 /// Reads the shell configuration to properly set the PATH environment variable.
 #[cfg(not(windows))]
 pub fn fix() -> std::result::Result<(), Error> {
-  mt_log!(Level::Info, "Entered");
+  mt_log!(Level::Info, "Entered1");
 
   let default_shell = if cfg!(target_os = "macos") {
     "/bin/zsh"

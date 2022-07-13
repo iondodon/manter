@@ -80,9 +80,11 @@ async fn handle_websocket_incoming(
                         }
                         export_cmd.push_str(&format!("{}=\"{}\" ", key, value));
                     }
-
+                    
+                    let term_var = "TERM=xterm-256color ";
                     let prompt_commnd = r#"PROMPT_COMMAND='echo -en "\033]0; [manter] {\"cwd\": \"$(pwd)\"} \a"' "#;
                     export_cmd.push_str(prompt_commnd);
+                    export_cmd.push_str(term_var);
                     export_cmd.push_str("\n");
 
                     pty_shell_writer.write_all(export_cmd.as_bytes()).await?;
