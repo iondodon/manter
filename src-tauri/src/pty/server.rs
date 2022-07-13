@@ -143,21 +143,7 @@ async fn handle_connection(stream: TcpStream) -> Result<(), anyhow::Error> {
     let ws_sender = sender.clone();
 
     let mut cmd = Command::new("su");
-    let mut envs: HashMap<String, String> = HashMap::new();
-    // envs.insert(
-    //     "PATH".to_owned(),
-    //     "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin".to_owned(),
-    // );
-
-    // read all enviroment variables
-    for (key, value) in std::env::vars() {
-        envs.insert(key, value);
-    }
-
-    // print all enviroment variables
-    // for (key, value) in &envs {
-    //     mt_log!(Level::Info, "{}={}", key, value);
-    // }
+    let envs: HashMap<String, String> = HashMap::new();
 
     cmd.envs(&envs).args(&["-", "ion"]);
     let mut pty_cmd = PtyCommand::from(cmd);
