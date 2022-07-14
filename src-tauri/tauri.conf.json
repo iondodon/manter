@@ -78,7 +78,8 @@
         "height": 600,
         "resizable": true,
         "title": "Manter",
-        "width": 800
+        "width": 800,
+        "s"
       }
     ]
   }

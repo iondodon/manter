@@ -48,10 +48,7 @@
       terminal.open(document.getElementById('terminal'))
       fitAddon.fit()
 
-      document.getElementById('terminal-width').addEventListener('input', function(evt: any) {
-        let val = evt.target.value
-        const terminalHtmlElement = document.getElementById('terminal')
-        terminalHtmlElement.style.width = `${val}px`
+      addEventListener('resize', (event) => {
         fitAddon.fit()
       })
 
@@ -231,9 +228,6 @@
 </script>
 
 <div>
-  <div>
-    <input type="range" min="1" max="1300" value="1300" id="terminal-width">
-  </div>
   <div id="terminal">
     <div id="suggestions">
       
@@ -252,11 +246,20 @@
           </div>
         {/each}
       {/if}
+
     </div>
   </div>
 </div>
 
 <style lang="scss">
+  #terminal {
+    width: 100%;
+    height: 70%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
   #suggestions {
     z-index: 1000;
     position: absolute;
