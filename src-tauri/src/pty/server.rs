@@ -16,8 +16,8 @@ use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tokio_tungstenite::{accept_async, WebSocketStream};
 use tungstenite::Message;
 
-#[cfg(target_os = "unix")]
-use super::lib_unix::{PtyCommand, PtyMaster};
+#[cfg(target_os = "linux")]
+use super::lib_linux::{PtyCommand, PtyMaster};
 #[cfg(target_os = "windows")]
 use super::lib_windows::{PtyCommand, PtyMaster};
 

@@ -1,4 +1,4 @@
-#![cfg(target_os = "unix")]
+#![cfg(target_os = "linux")]
 
 use core::pin::Pin;
 use core::task::{Context, Poll};
