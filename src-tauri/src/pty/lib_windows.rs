@@ -1,3 +1,5 @@
+#![cfg(target_os = "windows")]
+
 use core::pin::Pin;
 use core::task::{Context, Poll};
 use std::ffi::{CStr, OsStr};

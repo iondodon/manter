@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::process::Command;
 use tokio::sync::mpsc;
-use super::lib::PtyCommand;
+use super::lib_unix::PtyCommand;
 
 async fn run() -> Result<(), anyhow::Error> {
     let mut cmd = Command::new("su");

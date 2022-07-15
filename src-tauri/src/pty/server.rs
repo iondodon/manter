@@ -15,7 +15,13 @@ use tokio::process::Command;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tokio_tungstenite::{accept_async, WebSocketStream};
 use tungstenite::Message;
-use super::lib::{PtyCommand, PtyMaster};
+
+#[cfg(target_os = "unix")]
+use super::lib_unix::{PtyCommand, PtyMaster};
+#[cfg(target_os = "windows")]
+use super::lib_windows::{PtyCommand, PtyMaster};
+
+
 use mt_logger::*;
 use std::collections::HashSet;
 
