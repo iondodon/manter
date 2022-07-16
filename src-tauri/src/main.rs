@@ -4,15 +4,20 @@
 )]
 
 use std::thread;
-use log::{debug, error};
 use mt_logger::*;
 
-mod pty;
+#[cfg(target_os = "linux")]
+mod pty_linux;
+#[cfg(target_os = "windows")]
+mod pty_windows;
 
 fn main() {
   mt_new!(None, Level::Info, OutputStream::Both);
   thread::spawn(|| {
-    pty::server::main();
+    #[cfg(target_os = "linux")]
+    pty_linux::server::main();
+    #[cfg(target_os = "windows")]
+    pty_windows::server::main();
   });
 
   let context = tauri::generate_context!();
