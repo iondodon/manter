@@ -59,7 +59,7 @@ pub fn main() {
 
             println!("Client connected")
         },
-        NetEvent::Message(endpoint, data) => {
+        NetEvent::Message(_endpoint, data) => {
             // convert data to string
             let str_data = std::str::from_utf8(&data[1..]).unwrap();
             let to_write = OsString::from(str_data);
