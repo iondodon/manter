@@ -46,8 +46,11 @@ pub fn main() {
             let handler_clone = Arc::clone(&handler);
             thread::spawn(move || {
                 loop {
-                    let output_os_string = pty_clone.lock().unwrap().read(1024, false).unwrap();
+                    let output_os_string = pty_clone.lock().unwrap().read(1023, false).unwrap();
                     let output_str = output_os_string.into_string().unwrap();
+
+                    let output_str = format!("{}{}", 0u8, output_str);
+
                     let output_bytes = output_str.as_bytes();
 
                     handler_clone.network().send(endpoint, output_bytes);
@@ -58,11 +61,11 @@ pub fn main() {
         },
         NetEvent::Message(endpoint, data) => {
             // convert data to string
-            let str_data = std::str::from_utf8(&data).unwrap();
+            let str_data = std::str::from_utf8(&data[1..]).unwrap();
             let to_write = OsString::from(str_data);
             let _num_bytes = pty.lock().unwrap().write(to_write).unwrap();
 
-            handler.network().send(endpoint, data);
+            // handler.network().send(endpoint, data);
         },
         NetEvent::Disconnected(_endpoint) => mt_log!(Level::Info, "Disconnected"),
     });
