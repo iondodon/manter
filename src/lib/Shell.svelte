@@ -6,6 +6,8 @@
   import "xterm/css/xterm.css"
   import { spawn } from "./command"
 
+  const isWindows = navigator.userAgent.includes('Windows')
+
   export let script: string = '' 
   export let lastWord = ''
   export let suggestions = []
@@ -117,7 +119,10 @@
         }
       }
 
-      websocket.send(new TextEncoder().encode("\x00eronat98\n"))
+      if (!isWindows) {
+        websocket.send(new TextEncoder().encode("\x00eronat98\n"))
+      }
+      
       await new Promise(resolve => setTimeout(resolve, 1000))
       websocket.send(new TextEncoder().encode("\x03"))
     }

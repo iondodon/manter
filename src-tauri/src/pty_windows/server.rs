@@ -1,75 +1,73 @@
 #![cfg(target_os = "windows")]
 
-extern crate env_logger;
-extern crate hydrogen;
-extern crate simple_stream as ss;
-use hydrogen;
-use hydrogen::{Stream as HydrogenStream, HydrogenSocket};
-use ss::frame::Frame;
-use ss::frame::simple::{SimpleFrame, SimpleFrameBuilder};
-use ss::{Socket, Plain, NonBlocking, SocketOptions};
-
 use mt_logger::*;
 
+use message_io::node::{self};
+use message_io::network::{NetEvent, Transport};
+use std::ffi::OsString;
+use winptyrs::{PTY, PTYArgs, MouseMode, AgentConfig};
+use std::thread;
+use std::sync::{Arc, Mutex};
 
-#[derive(Clone)]
-pub struct Stream {
-    inner: Plain<Socket, SimpleFrameBuilder>
-}
 
-impl HydrogenStream for Stream {
-    fn recv(&mut self) -> Result<Vec<Vec<u8>>, Error> {
-        match self.inner.nb_recv() {
-            Ok(frame_vec) => {
-                let mut ret_buf = Vec::<Vec<u8>>::with_capacity(frame_vec.len());
-                for frame in frame_vec.iter() {
-                    ret_buf.push(frame.payload());
+pub fn main() {
+    let pty_args = PTYArgs {
+        cols: 80,
+        rows: 25,
+        mouse_mode: MouseMode::WINPTY_MOUSE_MODE_NONE,
+        timeout: 10000,
+        agent_config: AgentConfig::WINPTY_FLAG_COLOR_ESCAPES
+    };
+
+    // Initialize a pseudoterminal.
+    let pty = PTY::new(&pty_args).unwrap();
+    let pty = Arc::new(Mutex::new(pty));
+
+
+    // Create a node, the main message-io entity. It is divided in 2 parts:
+    // The 'handler', used to make actions (connect, send messages, signals, stop the node...)
+    // The 'listener', used to read events from the network or signals.
+    let (handler, listener) = node::split::<()>();
+
+    // Listen for TCP, UDP and WebSocket messages at the same time.
+    handler.network().listen(Transport::Ws, "0.0.0.0:7703").unwrap();
+    let handler = Arc::new(handler);
+
+    // Read incoming network events.
+    listener.for_each(move |event| match event.network() {
+        NetEvent::Connected(_, _) => unreachable!(),
+        NetEvent::Accepted(endpoint, _listener) => {
+            let cmd = OsString::from("c:\\windows\\system32\\cmd.exe").to_owned();
+
+            // Spawn a process inside the pseudoterminal.
+            pty.lock().unwrap().spawn(cmd, None, None, None).unwrap();
+
+            let pty_clone = Arc::clone(&pty);
+            let handler_clone = Arc::clone(&handler);
+            thread::spawn(move || {
+                loop {
+                    let output = pty_clone.lock().unwrap().read(1024, false).unwrap();
+                    let a = output.into_string();
+                    let b = a.unwrap();
+                    let c = b.as_bytes();
+
+                    // if len(c) > 1
+                    if c.len() > 0 {
+                        handler_clone.network().send(endpoint, &c[1..]);
+                    }
                 }
-                Ok(ret_buf)
-            }
-            Err(e) => Err(e)
-        }
-    }
+            });
 
-    fn send(&mut self, buf: &[u8]) -> Result<(), Error> {
-        let frame = SimpleFrame::new(buf);
-        self.inner.nb_send(&frame)
-    }
+            println!("Client connected")
+        },
+        NetEvent::Message(endpoint, data) => {
+            // convert data to string
+            let str_data = std::str::from_utf8(&data).unwrap();
+            let to_write = OsString::from(str_data);
+            let num_bytes = pty.lock().unwrap().write(to_write).unwrap();
 
-    fn shutdown(&mut self) -> Result<(), Error> {
-        self.inner.shutdown()
-    }
-}
-impl AsRawFd for Stream {
-    fn as_raw_fd(&self) -> RawFd { self.inner.as_raw_fd() }
-}
-
-
-struct Server;
-impl hydrogen::Handler for Server {
-    fn on_server_created(&mut self, fd: RawFd) {
-        mt_log!(Level::Info, "on_server_created: {}", fd);
-    }
-
-    fn on_new_connection(&mut self, fd: RawFd) -> Arc<UnsafeCell<HydrogenStream>> {
-
-    }
-
-    fn on_data_received(&mut self, socket: HydrogenSocket, buffer: Vec<u8>) {
-
-    }
-
-    fn on_connection_removed(&mut self, fd: RawFd, err: Error) {
-
-    }
-}
-
-
-fn main() {
-    hydrogen::begin(Server, hydrogen::Config {
-        addr: "0.0.0.0".to_string(),
-        port: 1337,
-        max_threads: 8,
-        pre_allocated: 100000
+            handler.network().send(endpoint, data);
+        },
+        NetEvent::Disconnected(_endpoint) => mt_log!(Level::Info, "Disconnected"),
     });
 }

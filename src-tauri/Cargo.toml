@@ -34,8 +34,9 @@ tungstenite = "0.17.3"
 mt_logger = "3.0.2"
 thiserror = "1"
 strip-ansi-escapes = "0.1"
-hydrogen = "0.1.5"
-simple-stream = "0.10.1"
+tokio-stream = "0.1.6"
+warp = "0.3"
+message-io = "0.14.6"
 
 [target.'cfg(windows)'.dependencies]
 winpty-rs = "0.3"
