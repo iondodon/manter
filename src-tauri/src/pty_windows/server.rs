@@ -46,15 +46,11 @@ pub fn main() {
             let handler_clone = Arc::clone(&handler);
             thread::spawn(move || {
                 loop {
-                    let output = pty_clone.lock().unwrap().read(1024, false).unwrap();
-                    let a = output.into_string();
-                    let b = a.unwrap();
-                    let c = b.as_bytes();
+                    let output_os_string = pty_clone.lock().unwrap().read(1024, false).unwrap();
+                    let output_str = output_os_string.into_string().unwrap();
+                    let output_bytes = output_str.as_bytes();
 
-                    // if len(c) > 1
-                    if c.len() > 0 {
-                        handler_clone.network().send(endpoint, &c[1..]);
-                    }
+                    handler_clone.network().send(endpoint, output_bytes);
                 }
             });
 
@@ -64,7 +60,7 @@ pub fn main() {
             // convert data to string
             let str_data = std::str::from_utf8(&data).unwrap();
             let to_write = OsString::from(str_data);
-            let num_bytes = pty.lock().unwrap().write(to_write).unwrap();
+            let _num_bytes = pty.lock().unwrap().write(to_write).unwrap();
 
             handler.network().send(endpoint, data);
         },

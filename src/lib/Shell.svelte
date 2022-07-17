@@ -62,7 +62,7 @@
         suggestions = history[script.length]
       })
 
-      function updateSuggestionsDivLocation(suggestions) {
+      function updateSuggestionsDivLocation() {
         const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
         const rect = cursorHtml.getBoundingClientRect()
         const suggestionsElement = document.getElementById('suggestions')
@@ -78,7 +78,7 @@
       }
 
       terminal.onCursorMove(() => {
-        updateSuggestionsDivLocation(suggestions)
+        updateSuggestionsDivLocation()
       })
 
       terminal.onResize(function(evt) {
@@ -92,6 +92,7 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
+        console.log('title change', title)
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
             promptContext = JSON.parse(title)
@@ -124,7 +125,10 @@
       }
       
       await new Promise(resolve => setTimeout(resolve, 1000))
-      websocket.send(new TextEncoder().encode("\x03"))
+
+      if (!isWindows) {
+        websocket.send(new TextEncoder().encode("\x03"))
+      }
     }
   })
 
