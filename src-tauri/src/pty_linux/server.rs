@@ -1,4 +1,4 @@
-#![cfg(target_os = "linux")]
+#![cfg(any(target_os = "linux", target_os = "macos"))]
 
 extern crate env_logger;
 extern crate futures;
@@ -18,7 +18,6 @@ use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tokio_tungstenite::{accept_async, WebSocketStream};
 use tungstenite::Message;
 
-#[cfg(target_os = "linux")]
 use super::lib::{PtyCommand, PtyMaster};
 
 use mt_logger::*;
