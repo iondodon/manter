@@ -12,8 +12,6 @@ use std::sync::Arc;
 use tokio::io::unix::AsyncFd;
 use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt, Error, ReadBuf};
 use tokio::sync::mpsc;
-use std::fmt;
-use mt_logger::*;
 
 pub struct PtyMaster {
     inner: Arc<AsyncFd<File>>,
@@ -203,7 +201,7 @@ impl AsyncWrite for PtyMaster {
     fn poll_shutdown(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
         if self
             .closed
-            .compare_and_swap(false, true, core::sync::atomic::Ordering::SeqCst)
+            .compare_exchange(false, true, core::sync::atomic::Ordering::SeqCst, core::sync::atomic::Ordering::SeqCst).unwrap()
         {
             return Poll::Ready(Ok(()));
         }
