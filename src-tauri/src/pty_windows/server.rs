@@ -4,10 +4,17 @@ use mt_logger::*;
 
 use message_io::node::{self};
 use message_io::network::{NetEvent, Transport};
+use serde::Deserialize;
 use std::ffi::OsString;
 use winptyrs::{PTY, PTYArgs, MouseMode, AgentConfig};
 use std::thread;
 use std::sync::{Arc, Mutex};
+
+#[derive(Deserialize, Debug)]
+struct WindowSize {
+    cols: i32,
+    rows: i32,
+}
 
 
 pub fn main() {
@@ -58,10 +65,20 @@ pub fn main() {
             println!("Client connected")
         },
         NetEvent::Message(_endpoint, data) => {
-            // convert data to string
-            let str_data = std::str::from_utf8(&data[1..]).unwrap();
-            let to_write = OsString::from(str_data);
-            let _num_bytes = pty.lock().unwrap().write(to_write).unwrap();
+            match data[0] {
+                0 => {
+                    let str_data = std::str::from_utf8(&data[1..]).unwrap();
+                    let to_write = OsString::from(str_data);
+                    let _num_bytes = pty.lock().unwrap().write(to_write).unwrap();
+                },
+                1 => {
+                    let resize_msg: WindowSize = serde_json::from_slice(&data[1..]).unwrap();
+                    let _ = pty.lock().unwrap().set_size(resize_msg.cols, resize_msg.rows);
+                },
+                _ => {
+                    mt_log!(Level::Info, "Unknown message: {:?}", data);
+                }
+            }
         },
         NetEvent::Disconnected(_endpoint) => mt_log!(Level::Info, "Disconnected"),
     });
