@@ -1,4 +1,4 @@
-#![cfg(target_os = "linux")]
+#![cfg(any(target_os = "linux", target_os = "macos"))]
 
 extern crate env_logger;
 extern crate futures;
@@ -18,7 +18,6 @@ use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 use tokio_tungstenite::{accept_async, WebSocketStream};
 use tungstenite::Message;
 
-#[cfg(target_os = "linux")]
 use super::lib::{PtyCommand, PtyMaster};
 
 use mt_logger::*;
@@ -85,7 +84,16 @@ async fn handle_websocket_incoming(
 
                     std::thread::sleep(std::time::Duration::from_secs(1));
 
+                    #[cfg(target_os = "linux")]
                     pty_shell_writer.write_all("source ~/.bashrc \n".as_bytes()).await?;
+                
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all("source ~/.profile \n".as_bytes()).await?;
+
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all("source ~/.zshenv \n".as_bytes()).await?;
                 }
                 _ => (),
             },

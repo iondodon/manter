@@ -1,4 +1,4 @@
-#![cfg(target_os = "linux")]
+#![cfg(any(target_os = "linux", target_os = "macos"))]
 
 use core::pin::Pin;
 use core::task::{Context, Poll};
@@ -12,8 +12,6 @@ use std::sync::Arc;
 use tokio::io::unix::AsyncFd;
 use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt, Error, ReadBuf};
 use tokio::sync::mpsc;
-use std::fmt;
-use mt_logger::*;
 
 pub struct PtyMaster {
     inner: Arc<AsyncFd<File>>,
@@ -34,7 +32,13 @@ impl Clone for PtyMaster {
 impl PtyMaster {
     pub fn new() -> Result<Self, std::io::Error> {
         let inner = unsafe {
-            let fd = libc::posix_openpt(libc::O_RDWR | libc::O_NOCTTY);
+            const APPLY_NONBLOCK_AFTER_OPEN: bool = cfg!(target_os = "freebsd");
+
+            let fd = if APPLY_NONBLOCK_AFTER_OPEN {
+                libc::posix_openpt(libc::O_RDWR | libc::O_NOCTTY)
+            } else {
+                libc::posix_openpt(libc::O_RDWR | libc::O_NOCTTY | libc::O_NONBLOCK)
+            };
 
             if fd < 0 {
                 return Err(std::io::Error::last_os_error());
@@ -48,13 +52,15 @@ impl PtyMaster {
                 return Err(std::io::Error::last_os_error());
             }
 
-            let flags = libc::fcntl(fd, libc::F_GETFL, 0);
-            if flags < 0 {
-                return Err(std::io::Error::last_os_error());
-            }
+            if APPLY_NONBLOCK_AFTER_OPEN {
+                let flags = libc::fcntl(fd, libc::F_GETFL, 0);
+                if flags < 0 {
+                    return Err(std::io::Error::last_os_error());
+                }
 
-            if libc::fcntl(fd, libc::F_SETFL, flags | libc::O_NONBLOCK) == -1 {
-                return Err(std::io::Error::last_os_error());
+                if libc::fcntl(fd, libc::F_SETFL, flags | libc::O_NONBLOCK) == -1 {
+                    return Err(std::io::Error::last_os_error());
+                }
             }
 
             AsyncFd::new(std::fs::File::from_raw_fd(fd))?
@@ -70,22 +76,23 @@ impl PtyMaster {
         let mut buf: [libc::c_char; 512] = [0; 512];
         let fd = self.as_raw_fd();
 
-        if unsafe { libc::ptsname_r(fd, buf.as_mut_ptr(), buf.len()) } != 0 {
-            return Err(std::io::Error::last_os_error());
+        #[cfg(not(any(target_os = "macos", target_os = "freebsd")))]
+        {
+            if unsafe { libc::ptsname_r(fd, buf.as_mut_ptr(), buf.len()) } != 0 {
+                return Err(io::Error::last_os_error());
+            }
+        }
+        #[cfg(any(target_os = "macos", target_os = "freebsd"))]
+        unsafe {
+            let st = libc::ptsname(fd);
+            if st.is_null() {
+                return Err(std::io::Error::last_os_error());
+            }
+            libc::strncpy(buf.as_mut_ptr(), st, buf.len());
         }
 
         let ptsname = OsStr::from_bytes(unsafe { CStr::from_ptr(&buf as _) }.to_bytes());
-        match std::fs::OpenOptions::new()
-            .read(true)
-            .write(true)
-            .open(ptsname)
-        {
-            Ok(slave) => {
-                self.slave.replace(slave.try_clone().unwrap());
-                Ok(slave)
-            }
-            Err(e) => Err(e),
-        }
+        std::fs::OpenOptions::new().read(true).write(true).open(ptsname)
     }
 
     pub fn resize(
@@ -203,7 +210,7 @@ impl AsyncWrite for PtyMaster {
     fn poll_shutdown(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Result<(), Error>> {
         if self
             .closed
-            .compare_and_swap(false, true, core::sync::atomic::Ordering::SeqCst)
+            .compare_exchange(false, true, core::sync::atomic::Ordering::SeqCst, core::sync::atomic::Ordering::SeqCst).unwrap()
         {
             return Poll::Ready(Ok(()));
         }
