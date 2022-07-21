@@ -84,6 +84,18 @@ async fn handle_websocket_incoming(
 
                     std::thread::sleep(std::time::Duration::from_secs(1));
 
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all(r#" prmptcmd() { eval "$PROMPT_COMMAND" } "#.as_bytes()).await?;
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all("\n".as_bytes()).await?;
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all(r#" precmd_functions=(prmptcmd) "#.as_bytes()).await?;
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all("\n".as_bytes()).await?;
+
+
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+
                     #[cfg(target_os = "linux")]
                     pty_shell_writer.write_all("source ~/.bashrc \n".as_bytes()).await?;
                 

@@ -89,6 +89,10 @@
         
       })
 
+      terminal.onBell(() => {
+        console.log("bell")
+      })
+
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {

@@ -79,7 +79,7 @@ impl PtyMaster {
         #[cfg(not(any(target_os = "macos", target_os = "freebsd")))]
         {
             if unsafe { libc::ptsname_r(fd, buf.as_mut_ptr(), buf.len()) } != 0 {
-                return Err(io::Error::last_os_error());
+                return Err(std::io::Error::last_os_error());
             }
         }
         #[cfg(any(target_os = "macos", target_os = "freebsd"))]
