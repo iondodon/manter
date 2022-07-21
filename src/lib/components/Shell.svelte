@@ -5,6 +5,7 @@
   import { FitAddon }   from "xterm-addon-fit"
   import "xterm/css/xterm.css"
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
+  import { COMMANDS } from "../suggestions/library/commands"
 
   const isWindows = navigator.userAgent.includes('Windows')
   const PTY_WS_ADDRESS = "ws://127.0.0.1:7703"
@@ -142,48 +143,10 @@
     return words[words.length - 1]
   }
 
-
-  const files = {
-      script: "ls -a",
-      processor: function (line) {
-        return {
-          'names': [line],
-          'description': 'description of first file',
-          'getNext': function() { return [files] }
-        }
-      }
-  }
-  
-
-  const lsOptions = {
-    values: [
-      {
-        'names': ['-a', '--all'],
-        'description': 'ls all - description',
-        'getNext': function() { return [lsOptions, files] }
-      }
-    ]
-  }
-
-  const commands = {
-    values: [
-      {
-        'names': ['ls'],
-        'description': "ls description",
-        'getNext': function() { return [lsOptions, files] }
-      },
-      {
-        'names': ['sudo'],
-        'description': "super user do",
-        'getNext': function() { return [commands] }
-      }
-    ]
-  }
-
-  history = [ [commands] ]
+  history = [ [COMMANDS] ]
   const getSuggestions = async (data: string) => {
     if (data === '\n' || data === '\r' || data == '\x03') {
-      history = [ [commands] ]
+      history = [ [COMMANDS] ]
       script = ''
       return
     }
