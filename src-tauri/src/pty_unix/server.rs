@@ -1,4 +1,4 @@
-#![cfg(any(target_os = "linux", target_os = "macos"))]
+#![cfg(unix)]
 
 extern crate env_logger;
 extern crate futures;

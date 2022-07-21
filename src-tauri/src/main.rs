@@ -6,16 +6,16 @@
 use std::thread;
 use mt_logger::*;
 
-#[cfg(any(target_os = "linux", target_os = "macos"))]
-mod pty_linux;
+#[cfg(unix)]
+mod pty_unix;
 #[cfg(target_os = "windows")]
 mod pty_windows;
 
 fn main() {
   mt_new!(None, Level::Info, OutputStream::Both);
   thread::spawn(|| {
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
-    pty_linux::server::main();
+    #[cfg(unix)]
+    pty_unix::server::main();
     #[cfg(target_os = "windows")]
     pty_windows::server::main();
   });
