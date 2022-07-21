@@ -7,7 +7,6 @@ use bytes::BytesMut;
 use futures::SinkExt;
 use futures::StreamExt;
 use futures_util::stream::{SplitSink, SplitStream};
-use libc::CTL_DEBUG;
 use log::{debug, error};
 use serde_derive::Deserialize;
 use std::collections::HashMap;
