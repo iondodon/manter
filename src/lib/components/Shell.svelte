@@ -4,9 +4,10 @@
   import { Terminal }  from "xterm"
   import { FitAddon }   from "xterm-addon-fit"
   import "xterm/css/xterm.css"
-  import { spawn } from "./command"
+  import { getDynamicValues } from "../suggestions/GetDynamicValues"
 
   const isWindows = navigator.userAgent.includes('Windows')
+  const PTY_WS_ADDRESS = "ws://127.0.0.1:7703"
 
   export let script: string = '' 
   export let lastWord = ''
@@ -29,7 +30,7 @@
   }
 
   onMount(async () => {
-    const websocket = new WebSocket("ws://127.0.0.1:7703")
+    const websocket = new WebSocket(PTY_WS_ADDRESS)
     websocket.binaryType = "arraybuffer"
 
 
@@ -204,7 +205,7 @@
     let selected = null
     for (let candidatesWrapper of history[script.length - 1]) {
       if (candidatesWrapper['processor']) {
-        candidatesWrapper['values'] = await spawn(candidatesWrapper, promptContext["cwd"])
+        candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, promptContext["cwd"])
         console.log("finished receiving data top", candidatesWrapper['values'])
       }
       
@@ -231,7 +232,7 @@
     history[script.length] = selected['getNext']()
     for (let wrapper of history[script.length]) {
       if (wrapper['processor']) {
-        wrapper['values'] = await spawn(wrapper, promptContext["cwd"])
+        wrapper['values'] = await getDynamicValues(wrapper, promptContext["cwd"])
         console.log("finished receiving data bottom", wrapper['values'])
       }
     }

@@ -1,5 +1,5 @@
 <script type="ts">
-  import Shell from './lib/Shell.svelte'
+  import Shell from './lib/components/Shell.svelte'
 </script>
 
 <main>
