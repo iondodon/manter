@@ -7,6 +7,7 @@ use bytes::BytesMut;
 use futures::SinkExt;
 use futures::StreamExt;
 use futures_util::stream::{SplitSink, SplitStream};
+use libc::CTL_DEBUG;
 use log::{debug, error};
 use serde_derive::Deserialize;
 use std::collections::HashMap;
@@ -81,6 +82,18 @@ async fn handle_websocket_incoming(
 
                     load_env_var_script.push_str("\n");
                     pty_shell_writer.write_all(load_env_var_script.as_bytes()).await?;
+
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all(r#" prmptcmd() { eval "$PROMPT_COMMAND" } "#.as_bytes()).await?;
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all("\n".as_bytes()).await?;
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all(r#" precmd_functions=(prmptcmd) "#.as_bytes()).await?;
+                    #[cfg(target_os = "macos")]
+                    pty_shell_writer.write_all("\n".as_bytes()).await?;
+
 
                     std::thread::sleep(std::time::Duration::from_secs(1));
 
