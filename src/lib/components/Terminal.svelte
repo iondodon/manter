@@ -6,17 +6,13 @@
   import "xterm/css/xterm.css"
   import SuggestionsBox from "./SuggestionsBox.svelte"
   import { IS_WINDOWS, PTY_WS_ADDRESS } from "../config/config"
+  import { ab2str } from "../utils/utils"
 
   let suggestionsBox;
 
   onMount(async () => {
     const websocket = new WebSocket(PTY_WS_ADDRESS)
     websocket.binaryType = "arraybuffer"
-
-
-    const ab2str = (buf: ArrayBuffer) => {
-      return String.fromCharCode.apply(null, new Uint8Array(buf))
-    }
 
     websocket.onopen = async function(_evt) {
       const fitAddon: FitAddon = new FitAddon()
@@ -39,7 +35,7 @@
         let encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
 
-        await suggestionsBox.getSuggestions(data)
+        await suggestionsBox.updateSuggestions(data)
       })
 
       terminal.onCursorMove(() => {

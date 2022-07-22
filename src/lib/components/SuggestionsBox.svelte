@@ -104,7 +104,7 @@
     }
   }
 
-  export const getSuggestions = async (data: string) => {
+  export const updateSuggestions = async (data: string) => {
     await processSuggestions(data)
     suggestions = history[script.length]
   }
