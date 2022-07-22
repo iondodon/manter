@@ -9,6 +9,9 @@
   import { ab2str } from "../utils/utils"
 
   let suggestionsBox;
+  let promptContext = {
+    cwd: "~"
+  }
 
   onMount(async () => {
     const websocket = new WebSocket(PTY_WS_ADDRESS)
@@ -32,14 +35,13 @@
       })
 
       terminal.onData(async function(data: string) {
-        let encodedData = new TextEncoder().encode("\x00" + data)
+        const encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
-
-        await suggestionsBox.updateSuggestions(data)
+        await suggestionsBox.updateSuggestions(data, promptContext)
       })
 
       terminal.onCursorMove(() => {
-        suggestionsBox.updateSuggestionsDivLocation()
+        suggestionsBox.bringSuggestionsToCursor()
       })
 
       terminal.onResize(function(evt) {
@@ -60,7 +62,7 @@
         console.log('title change', title)
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
-            suggestionsBox.promptContext = JSON.parse(title)
+            promptContext = JSON.parse(title)
             return
         }
         document.title = title

@@ -4,16 +4,12 @@
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/library/commands"
 
+  let script: string = ''
+  let lastWord = ''
+  let suggestions = []
+  let suggestionsCarrier = [ [COMMANDS] ]
 
-  export let script: string = ''
-  export let lastWord = ''
-  export let suggestions = []
-  let history = []
-  export let promptContext = {
-    cwd: "~"
-  }
-
-  export const isVisible = (suggestion) => {
+  const isVisible = (suggestion) => {
     if (script[script.length - 1] == " ") {
       return true
     }
@@ -25,54 +21,37 @@
     return false
   }
 
-  export const updateSuggestionsDivLocation = () => {
-    const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
-    const rect = cursorHtml.getBoundingClientRect()
-    const suggestionsElement = document.getElementById('suggestions')
-
-    if (script.length == 0) {
-      suggestionsElement.style.display = 'none'
-      return
-    }
-
-    suggestionsElement.style.display = 'block'
-    suggestionsElement.style.top = `${rect.top + 20}px`
-    suggestionsElement.style.left = `${rect.left + 10}px`
-  }
-
-  const getLastWordsFromScript = (script: string): string => {
+  const getLastScriptWord = (script: string): string => {
     const words = script.trim().split(' ')
     return words[words.length - 1]
   }
 
-  history = [ [COMMANDS] ]
-
-  const processSuggestions = async (data: string) => {
-    if (data === '\n' || data === '\r' || data == '\x03') {
-      history = [ [COMMANDS] ]
+  const processSuggestions = async (newCmdInput: string, promptContext: object) => {
+    if (newCmdInput === '\n' || newCmdInput === '\r' || newCmdInput == '\x03') {
+      suggestionsCarrier = [ [COMMANDS] ]
       script = ''
       return
     }
 
-    if (data === '\b' || data === '\x7f') {
+    if (newCmdInput === '\b' || newCmdInput === '\x7f') {
       if (script.length > 0) {
         script = script.slice(0, -1)
       }
     } else {
-      script += data
+      script += newCmdInput
     }
 
-    lastWord = getLastWordsFromScript(script)
+    lastWord = getLastScriptWord(script)
 
     if (script.length == 0) {
       return
     }
 
     let selected = null
-    for (let candidatesWrapper of history[script.length - 1]) {
+    for (let candidatesWrapper of suggestionsCarrier[script.length - 1]) {
       if (candidatesWrapper['processor']) {
         candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, promptContext["cwd"])
-        console.log("finished receiving data top", candidatesWrapper['values'])
+        console.log("finished receiving newCmdInput top", candidatesWrapper['values'])
       }
       
       let candidates = candidatesWrapper['values']
@@ -91,22 +70,38 @@
     }
 
     if (!selected) {
-      history[script.length] = history[script.length - 1]
+      suggestionsCarrier[script.length] = suggestionsCarrier[script.length - 1]
       return
     }
 
-    history[script.length] = selected['getNext']()
-    for (let wrapper of history[script.length]) {
+    suggestionsCarrier[script.length] = selected['getNext']()
+    for (let wrapper of suggestionsCarrier[script.length]) {
       if (wrapper['processor']) {
         wrapper['values'] = await getDynamicValues(wrapper, promptContext["cwd"])
-        console.log("finished receiving data bottom", wrapper['values'])
+        console.log("finished receiving newCmdInput bottom", wrapper['values'])
       }
     }
   }
 
-  export const updateSuggestions = async (data: string) => {
-    await processSuggestions(data)
-    suggestions = history[script.length]
+  export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
+    await processSuggestions(newCmdInput, promptContext)
+    suggestions = suggestionsCarrier[script.length]
+  }
+
+  export const bringSuggestionsToCursor = () => {
+    const suggestionsElement = document.getElementById('suggestions-box')
+    
+    if (script.length == 0) {
+      suggestionsElement.style.display = 'none'
+      return
+    }
+
+    const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
+    const rect = cursorHtml.getBoundingClientRect()
+
+    suggestionsElement.style.display = 'block'
+    suggestionsElement.style.top = `${rect.top + 20}px`
+    suggestionsElement.style.left = `${rect.left + 10}px`
   }
 </script>
 
