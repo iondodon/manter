@@ -111,7 +111,7 @@
 </script>
 
 
-<div id="suggestions">
+<div id="suggestions-box">
   {#if suggestions}
     {#each suggestions as wrapper}
       <div class="suggestions-wrapper suggestion-item">
@@ -131,7 +131,7 @@
 
 
 <style type="scss">
-  #suggestions {
+  #suggestions-box {
     z-index: 1000;
     position: absolute;
     top: 0;
