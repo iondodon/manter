@@ -18,7 +18,7 @@ function _getEnv() {
   }, {})
 }
 
-export function spawn(wrapper, cwd) {
+export function getDynamicValues(wrapper, cwd) {
   let res = []
 
   child = null

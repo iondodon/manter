@@ -1,9 +1,9 @@
 <script type="ts">
-  import Shell from './lib/Shell.svelte'
+  import Terminal from './lib/components/Terminal.svelte'
 </script>
 
 <main>
-    <Shell/>
+    <Terminal/>
 </main>
 
 <style type="scss">
