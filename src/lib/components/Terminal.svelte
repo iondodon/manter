@@ -8,7 +8,7 @@
   import { IS_WINDOWS, PTY_WS_ADDRESS } from "../config/config"
   import { ab2str } from "../utils/utils"
 
-  let suggestionsBox;
+  let suggestionsBox: SuggestionsBox;
   let promptContext = {
     cwd: "~"
   }
