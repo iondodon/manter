@@ -40,6 +40,7 @@ message-io = "0.14.6"
 
 [target.'cfg(windows)'.dependencies]
 winpty-rs = "0.3"
+conpty = "0.3.0"
 
 [dev-dependencies]
 
