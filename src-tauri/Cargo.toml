@@ -37,10 +37,15 @@ strip-ansi-escapes = "0.1"
 tokio-stream = "0.1.6"
 warp = "0.3"
 message-io = "0.14.6"
+websocket = "0.26.5"
 
 [target.'cfg(windows)'.dependencies]
 winpty-rs = "0.3"
 conpty = "0.3.0"
+winapi = "0.3.9"
+widestring = "1.0.2"
+vte = "0.11.0"
+portable-pty = "0.7.0"
 
 [dev-dependencies]
 

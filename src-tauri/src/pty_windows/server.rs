@@ -1,85 +1,83 @@
 #![cfg(target_os = "windows")]
 
-use mt_logger::*;
-
-use message_io::node::{self};
-use message_io::network::{NetEvent, Transport};
-use serde::Deserialize;
-use std::ffi::OsString;
-use winptyrs::{PTY, PTYArgs, MouseMode, AgentConfig};
+use std::io::{Write, Read};
+use std::net::TcpStream;
 use std::thread;
-use std::sync::{Arc, Mutex};
+use bytes::BytesMut;
+use conpty::io::PipeReader;
+use websocket::sync::{Server, Writer};
+use websocket::OwnedMessage;
+use mt_logger::*;
+use portable_pty::{CommandBuilder, PtySize, native_pty_system, PtySystem};
+use anyhow::Error;
 
-#[derive(Deserialize, Debug)]
-struct WindowSize {
-    cols: i32,
-    rows: i32,
+fn listen_pty(mut reader: Box<dyn Read + Send>, mut sender: Writer<TcpStream>) {
+    let mut buffer = BytesMut::with_capacity(1024);
+    buffer.resize(1024, 0u8);
+    loop {
+        buffer[0] = 0u8;
+        let mut tail = &mut buffer[1..];
+        let n = reader.read(&mut tail).unwrap();
+        if n == 0 {
+            break;
+        }
+        sender.send_message(&OwnedMessage::Text(String::from_utf8_lossy(&buffer[..n + 1]).to_string())).unwrap();
+    }
 }
 
 
 pub fn main() {
-    let pty_args = PTYArgs {
-        cols: 80,
-        rows: 25,
-        mouse_mode: MouseMode::WINPTY_MOUSE_MODE_NONE,
-        timeout: 10000,
-        agent_config: AgentConfig::WINPTY_FLAG_COLOR_ESCAPES
-    };
+	let server = Server::bind("127.0.0.1:7703").unwrap();
 
-    // Initialize a pseudoterminal.
-    let pty = PTY::new(&pty_args).unwrap();
-    let pty = Arc::new(Mutex::new(pty));
+	for request in server.filter_map(Result::ok) {
+		thread::spawn(|| {
+			let client = request.accept().unwrap();
 
+			let ip = client.peer_addr().unwrap();
 
-    // Create a node, the main message-io entity. It is divided in 2 parts:
-    // The 'handler', used to make actions (connect, send messages, signals, stop the node...)
-    // The 'listener', used to read events from the network or signals.
-    let (handler, listener) = node::split::<()>();
+			mt_log!(Level::Info, "Connection from {}", ip);
 
-    // Listen for TCP, UDP and WebSocket messages at the same time.
-    handler.network().listen(Transport::Ws, "0.0.0.0:7703").unwrap();
-    let handler = Arc::new(handler);
+			let (mut receiver, sender) = client.split().unwrap();
 
-    // Read incoming network events.
-    listener.for_each(move |event| match event.network() {
-        NetEvent::Connected(_, _) => unreachable!(),
-        NetEvent::Accepted(endpoint, _listener) => {
-            let cmd = OsString::from("c:\\windows\\system32\\cmd.exe").to_owned();
+            // Use the native pty implementation for the system
+            let pty_system = native_pty_system();
 
-            // Spawn a process inside the pseudoterminal.
-            pty.lock().unwrap().spawn(cmd, None, None, None).unwrap();
+            // Create a new pty
+            let mut pair = pty_system.openpty(PtySize {
+                rows: 24,
+                cols: 80,
+                // Not all systems support pixel_width, pixel_height,
+                // but it is good practice to set it to something
+                // that matches the size of the selected font.  That
+                // is more complex than can be shown here in this
+                // brief example though!
+                pixel_width: 0,
+                pixel_height: 0,
+            }).unwrap();
 
-            let pty_clone = Arc::clone(&pty);
-            let handler_clone = Arc::clone(&handler);
-            thread::spawn(move || {
-                loop {
-                    let output_os_string = pty_clone.lock().unwrap().read(1023, false).unwrap();
-                    let output_str = output_os_string.into_string().unwrap();
-                    let output_str = format!("{}{}", 0u8, output_str);
-                    let output_bytes = output_str.as_bytes();
+            // Spawn a shell into the pty
+            let cmd = CommandBuilder::new("powershell");
+            let child = pair.slave.spawn_command(cmd).unwrap();
 
-                    handler_clone.network().send(endpoint, output_bytes);
-                }
+            // Read and parse output from the pty with reader
+            let mut reader = pair.master.try_clone_reader().unwrap();
+            let mut writer = pair.master.try_clone_writer().unwrap();
+
+            thread::spawn(|| {
+                listen_pty(reader, sender);
             });
 
-            println!("Client connected")
-        },
-        NetEvent::Message(_endpoint, data) => {
-            match data[0] {
-                0 => {
-                    let str_data = std::str::from_utf8(&data[1..]).unwrap();
-                    let to_write = OsString::from(str_data);
-                    let _num_bytes = pty.lock().unwrap().write(to_write).unwrap();
-                },
-                1 => {
-                    let resize_msg: WindowSize = serde_json::from_slice(&data[1..]).unwrap();
-                    let _ = pty.lock().unwrap().set_size(resize_msg.cols, resize_msg.rows);
-                },
-                _ => {
-                    mt_log!(Level::Info, "Unknown message: {:?}", data);
-                }
-            }
-        },
-        NetEvent::Disconnected(_endpoint) => mt_log!(Level::Info, "Disconnected"),
-    });
+			for message in receiver.incoming_messages() {
+				let message = message.unwrap();
+
+				match message {
+                    OwnedMessage::Binary(msg) => {
+                        let msg_bytes = msg.as_slice();
+                        writer.write_all(&msg_bytes[1..]).unwrap();
+                    },
+                    _ => todo!()
+				}
+			}
+		});
+	}
 }
