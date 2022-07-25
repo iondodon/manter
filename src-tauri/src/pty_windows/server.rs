@@ -21,7 +21,10 @@ fn listen_pty(mut reader: Box<dyn Read + Send>, mut sender: Writer<TcpStream>) {
         if n == 0 {
             break;
         }
-        sender.send_message(&OwnedMessage::Text(String::from_utf8_lossy(&buffer[..n + 1]).to_string())).unwrap();
+        // convert buffer to vec
+        let mut vec = Vec::with_capacity(n + 1);
+        vec.extend_from_slice(&buffer[..n + 1]);
+        sender.send_message(&OwnedMessage::Binary(vec)).unwrap();
     }
 }
 

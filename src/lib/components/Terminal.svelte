@@ -69,11 +69,11 @@
       })
 
       websocket.onmessage = function(evt) {
-        // if (evt.data instanceof ArrayBuffer) {
-          terminal.write(evt.data.slice(1))
-        // } else {
-        //   alert(evt.data)
-        // }
+        if (evt.data instanceof ArrayBuffer) {
+          terminal.write(ab2str(evt.data.slice(1)))
+        } else {
+          alert(evt.data)
+        }
       }
 
       websocket.onclose = function(_evt) {
