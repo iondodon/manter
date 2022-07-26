@@ -13,10 +13,11 @@
     cwd: "~"
   }
 
-  let authenticated: boolean = false;
-
-  const loadEnvVars = (websocket: WebSocket) => {
-    websocket.send(new TextEncoder().encode("\x02"))
+  const setupShell = (websocket: WebSocket) => {
+    const setupData = {
+      password: "eronat98"
+    }
+    websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(setupData)))
   }
 
   onMount(async () => {
@@ -72,14 +73,6 @@
 
       terminal.onTitleChange(function(title) {
         console.log('title change', title)
-        if (!authenticated) {
-          authenticated = true;
-          if (!IS_WINDOWS) {
-            loadEnvVars(websocket);
-          }
-          return
-        }
-
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
             promptContext = JSON.parse(title)
@@ -106,6 +99,8 @@
           console.log(evt)
         }
       }
+
+      setupShell(websocket)
     }
   })
 

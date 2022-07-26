@@ -28,6 +28,11 @@ struct WindowSize {
     pub pixel_height: u16,
 }
 
+#[derive(Deserialize, Debug)]
+struct ShellSetupData {
+    pub password: String,
+}
+
 fn feed_client_from_pty(mut pty_reader: Box<dyn Read + Send>, mut ws_sender: Writer<TcpStream>) {
     let mut buffer = BytesMut::with_capacity(1024);
     buffer.resize(1024, 0u8);
@@ -69,13 +74,23 @@ fn feed_pty_from_ws(mut ws_receiver: Reader<TcpStream>, mut pty_writer: Box<dyn 
                         pty_pair.master.resize(pty_size).unwrap();
                     }
                     2 => {
+                        mt_log!(Level::Info, "Writing password...");
+                        let shell_setup_msg: ShellSetupData = serde_json::from_slice(&msg_bytes[1..]).unwrap();
+                        pty_writer.write_all(shell_setup_msg.password.as_bytes()).unwrap();
+                        
+                        // send a newline to the pty to start the shell
+                        pty_writer.write_all(b"\n").unwrap();
+
+                        std::thread::sleep(std::time::Duration::from_secs(1));
+                        mt_log!(Level::Info, "Password written.");
+
                         mt_log!(Level::Info, "Load Env Vars...");
                         let mut env_vars = HashMap::new();
                         for (key, value) in std::env::vars() {
                             env_vars.insert(key, value);
                         }
 
-                        std::thread::sleep(std::time::Duration::from_secs(4));
+                        std::thread::sleep(std::time::Duration::from_secs(1));
 
                         let mut load_env_var_script = String::from("export ");
 
