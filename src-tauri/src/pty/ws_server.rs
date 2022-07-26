@@ -114,7 +114,7 @@ fn feed_pty_from_ws(mut ws_receiver: Reader<TcpStream>, mut pty_writer: Box<dyn 
                         std::thread::sleep(std::time::Duration::from_secs(1));
 
                         #[cfg(target_os = "macos")]
-                        pty_writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap;
+                        pty_writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap();
                         mt_log!(Level::Info, "Env Vars loaded");
                     }
                     _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
