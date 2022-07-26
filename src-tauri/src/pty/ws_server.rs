@@ -1,15 +1,15 @@
 use std::collections::HashMap;
 use std::io::{Write, Read};
-use std::net::TcpStream;
-use std::thread;
+use futures::{StreamExt, SinkExt};
+use futures::stream::{SplitSink, SplitStream};
+use tokio::net::{TcpListener, TcpStream};
+use tokio_tungstenite::tungstenite::Message;
 use bytes::BytesMut;
 use serde::Deserialize;
-use websocket::receiver::Reader;
-use websocket::sync::{Server, Writer};
-use websocket::OwnedMessage;
 use mt_logger::*;
 use portable_pty::{CommandBuilder, PtySize, native_pty_system, PtyPair};
 use std::fs;
+use tokio_tungstenite::{accept_async, WebSocketStream};
 
 const PTY_SERVER_ADDRESS: &str = "127.0.0.1:7703";
 
@@ -33,7 +33,7 @@ struct ShellSetupData {
     pub password: String,
 }
 
-fn feed_client_from_pty(mut pty_reader: Box<dyn Read + Send>, mut ws_sender: Writer<TcpStream>) {
+async fn feed_client_from_pty(mut pty_reader: Box<dyn Read + Send>, mut ws_sender: SplitSink<WebSocketStream<TcpStream>, Message>) {
     let mut buffer = BytesMut::with_capacity(1024);
     buffer.resize(1024, 0u8);
     loop {
@@ -45,17 +45,19 @@ fn feed_client_from_pty(mut pty_reader: Box<dyn Read + Send>, mut ws_sender: Wri
         }
         let mut data_to_send = Vec::with_capacity(n + 1);
         data_to_send.extend_from_slice(&buffer[..n + 1]);
-        ws_sender.send_message(&OwnedMessage::Binary(data_to_send)).unwrap();
+        let message  = Message::Binary(data_to_send);
+        ws_sender.send(message).await.unwrap();
     }
 }
 
 
-fn feed_pty_from_ws(mut ws_receiver: Reader<TcpStream>, mut pty_writer: Box<dyn Write + Send>, pty_pair: PtyPair) {
-    for message in ws_receiver.incoming_messages() {
-        let message = message.unwrap();
+async fn feed_pty_from_ws(mut ws_receiver: SplitStream<WebSocketStream<TcpStream>>, mut pty_writer: Box<dyn Write + Send>, pty_pair: PtyPair) {
+
+    loop {
+        let message = ws_receiver.next().await.unwrap().unwrap();
 
         match message {
-            OwnedMessage::Binary(msg) => {
+            Message::Binary(msg) => {
                 let msg_bytes = msg.as_slice();
                 match msg_bytes[0] {
                     0 => {
@@ -154,52 +156,51 @@ fn get_default_login_user() -> String {
 }
 
 
-pub fn pty_serve() {
-	let server = Server::bind(PTY_SERVER_ADDRESS).unwrap();
+async fn accept_connection(stream: TcpStream) {
+    let ws_stream = accept_async(stream).await.expect("Failed to accept");
+    let (ws_sender, ws_receiver) = ws_stream.split();
 
-	for request in server.filter_map(Result::ok) {
-		thread::spawn(|| {
-			let client = request.accept().unwrap();
-
-			let ip = client.peer_addr().unwrap();
-
-			mt_log!(Level::Info, "Connection from {}", ip);
-
-			let (ws_receiver, ws_sender) = client.split().unwrap();
-
-            let pty_system = native_pty_system();
-            let pty_pair = pty_system.openpty(PtySize {
-                rows: 24,
-                cols: 80,
-                // Not all systems support pixel_width, pixel_height,
-                // but it is good practice to set it to something
-                // that matches the size of the selected font.  That
-                // is more complex than can be shown here in this
-                // brief example though!
-                pixel_width: 0,
-                pixel_height: 0,
-            }).unwrap();
+    let pty_system = native_pty_system();
+    let pty_pair = pty_system.openpty(PtySize {
+        rows: 24,
+        cols: 80,
+        // Not all systems support pixel_width, pixel_height,
+        // but it is good practice to set it to something
+        // that matches the size of the selected font.  That
+        // is more complex than can be shown here in this
+        // brief example though!
+        pixel_width: 0,
+        pixel_height: 0,
+    }).unwrap();
 
 
-            let cmd = if cfg!(target_os = "windows") { 
-                CommandBuilder::new("powershell")
-            } else {
-                let mut cmd = CommandBuilder::new("su");  
-                let user = get_default_login_user();
-                cmd.args(["-", user.as_str()]);
-                cmd
-            };
+    let cmd = if cfg!(target_os = "windows") { 
+        CommandBuilder::new("powershell")
+    } else {
+        let mut cmd = CommandBuilder::new("su");  
+        let user = get_default_login_user();
+        cmd.args(["-", user.as_str()]);
+        cmd
+    };
 
-            let _child = pty_pair.slave.spawn_command(cmd).unwrap();
+    let _child = pty_pair.slave.spawn_command(cmd).unwrap();
 
-            let pty_reader = pty_pair.master.try_clone_reader().unwrap();
-            let pty_writer = pty_pair.master.try_clone_writer().unwrap();
+    let pty_reader = pty_pair.master.try_clone_reader().unwrap();
+    let pty_writer = pty_pair.master.try_clone_writer().unwrap();
 
-            thread::spawn(|| {
-                feed_client_from_pty(pty_reader, ws_sender);
-            });
+    tokio::spawn(feed_client_from_pty(pty_reader, ws_sender));
 
-            feed_pty_from_ws(ws_receiver, pty_writer, pty_pair);
-		});
-	}
+    tokio::spawn(feed_pty_from_ws(ws_receiver, pty_writer, pty_pair));
+}
+
+
+pub async fn pty_serve() {
+	let listener = TcpListener::bind(PTY_SERVER_ADDRESS).await.expect("Can't listen");
+
+    while let Ok((stream, _)) = listener.accept().await {
+        let peer = stream.peer_addr().expect("connected streams should have a peer address");
+        mt_log!(Level::Info, "Peer address: {}", peer);
+
+        tokio::spawn(accept_connection(stream));
+    }
 }
