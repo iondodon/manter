@@ -9,6 +9,8 @@ use websocket::OwnedMessage;
 use mt_logger::*;
 use portable_pty::{CommandBuilder, PtySize, native_pty_system};
 
+const WS_ADDRESS: &str = "127.0.0.1:7703";
+
 #[derive(Deserialize, Debug)]
 struct WindowSize {
     /// The number of lines of text
@@ -23,25 +25,25 @@ struct WindowSize {
     pub pixel_height: u16,
 }
 
-fn listen_pty(mut reader: Box<dyn Read + Send>, mut sender: Writer<TcpStream>) {
+fn feed_client(mut pty_reader: Box<dyn Read + Send>, mut ws_sender: Writer<TcpStream>) {
     let mut buffer = BytesMut::with_capacity(1024);
     buffer.resize(1024, 0u8);
     loop {
         buffer[0] = 0u8;
         let mut tail = &mut buffer[1..];
-        let n = reader.read(&mut tail).unwrap();
+        let n = pty_reader.read(&mut tail).unwrap();
         if n == 0 {
             break;
         }
         let mut data_to_send = Vec::with_capacity(n + 1);
         data_to_send.extend_from_slice(&buffer[..n + 1]);
-        sender.send_message(&OwnedMessage::Binary(data_to_send)).unwrap();
+        ws_sender.send_message(&OwnedMessage::Binary(data_to_send)).unwrap();
     }
 }
 
 
 pub fn pty_server() {
-	let server = Server::bind("127.0.0.1:7703").unwrap();
+	let server = Server::bind(WS_ADDRESS).unwrap();
 
 	for request in server.filter_map(Result::ok) {
 		thread::spawn(|| {
@@ -51,11 +53,10 @@ pub fn pty_server() {
 
 			mt_log!(Level::Info, "Connection from {}", ip);
 
-			let (mut receiver, sender) = client.split().unwrap();
+			let (mut ws_receiver, ws_sender) = client.split().unwrap();
 
             let pty_system = native_pty_system();
-
-            let pair = pty_system.openpty(PtySize {
+            let pty_pair = pty_system.openpty(PtySize {
                 rows: 24,
                 cols: 80,
                 // Not all systems support pixel_width, pixel_height,
@@ -67,23 +68,23 @@ pub fn pty_server() {
                 pixel_height: 0,
             }).unwrap();
 
-            #[cfg(target_os = "windows")]
-            let cmd = CommandBuilder::new("powershell");
-            #[cfg(unix)]
-            let mut cmd = CommandBuilder::new("su");
+
+            // if os is windows let handler_cmd be powershell else if unix let handler_cmd be su
+            let handler_cmd = if cfg!(target_os = "windows") { "powershell" } else { "su" };
+            let mut cmd = CommandBuilder::new(handler_cmd);
             #[cfg(unix)]
             cmd.args(["-", "ion"]);
 
-            let _child = pair.slave.spawn_command(cmd).unwrap();
+            let _child = pty_pair.slave.spawn_command(cmd).unwrap();
 
-            let reader = pair.master.try_clone_reader().unwrap();
-            let mut writer = pair.master.try_clone_writer().unwrap();
+            let pty_reader = pty_pair.master.try_clone_reader().unwrap();
+            let mut pty_writer = pty_pair.master.try_clone_writer().unwrap();
 
             thread::spawn(|| {
-                listen_pty(reader, sender);
+                feed_client(pty_reader, ws_sender);
             });
 
-			for message in receiver.incoming_messages() {
+			for message in ws_receiver.incoming_messages() {
 				let message = message.unwrap();
 
 				match message {
@@ -92,7 +93,7 @@ pub fn pty_server() {
                         match msg_bytes[0] {
                             0 => {
                                 if msg_bytes.len().gt(&0) {
-                                    writer.write_all(&msg_bytes[1..]).unwrap();
+                                    pty_writer.write_all(&msg_bytes[1..]).unwrap();
                                 }
                             }
                             1 => {
@@ -103,7 +104,7 @@ pub fn pty_server() {
                                     pixel_width: resize_msg.pixel_width,
                                     pixel_height: resize_msg.pixel_height,
                                 };
-                                pair.master.resize(pty_size).unwrap();
+                                pty_pair.master.resize(pty_size).unwrap();
                             }
                             2 => {
                                 mt_log!(Level::Info, "LOADING ENV VARS");
@@ -127,36 +128,36 @@ pub fn pty_server() {
                                 load_env_var_script.push_str(term_var);
 
                                 load_env_var_script.push_str("\n");
-                                writer.write_all(load_env_var_script.as_bytes()).unwrap();
+                                pty_writer.write_all(load_env_var_script.as_bytes()).unwrap();
 
                                 std::thread::sleep(std::time::Duration::from_secs(1));
 
                                 #[cfg(target_os = "macos")]
-                                writer.write_all(r#" prmptcmd() { eval "$PROMPT_COMMAND" } "#.as_bytes()).unwrap();
+                                pty_writer.write_all(r#" prmptcmd() { eval "$PROMPT_COMMAND" } "#.as_bytes()).unwrap();
                                 #[cfg(target_os = "macos")]
-                                writer.write_all("\n".as_bytes()).unwrap();
+                                pty_writer.write_all("\n".as_bytes()).unwrap();
                                 #[cfg(target_os = "macos")]
-                                writer.write_all(r#" precmd_functions=(prmptcmd) "#.as_bytes()).unwrap();
+                                pty_writer.write_all(r#" precmd_functions=(prmptcmd) "#.as_bytes()).unwrap();
                                 #[cfg(target_os = "macos")]
-                                writer.write_all("\n".as_bytes()).unwrap();
+                                pty_writer.write_all("\n".as_bytes()).unwrap();
 
                                 std::thread::sleep(std::time::Duration::from_secs(1));
 
                                 #[cfg(target_os = "linux")]
-                                writer.write_all("source ~/.bashrc \n".as_bytes()).unwrap();
+                                pty_writer.write_all("source ~/.bashrc \n".as_bytes()).unwrap();
 
                                 #[cfg(target_os = "macos")]
-                                writer.write_all("source ~/.profile \n".as_bytes()).unwrap();
+                                pty_writer.write_all("source ~/.profile \n".as_bytes()).unwrap();
 
                                 std::thread::sleep(std::time::Duration::from_secs(1));
 
                                 #[cfg(target_os = "macos")]
-                                writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap();
+                                pty_writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap;
                             }
-                            _ => mt_log!(Level::Info, "Unknown command {}", msg_bytes[0]),
+                            _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
                         }
                     },
-                    _ => todo!()
+                    _ => mt_log!(Level::Error, "Unknown received data type")
 				}
 			}
 		});
