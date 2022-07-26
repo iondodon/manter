@@ -13,6 +13,14 @@
     cwd: "~"
   }
 
+  let authenticated: boolean = false;
+
+  const loadEnvVars = (websocket: WebSocket) => {
+    if (!IS_WINDOWS) {
+      websocket.send(new TextEncoder().encode("\x02"))
+    }
+  }
+
   onMount(async () => {
     const websocket = new WebSocket(PTY_WS_ADDRESS)
     websocket.binaryType = "arraybuffer"
@@ -65,6 +73,12 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
+        if (!authenticated) {
+          authenticated = true;
+          loadEnvVars(websocket);
+          return
+        }
+
         console.log('title change', title)
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
@@ -91,16 +105,6 @@
         if (typeof console.log == "function") {
           console.log(evt)
         }
-      }
-
-      if (!IS_WINDOWS) {
-        websocket.send(new TextEncoder().encode("\x00eronat98\n"))
-      }
-      
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      if (!IS_WINDOWS) {
-        websocket.send(new TextEncoder().encode("\x02"))
       }
     }
   })

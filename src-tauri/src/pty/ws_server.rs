@@ -9,6 +9,7 @@ use websocket::sync::{Server, Writer};
 use websocket::OwnedMessage;
 use mt_logger::*;
 use portable_pty::{CommandBuilder, PtySize, native_pty_system, PtyPair};
+use std::fs;
 
 const PTY_SERVER_ADDRESS: &str = "127.0.0.1:7703";
 
@@ -26,7 +27,6 @@ struct WindowSize {
     /// fill this value and ignore it.
     pub pixel_height: u16,
 }
-
 
 fn feed_client_from_pty(mut pty_reader: Box<dyn Read + Send>, mut ws_sender: Writer<TcpStream>) {
     let mut buffer = BytesMut::with_capacity(1024);
@@ -69,13 +69,13 @@ fn feed_pty_from_ws(mut ws_receiver: Reader<TcpStream>, mut pty_writer: Box<dyn 
                         pty_pair.master.resize(pty_size).unwrap();
                     }
                     2 => {
-                        mt_log!(Level::Info, "LOADING ENV VARS");
+                        mt_log!(Level::Info, "Load Env Vars...");
                         let mut env_vars = HashMap::new();
                         for (key, value) in std::env::vars() {
                             env_vars.insert(key, value);
                         }
 
-                        std::thread::sleep(std::time::Duration::from_secs(1));
+                        std::thread::sleep(std::time::Duration::from_secs(4));
 
                         let mut load_env_var_script = String::from("export ");
 
@@ -115,6 +115,7 @@ fn feed_pty_from_ws(mut ws_receiver: Reader<TcpStream>, mut pty_writer: Box<dyn 
 
                         #[cfg(target_os = "macos")]
                         pty_writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap;
+                        mt_log!(Level::Info, "Env Vars loaded");
                     }
                     _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
                 }
@@ -125,7 +126,20 @@ fn feed_pty_from_ws(mut ws_receiver: Reader<TcpStream>, mut pty_writer: Box<dyn 
 }
 
 
-pub fn pty_server() {
+#[derive(Deserialize, Debug)]
+struct PtySettings {
+    pub default_login_user: String
+}
+
+
+fn get_default_login_user() -> String {
+    let pty_settings_string = fs::read_to_string("src/pty_settings.json").unwrap();
+    let pty_settings: PtySettings = serde_json::from_str(&pty_settings_string).unwrap();
+    pty_settings.default_login_user
+}
+
+
+pub fn pty_serve() {
 	let server = Server::bind(PTY_SERVER_ADDRESS).unwrap();
 
 	for request in server.filter_map(Result::ok) {
@@ -152,11 +166,14 @@ pub fn pty_server() {
             }).unwrap();
 
 
-            // if os is windows let handler_cmd be powershell else if unix let handler_cmd be su
-            let handler_cmd = if cfg!(target_os = "windows") { "powershell" } else { "su" };
-            let mut cmd = CommandBuilder::new(handler_cmd);
-            #[cfg(unix)]
-            cmd.args(["-", "ion"]);
+            let cmd = if cfg!(target_os = "windows") { 
+                CommandBuilder::new("powershell")
+            } else {
+                let mut cmd = CommandBuilder::new("su");  
+                let user = get_default_login_user();
+                cmd.args(["-", user.as_str()]);
+                cmd
+            };
 
             let _child = pty_pair.slave.spawn_command(cmd).unwrap();
 
