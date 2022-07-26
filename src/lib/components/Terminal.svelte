@@ -100,7 +100,9 @@
         }
       }
 
-      setupShell(websocket)
+      if (!IS_WINDOWS) {
+        setupShell(websocket)
+      }
     }
   })
 
