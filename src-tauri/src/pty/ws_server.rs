@@ -2,10 +2,25 @@ use std::io::{Write, Read};
 use std::net::TcpStream;
 use std::thread;
 use bytes::BytesMut;
+use serde::Deserialize;
 use websocket::sync::{Server, Writer};
 use websocket::OwnedMessage;
 use mt_logger::*;
 use portable_pty::{CommandBuilder, PtySize, native_pty_system};
+
+#[derive(Deserialize, Debug)]
+struct WindowSize {
+    /// The number of lines of text
+    pub rows: u16,
+    /// The number of columns of text
+    pub cols: u16,
+    /// The width of a cell in pixels.  Note that some systems never
+    /// fill this value and ignore it.
+    pub pixel_width: u16,
+    /// The height of a cell in pixels.  Note that some systems never
+    /// fill this value and ignore it.
+    pub pixel_height: u16,
+}
 
 fn listen_pty(mut reader: Box<dyn Read + Send>, mut sender: Writer<TcpStream>) {
     let mut buffer = BytesMut::with_capacity(1024);
@@ -73,7 +88,24 @@ pub fn pty_server() {
 				match message {
                     OwnedMessage::Binary(msg) => {
                         let msg_bytes = msg.as_slice();
-                        writer.write_all(&msg_bytes[1..]).unwrap();
+                        match msg_bytes[0] {
+                            0 => {
+                                if msg_bytes.len().gt(&0) {
+                                    writer.write_all(&msg_bytes[1..]).unwrap();
+                                }
+                            }
+                            1 => {
+                                let resize_msg: WindowSize = serde_json::from_slice(&msg_bytes[1..]).unwrap();
+                                let pty_size = PtySize {
+                                    rows: resize_msg.rows,
+                                    cols: resize_msg.cols,
+                                    pixel_width: resize_msg.pixel_width,
+                                    pixel_height: resize_msg.pixel_height,
+                                };
+                                pair.master.resize(pty_size).unwrap();
+                            }
+                            _ => todo!()
+                        }
                     },
                     _ => todo!()
 				}
