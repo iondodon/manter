@@ -87,15 +87,15 @@
         }
       }
 
-      if (!IS_WINDOWS) {
-        websocket.send(new TextEncoder().encode("\x00eronat98\n"))
-      }
+      // if (!IS_WINDOWS) {
+      //   websocket.send(new TextEncoder().encode("\x00eronat98\n"))
+      // }
       
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // await new Promise(resolve => setTimeout(resolve, 1000))
 
-      if (!IS_WINDOWS) {
-        websocket.send(new TextEncoder().encode("\x03"))
-      }
+      // if (!IS_WINDOWS) {
+      //   websocket.send(new TextEncoder().encode("\x03"))
+      // }
     }
   })
 

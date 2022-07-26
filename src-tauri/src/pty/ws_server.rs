@@ -1,5 +1,3 @@
-#![cfg(target_os = "windows")]
-
 use std::io::{Write, Read};
 use std::net::TcpStream;
 use std::thread;
@@ -26,7 +24,7 @@ fn listen_pty(mut reader: Box<dyn Read + Send>, mut sender: Writer<TcpStream>) {
 }
 
 
-pub fn main() {
+pub fn pty_server() {
 	let server = Server::bind("127.0.0.1:7703").unwrap();
 
 	for request in server.filter_map(Result::ok) {
@@ -39,10 +37,8 @@ pub fn main() {
 
 			let (mut receiver, sender) = client.split().unwrap();
 
-            // Use the native pty implementation for the system
             let pty_system = native_pty_system();
 
-            // Create a new pty
             let pair = pty_system.openpty(PtySize {
                 rows: 24,
                 cols: 80,
@@ -55,11 +51,15 @@ pub fn main() {
                 pixel_height: 0,
             }).unwrap();
 
-            // Spawn a shell into the pty
+            #[cfg(target_os = "windows")]
             let cmd = CommandBuilder::new("powershell");
+            #[cfg(unix)]
+            let mut cmd = CommandBuilder::new("su");
+            #[cfg(unix)]
+            cmd.args(["-", "ion"]);
+
             let _child = pair.slave.spawn_command(cmd).unwrap();
 
-            // Read and parse output from the pty with reader
             let reader = pair.master.try_clone_reader().unwrap();
             let mut writer = pair.master.try_clone_writer().unwrap();
 

@@ -3,21 +3,16 @@
   windows_subsystem = "windows"
 )]
 
+mod pty;
+
+use pty::ws_server::pty_server;
 use std::thread;
 use mt_logger::*;
-
-#[cfg(unix)]
-mod pty_unix;
-#[cfg(target_os = "windows")]
-mod pty_windows;
 
 fn main() {
   mt_new!(None, Level::Info, OutputStream::Both);
   thread::spawn(|| {
-    #[cfg(unix)]
-    pty_unix::server::main();
-    #[cfg(target_os = "windows")]
-    pty_windows::server::main();
+    pty_server();
   });
 
   let context = tauri::generate_context!();
