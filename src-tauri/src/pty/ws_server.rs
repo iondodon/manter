@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::io::{Write, Read};
 use std::net::TcpStream;
 use std::thread;
@@ -104,7 +105,55 @@ pub fn pty_server() {
                                 };
                                 pair.master.resize(pty_size).unwrap();
                             }
-                            _ => todo!()
+                            2 => {
+                                mt_log!(Level::Info, "LOADING ENV VARS");
+                                let mut env_vars = HashMap::new();
+                                for (key, value) in std::env::vars() {
+                                    env_vars.insert(key, value);
+                                }
+
+                                std::thread::sleep(std::time::Duration::from_secs(1));
+
+                                let mut load_env_var_script = String::from("export ");
+
+                                for (key, value) in env_vars.iter() {
+                                    load_env_var_script.push_str(&format!("{}=\"{}\" ", key, value));
+                                }
+
+                                let prompt_commnd = r#"PROMPT_COMMAND='echo -en "\033]0; [manter] {\"cwd\": \"$(pwd)\"} \a"' "#;
+                                load_env_var_script.push_str(prompt_commnd);
+
+                                let term_var = "TERM=xterm-256color ";
+                                load_env_var_script.push_str(term_var);
+
+                                load_env_var_script.push_str("\n");
+                                writer.write_all(load_env_var_script.as_bytes()).unwrap();
+
+                                std::thread::sleep(std::time::Duration::from_secs(1));
+
+                                #[cfg(target_os = "macos")]
+                                writer.write_all(r#" prmptcmd() { eval "$PROMPT_COMMAND" } "#.as_bytes()).unwrap();
+                                #[cfg(target_os = "macos")]
+                                writer.write_all("\n".as_bytes()).unwrap();
+                                #[cfg(target_os = "macos")]
+                                writer.write_all(r#" precmd_functions=(prmptcmd) "#.as_bytes()).unwrap();
+                                #[cfg(target_os = "macos")]
+                                writer.write_all("\n".as_bytes()).unwrap();
+
+                                std::thread::sleep(std::time::Duration::from_secs(1));
+
+                                #[cfg(target_os = "linux")]
+                                writer.write_all("source ~/.bashrc \n".as_bytes()).unwrap();
+
+                                #[cfg(target_os = "macos")]
+                                writer.write_all("source ~/.profile \n".as_bytes()).unwrap();
+
+                                std::thread::sleep(std::time::Duration::from_secs(1));
+
+                                #[cfg(target_os = "macos")]
+                                writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap();
+                            }
+                            _ => mt_log!(Level::Info, "Unknown command {}", msg_bytes[0]),
                         }
                     },
                     _ => todo!()
