@@ -16,9 +16,7 @@
   let authenticated: boolean = false;
 
   const loadEnvVars = (websocket: WebSocket) => {
-    if (!IS_WINDOWS) {
-      websocket.send(new TextEncoder().encode("\x02"))
-    }
+    websocket.send(new TextEncoder().encode("\x02"))
   }
 
   onMount(async () => {
@@ -73,13 +71,15 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
+        console.log('title change', title)
         if (!authenticated) {
           authenticated = true;
-          loadEnvVars(websocket);
+          if (!IS_WINDOWS) {
+            loadEnvVars(websocket);
+          }
           return
         }
 
-        console.log('title change', title)
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
             promptContext = JSON.parse(title)
