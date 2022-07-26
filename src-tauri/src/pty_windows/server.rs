@@ -4,12 +4,10 @@ use std::io::{Write, Read};
 use std::net::TcpStream;
 use std::thread;
 use bytes::BytesMut;
-use conpty::io::PipeReader;
 use websocket::sync::{Server, Writer};
 use websocket::OwnedMessage;
 use mt_logger::*;
-use portable_pty::{CommandBuilder, PtySize, native_pty_system, PtySystem};
-use anyhow::Error;
+use portable_pty::{CommandBuilder, PtySize, native_pty_system};
 
 fn listen_pty(mut reader: Box<dyn Read + Send>, mut sender: Writer<TcpStream>) {
     let mut buffer = BytesMut::with_capacity(1024);
@@ -21,10 +19,9 @@ fn listen_pty(mut reader: Box<dyn Read + Send>, mut sender: Writer<TcpStream>) {
         if n == 0 {
             break;
         }
-        // convert buffer to vec
-        let mut vec = Vec::with_capacity(n + 1);
-        vec.extend_from_slice(&buffer[..n + 1]);
-        sender.send_message(&OwnedMessage::Binary(vec)).unwrap();
+        let mut data_to_send = Vec::with_capacity(n + 1);
+        data_to_send.extend_from_slice(&buffer[..n + 1]);
+        sender.send_message(&OwnedMessage::Binary(data_to_send)).unwrap();
     }
 }
 
@@ -46,7 +43,7 @@ pub fn main() {
             let pty_system = native_pty_system();
 
             // Create a new pty
-            let mut pair = pty_system.openpty(PtySize {
+            let pair = pty_system.openpty(PtySize {
                 rows: 24,
                 cols: 80,
                 // Not all systems support pixel_width, pixel_height,
@@ -60,10 +57,10 @@ pub fn main() {
 
             // Spawn a shell into the pty
             let cmd = CommandBuilder::new("powershell");
-            let child = pair.slave.spawn_command(cmd).unwrap();
+            let _child = pair.slave.spawn_command(cmd).unwrap();
 
             // Read and parse output from the pty with reader
-            let mut reader = pair.master.try_clone_reader().unwrap();
+            let reader = pair.master.try_clone_reader().unwrap();
             let mut writer = pair.master.try_clone_writer().unwrap();
 
             thread::spawn(|| {
