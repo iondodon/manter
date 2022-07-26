@@ -45,13 +45,13 @@
       })
 
       terminal.onResize(function(evt) {
-        const resizeObject = {
+        const resizeData = {
             cols: evt.cols, 
             rows: evt.rows, 
             pixel_width: 0, 
             pixel_height: 0
         }
-        websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeObject)))
+        websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
       })
 
       terminal.onSelectionChange(() => {
