@@ -8,7 +8,6 @@ use bytes::BytesMut;
 use serde::Deserialize;
 use mt_logger::*;
 use portable_pty::{CommandBuilder, PtySize, native_pty_system, PtyPair};
-use std::fs;
 use tokio_tungstenite::{accept_async, WebSocketStream};
 
 const PTY_SERVER_ADDRESS: &str = "127.0.0.1:7703";
@@ -143,19 +142,6 @@ async fn feed_pty_from_ws(mut ws_receiver: SplitStream<WebSocketStream<TcpStream
 }
 
 
-#[derive(Deserialize, Debug)]
-struct PtySettings {
-    pub default_login_user: String
-}
-
-
-fn get_default_login_user() -> String {
-    let pty_settings_string = fs::read_to_string("src/pty_settings.json").unwrap();
-    let pty_settings: PtySettings = serde_json::from_str(&pty_settings_string).unwrap();
-    pty_settings.default_login_user
-}
-
-
 async fn accept_connection(stream: TcpStream) {
     let ws_stream = accept_async(stream).await.expect("Failed to accept");
     let (ws_sender, ws_receiver) = ws_stream.split();
@@ -178,7 +164,7 @@ async fn accept_connection(stream: TcpStream) {
         CommandBuilder::new("powershell")
     } else {
         let mut cmd = CommandBuilder::new("su");  
-        let user = get_default_login_user();
+        let user = crate::get_setting("default_login_user");
         cmd.args(["-", user.as_str()]);
         cmd
     };
@@ -189,7 +175,6 @@ async fn accept_connection(stream: TcpStream) {
     let pty_writer = pty_pair.master.try_clone_writer().unwrap();
 
     tokio::spawn(feed_client_from_pty(pty_reader, ws_sender));
-
     tokio::spawn(feed_pty_from_ws(ws_receiver, pty_writer, pty_pair));
 }
 
