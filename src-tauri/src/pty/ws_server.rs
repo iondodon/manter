@@ -174,8 +174,14 @@ async fn accept_connection(stream: TcpStream) {
     let pty_reader = pty_pair.master.try_clone_reader().unwrap();
     let pty_writer = pty_pair.master.try_clone_writer().unwrap();
 
-    tokio::spawn(feed_client_from_pty(pty_reader, ws_sender));
-    tokio::spawn(feed_pty_from_ws(ws_receiver, pty_writer, pty_pair));
+    std::thread::spawn(|| {
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        rt.block_on(async {
+            feed_client_from_pty(pty_reader, ws_sender).await;
+        })
+    });
+
+    feed_pty_from_ws(ws_receiver, pty_writer, pty_pair).await;
 }
 
 
@@ -186,6 +192,11 @@ pub async fn pty_serve() {
         let peer = stream.peer_addr().expect("connected streams should have a peer address");
         mt_log!(Level::Info, "Peer address: {}", peer);
 
-        tokio::spawn(accept_connection(stream));
+        std::thread::spawn(|| {
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                accept_connection(stream).await;
+            });
+        });
     }
 }

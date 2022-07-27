@@ -73,7 +73,10 @@ async fn main() {
 
   check_settings_file();
 
-  tokio::spawn(pty_serve());
+  std::thread::spawn(|| {
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    rt.block_on(async { pty_serve().await });
+  });
 
   let context = tauri::generate_context!();
   tauri::Builder::default()
