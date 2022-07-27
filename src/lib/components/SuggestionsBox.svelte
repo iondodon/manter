@@ -1,6 +1,8 @@
 <svelte:options accessors={true}/>
 
 <script type="ts">
+  import { IS_WINDOWS } from "../config/config";
+
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/library/commands"
 
@@ -49,13 +51,17 @@
 
     let selected = null
     for (let candidatesWrapper of suggestionsCarrier[script.length - 1]) {
-      if (candidatesWrapper['processor']) {
+      if (!IS_WINDOWS && candidatesWrapper['processor']) {
         candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, promptContext["cwd"])
         console.log("finished receiving newCmdInput top", candidatesWrapper['values'])
       }
       
       let candidates = candidatesWrapper['values']
       for (const candidate of candidates) {
+        if (typeof candidate['names'] == 'function') {
+          candidate['names'] = candidate['names']()
+        }
+
         for (const name of candidate['names']) {
           if (!selected && name == lastWord) {
             selected = candidate

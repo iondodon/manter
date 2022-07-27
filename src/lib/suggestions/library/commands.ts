@@ -1,4 +1,13 @@
+import { IS_WINDOWS } from "../../config/config"
+
 const files = {
+  values: [
+    {
+      'names': ['files...'],
+      'description': 'list of files',
+      'getNext': function() { return [files] }
+    }
+  ],
   script: "ls -a",
   processor: function (line) {
     return {
@@ -13,7 +22,7 @@ const files = {
 const lsOptions = {
   values: [
     {
-      'names': ['-a', '--all'],
+      'names': function() { return IS_WINDOWS ? ['-a'] : ['-a', '--all'] },
       'description': 'ls all - description',
       'getNext': function() { return [lsOptions, files] }
     }
