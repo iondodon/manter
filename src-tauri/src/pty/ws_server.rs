@@ -32,7 +32,10 @@ struct ShellSetupData {
     pub password: String,
 }
 
-async fn feed_client_from_pty(mut pty_reader: Box<dyn Read + Send>, mut ws_sender: SplitSink<WebSocketStream<TcpStream>, Message>) {
+async fn feed_client_from_pty(
+  mut pty_reader: Box<dyn Read + Send>, 
+  mut ws_sender: SplitSink<WebSocketStream<TcpStream>, Message>
+) {
   let mut buffer = BytesMut::with_capacity(1024);
   buffer.resize(1024, 0u8);
   loop {
@@ -50,8 +53,10 @@ async fn feed_client_from_pty(mut pty_reader: Box<dyn Read + Send>, mut ws_sende
 }
 
 
-async fn feed_pty_from_ws(mut ws_receiver: SplitStream<WebSocketStream<TcpStream>>, mut pty_writer: Box<dyn Write + Send>, pty_pair: PtyPair) {
-
+async fn feed_pty_from_ws(
+  mut ws_receiver: SplitStream<WebSocketStream<TcpStream>>, 
+  mut pty_writer: Box<dyn Write + Send>, pty_pair: PtyPair
+) {
   loop {
     let message = ws_receiver.next().await.unwrap().unwrap();
 
