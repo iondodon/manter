@@ -1,6 +1,6 @@
 <script type="ts">
   import BottomBar from './lib/components/BottomBar.svelte';
-import Terminal from './lib/components/Terminal.svelte'
+  import Terminal from './lib/components/Terminal.svelte'
 </script>
 
 <main>
