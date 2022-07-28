@@ -11,7 +11,8 @@
     width: 100%;
     background-color: rgb(29, 29, 29);
     color: rgb(156, 156, 156);
-    margin: 0%;
-    padding: 0%;
+    margin: 0;
+    padding: 0;
+    bottom: 0;
   }
 </style>

@@ -17,7 +17,6 @@
   }
 
   main {
-    margin: 0 auto;
     display: flex;
     flex-direction: column;
     margin: 0%;
@@ -27,5 +26,6 @@
     left: 0;
     width: 100%;
     height: 100%;
+    bottom: 0%;
   }
 </style>
