@@ -15,6 +15,11 @@
     if (script[script.length - 1] == " ") {
       return true
     }
+
+    if (typeof suggestion['names'] == 'function') {
+      suggestion['names'] = suggestion['names']()
+    }
+
     for (const name of suggestion["names"]) {
       if (name == lastWord || name.startsWith(lastWord)) {
         return true
@@ -53,7 +58,6 @@
     for (let candidatesWrapper of suggestionsCarrier[script.length - 1]) {
       if (!IS_WINDOWS && candidatesWrapper['processor']) {
         candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, promptContext["cwd"])
-        console.log("finished receiving newCmdInput top", candidatesWrapper['values'])
       }
       
       let candidates = candidatesWrapper['values']
@@ -82,9 +86,8 @@
 
     suggestionsCarrier[script.length] = selected['getNext']()
     for (let wrapper of suggestionsCarrier[script.length]) {
-      if (wrapper['processor']) {
+      if (!IS_WINDOWS && wrapper['processor']) {
         wrapper['values'] = await getDynamicValues(wrapper, promptContext["cwd"])
-        console.log("finished receiving newCmdInput bottom", wrapper['values'])
       }
     }
   }
