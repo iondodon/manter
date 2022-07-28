@@ -8,7 +8,7 @@
 
   let script: string = ''
   let lastWord = ''
-  let suggestions = []
+  let currentSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
 
   const isVisible = (suggestion) => {
@@ -94,7 +94,7 @@
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
     await processSuggestions(newCmdInput, promptContext)
-    suggestions = suggestionsCarrier[script.length]
+    currentSuggestions = suggestionsCarrier[script.length]
   }
 
   export const bringSuggestionsToCursor = () => {
@@ -116,8 +116,8 @@
 
 
 <div id="suggestions-box">
-  {#if suggestions}
-    {#each suggestions as wrapper}
+  {#if currentSuggestions}
+    {#each currentSuggestions as wrapper}
       <div class="suggestions-wrapper suggestion-item">
         {#if wrapper["values"]}
           {#each wrapper['values'] as suggestion}
