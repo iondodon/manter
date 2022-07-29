@@ -85,11 +85,6 @@
     }
 
     suggestionsCarrier[script.length] = selected['getNext']()
-    for (let wrapper of suggestionsCarrier[script.length]) {
-      if (!IS_WINDOWS && wrapper['processor']) {
-        wrapper['values'] = await getDynamicValues(wrapper, promptContext["cwd"])
-      }
-    }
   }
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
