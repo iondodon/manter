@@ -119,15 +119,13 @@
   <div id="suggestions-box">
       {#each currentSuggestions as wrapper}
         <div class="suggestions-wrapper">
-          {#if wrapper["values"]}
-            {#each wrapper['values'] as suggestion}
-              {#if isVisible(suggestion)}
-                <div class="suggestion">
-                    {JSON.stringify(suggestion["names"])}
-                </div>
-              {/if}
-            {/each}
-          {/if}
+          {#each wrapper['values'] as suggestion}
+            {#if isVisible(suggestion)}
+              <div class="suggestion">
+                  {JSON.stringify(suggestion["names"])}
+              </div>
+            {/if}
+          {/each}
         </div>
       {/each}
   </div>
