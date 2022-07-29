@@ -115,23 +115,23 @@
 </script>
 
 
-<div id="suggestions-box">
-  {#if currentSuggestions}
-    {#each currentSuggestions as wrapper}
-      <div class="suggestions-wrapper">
-        {#if wrapper["values"]}
-          {#each wrapper['values'] as suggestion}
-            {#if isVisible(suggestion)}
-              <div class="suggestion">
-                  {JSON.stringify(suggestion["names"])}
-              </div>
-            {/if}
-          {/each}
-        {/if}
-      </div>
-    {/each}
-  {/if}
-</div>
+{#if currentSuggestions}
+  <div id="suggestions-box">
+      {#each currentSuggestions as wrapper}
+        <div class="suggestions-wrapper">
+          {#if wrapper["values"]}
+            {#each wrapper['values'] as suggestion}
+              {#if isVisible(suggestion)}
+                <div class="suggestion">
+                    {JSON.stringify(suggestion["names"])}
+                </div>
+              {/if}
+            {/each}
+          {/if}
+        </div>
+      {/each}
+  </div>
+{/if}
 
 
 <style type="scss">
