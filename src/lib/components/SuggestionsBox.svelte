@@ -40,11 +40,6 @@
       return
     }
 
-    if (newCmdInput === '\x1b') {
-      hideSuggestions()
-      return
-    }
-
     if (newCmdInput === '\b' || newCmdInput === '\x7f') {
       if (script.length > 0) {
         script = script.slice(0, -1)
@@ -100,19 +95,6 @@
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
     await processSuggestions(newCmdInput, promptContext)
     currentSuggestions = suggestionsCarrier[script.length]
-  }
-
-  const hideSuggestions = () => {
-    if (IS_WINDOWS) {
-      script = ''
-    }
-
-    const suggestionsElement = document.getElementById('suggestions-box')
-    
-    if (suggestionsElement && script.length == 0) {
-      suggestionsElement.style.display = 'none'
-      return
-    }
   }
 
   export const bringSuggestionsToCursor = () => {
