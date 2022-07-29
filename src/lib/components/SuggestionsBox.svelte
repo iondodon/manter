@@ -118,11 +118,11 @@
 <div id="suggestions-box">
   {#if currentSuggestions}
     {#each currentSuggestions as wrapper}
-      <div class="suggestions-wrapper suggestion-item">
+      <div class="suggestions-wrapper">
         {#if wrapper["values"]}
           {#each wrapper['values'] as suggestion}
             {#if isVisible(suggestion)}
-              <div class="suggestion suggestion-item">
+              <div class="suggestion">
                   {JSON.stringify(suggestion["names"])}
               </div>
             {/if}
@@ -153,13 +153,11 @@
 
   .suggestion {
     border-bottom: 1px solid rgb(0, 0, 0);
+    margin: 2px;
   }
 
   .suggestions-wrapper {
     border-bottom: 3px solid rgb(7, 115, 3);
-  }
-
-  .suggestion-item {
     margin: 2px;
   }
 </style>
