@@ -40,6 +40,11 @@
       return
     }
 
+    if (newCmdInput === '\x1b') {
+      hideSuggestions()
+      return
+    }
+
     if (newCmdInput === '\b' || newCmdInput === '\x7f') {
       if (script.length > 0) {
         script = script.slice(0, -1)
@@ -97,10 +102,23 @@
     currentSuggestions = suggestionsCarrier[script.length]
   }
 
+  const hideSuggestions = () => {
+    if (IS_WINDOWS) {
+      script = ''
+    }
+
+    const suggestionsElement = document.getElementById('suggestions-box')
+    
+    if (suggestionsElement && script.length == 0) {
+      suggestionsElement.style.display = 'none'
+      return
+    }
+  }
+
   export const bringSuggestionsToCursor = () => {
     const suggestionsElement = document.getElementById('suggestions-box')
     
-    if (script.length == 0) {
+    if (suggestionsElement && script.length == 0) {
       suggestionsElement.style.display = 'none'
       return
     }
