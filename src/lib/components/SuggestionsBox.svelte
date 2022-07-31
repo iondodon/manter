@@ -5,11 +5,12 @@
 
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/library/commands"
-  import SuggestionsWrapper from "./SuggestionsWrapper.svelte";
+  import { isVisibleSuggestion } from "../utils/utils"
 
   let script: string = ''
   let lastWord = ''
   let currentSuggestions = []
+  let visibleWrappers = []
   let suggestionsCarrier = [ [COMMANDS] ]
 
   const getLastScriptWord = (script: string): string => {
@@ -74,12 +75,26 @@
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
     await processSuggestions(newCmdInput, promptContext)
     currentSuggestions = suggestionsCarrier[script.length]
+
+    visibleWrappers = []
+    for (let wrp of currentSuggestions) {
+      for (let sugg of wrp['values']) {
+        if (isVisibleSuggestion(sugg, script, lastWord)) {
+          visibleWrappers.push(wrp)
+          break
+        }
+      }
+    }
   }
 
   export const bringSuggestionsToCursor = () => {
     const suggestionsElement = document.getElementById('suggestions-box')
+
+    if (!suggestionsElement) {
+      return
+    }
     
-    if (suggestionsElement && script.length == 0) {
+    if (script.length == 0) {
       suggestionsElement.style.display = 'none'
       return
     }
@@ -91,13 +106,23 @@
     suggestionsElement.style.top = `${rect.top + 20}px`
     suggestionsElement.style.left = `${rect.left + 10}px`
   }
+
+  
 </script>
 
 
-{#if currentSuggestions}
+{#if visibleWrappers.length > 0}
   <div id="suggestions-box">
       {#each currentSuggestions as wrapper}
-        <SuggestionsWrapper wrapper={wrapper} script={script} lastWord={lastWord} />
+        <div class="suggestions-wrapper">
+          {#each wrapper['values'] as suggestion}
+            {#if isVisibleSuggestion(suggestion, script, lastWord)}
+              <div class="suggestion">
+                  {JSON.stringify(suggestion["names"])}
+                </div>
+            {/if}
+          {/each}
+        </div>
       {/each}
   </div>
 {/if}
@@ -118,5 +143,14 @@
     border: 1px solid rgb(222, 21, 21);
     display: none;
     overflow-y: scroll;
+  }
+
+  .suggestions-wrapper {
+    border: 1px solid rgb(2, 151, 89);
+  }
+
+  .suggestion {
+    margin: 1px;
+    border: 1px solid rgb(153, 151, 155);
   }
 </style>
