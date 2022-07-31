@@ -5,28 +5,12 @@
 
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/library/commands"
+  import SuggestionsWrapper from "./SuggestionsWrapper.svelte";
 
   let script: string = ''
   let lastWord = ''
   let currentSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
-
-  const isVisible = (suggestion) => {
-    if (script[script.length - 1] == " ") {
-      return true
-    }
-
-    if (typeof suggestion['names'] == 'function') {
-      suggestion['names'] = suggestion['names']()
-    }
-
-    for (const name of suggestion["names"]) {
-      if (name == lastWord || name.startsWith(lastWord)) {
-        return true
-      }
-    }
-    return false
-  }
 
   const getLastScriptWord = (script: string): string => {
     const words = script.trim().split(' ')
@@ -113,15 +97,7 @@
 {#if currentSuggestions}
   <div id="suggestions-box">
       {#each currentSuggestions as wrapper}
-        <div class="suggestions-wrapper">
-          {#each wrapper['values'] as suggestion}
-            {#if isVisible(suggestion)}
-              <div class="suggestion">
-                  {JSON.stringify(suggestion["names"])}
-              </div>
-            {/if}
-          {/each}
-        </div>
+        <SuggestionsWrapper wrapper={wrapper} script={script} lastWord={lastWord} />
       {/each}
   </div>
 {/if}
@@ -142,15 +118,5 @@
     border: 1px solid rgb(222, 21, 21);
     display: none;
     overflow-y: scroll;
-  }
-
-  .suggestion {
-    border-bottom: 1px solid rgb(0, 0, 0);
-    margin: 2px;
-  }
-
-  .suggestions-wrapper {
-    border-bottom: 3px solid rgb(7, 115, 3);
-    margin: 2px;
   }
 </style>
