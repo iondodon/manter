@@ -8,6 +8,7 @@
   import { IS_WINDOWS, PTY_WS_ADDRESS } from "../config/config"
   import { ab2str } from "../utils/utils"
 
+  let handlePtyResponse = false
   let suggestionsBox: SuggestionsBox;
   let promptContext = {
     cwd: "~"
@@ -61,6 +62,12 @@
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
       })
 
+      terminal.onKey(evt => {
+        if (evt.key ===  '\t') {
+          handlePtyResponse = true
+        }
+      })
+
       terminal.onSelectionChange(() => {
         
       })
@@ -79,11 +86,23 @@
             return
         }
         document.title = title
+        handlePtyResponse = false
       })
 
-      websocket.onmessage = function(evt) {
+      websocket.onmessage = async function(evt) {
         if (evt.data instanceof ArrayBuffer) {
-          terminal.write(ab2str(evt.data.slice(1)))
+          const data = ab2str(evt.data.slice(1))
+          if (handlePtyResponse) {
+            for (let i = 0; i < data.length; i++) {
+              if (data[i] === "\u0007") { // bell
+                continue
+              }
+              console.log('handle pty response', data[i])
+              await suggestionsBox.updateSuggestions(data[i], promptContext)
+            }
+          }
+          terminal.write(data)
+          handlePtyResponse = false
         } else {
           alert(evt.data)
         }
