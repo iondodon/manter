@@ -52,7 +52,7 @@
 
     let selected = null
     for (let candidatesWrapper of suggestionsCarrier[script.length - 1]) {
-      if (!IS_WINDOWS && candidatesWrapper['processor']) {
+      if (!IS_WINDOWS && candidatesWrapper['postProcessor']) {
         candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, promptContext["cwd"])
       }
       

@@ -9,7 +9,7 @@ const files = {
     }
   ],
   script: "ls -a",
-  processor: function (line) {
+  postProcessor: function (line) {
     return {
       'names': [line],
       'description': 'description of first file',
