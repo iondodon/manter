@@ -1,21 +1,17 @@
 <svelte:options accessors={true}/>
 
 <script type="ts">
-  import { IS_WINDOWS } from "../config/config";
-
+  import { IS_WINDOWS } from "../config/config"
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/library/commands"
 
   let script: string = ''
   let lastWord = ''
   let currentSuggestions = []
+  let visibleSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
 
-  const isVisible = (suggestion) => {
-    if (script[script.length - 1] == " ") {
-      return true
-    }
-
+  const isCandidate = (suggestion) => {
     if (typeof suggestion['names'] == 'function') {
       suggestion['names'] = suggestion['names']()
     }
@@ -30,7 +26,7 @@
 
   const getLastScriptWord = (script: string): string => {
     const words = script.trim().split(' ')
-    return words[words.length - 1]
+    return words[words.length - 1].trim()
   }
 
   const processSuggestions = async (newCmdInput: string, promptContext: object) => {
@@ -90,12 +86,29 @@
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
     await processSuggestions(newCmdInput, promptContext)
     currentSuggestions = suggestionsCarrier[script.length]
+
+    visibleSuggestions = []
+    for (let wrp of currentSuggestions) {
+      let newWrp = {...wrp}
+      if (script[script.length - 1] == " ") {
+        visibleSuggestions = [...visibleSuggestions, newWrp]
+        continue
+      }
+      newWrp['values'] = newWrp['values'].filter(sugg => isCandidate(sugg))
+      if (newWrp['values'].length > 0) {
+        visibleSuggestions = [...visibleSuggestions, newWrp]
+      }
+    }
   }
 
   export const bringSuggestionsToCursor = () => {
     const suggestionsElement = document.getElementById('suggestions-box')
     
-    if (suggestionsElement && script.length == 0) {
+    if (!suggestionsElement) {
+      return
+    }
+
+    if (script.length == 0) {
       suggestionsElement.style.display = 'none'
       return
     }
@@ -110,21 +123,19 @@
 </script>
 
 
-{#if currentSuggestions}
-  <div id="suggestions-box">
-      {#each currentSuggestions as wrapper}
-        <div class="suggestions-wrapper">
-          {#each wrapper['values'] as suggestion}
-            {#if isVisible(suggestion)}
-              <div class="suggestion">
-                  {JSON.stringify(suggestion["names"])}
-              </div>
-            {/if}
-          {/each}
+
+<div id="suggestions-box">
+  {#each visibleSuggestions as wrapper}
+    <div class="suggestions-wrapper">
+      {#each wrapper['values'] as suggestion}            
+        <div class="suggestion">
+            {JSON.stringify(suggestion["names"])}
         </div>
       {/each}
-  </div>
-{/if}
+    </div>
+  {/each}
+</div>
+
 
 
 <style type="scss">
