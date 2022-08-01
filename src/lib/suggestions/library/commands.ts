@@ -5,15 +5,15 @@ const files = {
     {
       names: ['files...'],
       description: 'list of files',
-      next: function() { return [files] }
+      next: () => { return [files] }
     }
   ],
   script: "ls -a",
-  postProcessor: function (line) {
+  postProcessor: (line) => {
     return {
       names: [line],
       description: 'description of first file',
-      next: function() { return [files] }
+      next: () => { return [files] }
     }
   }
 }
@@ -22,9 +22,9 @@ const files = {
 const lsOptions = {
   values: [
     {
-      names: function() { return IS_WINDOWS ? ['-a'] : ['-a', '--all'] },
+      names: () => { return IS_WINDOWS ? ['-a'] : ['-a', '--all'] },
       description: 'ls all - description',
-      next: function() { return [lsOptions, files] }
+      next: () => { return [lsOptions, files] }
     }
   ]
 }
@@ -34,12 +34,12 @@ export const COMMANDS = {
     {
       names: ['ls'],
       description: "ls description",
-      next: function() { return [lsOptions, files] }
+      next: () => { return [lsOptions, files] }
     },
     {
       names: ['sudo'],
       description: "super user do",
-      next: function() { return [] }
+      next: () => { return [] }
     }
   ]
 }
