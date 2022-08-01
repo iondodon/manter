@@ -1,8 +1,7 @@
 <svelte:options accessors={true}/>
 
 <script type="ts">
-  import { IS_WINDOWS } from "../config/config";
-
+  import { IS_WINDOWS } from "../config/config"
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/library/commands"
 
@@ -12,7 +11,7 @@
   let visibleSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
 
-  const isVisible = (suggestion) => {
+  const isCandidate = (suggestion) => {
     if (typeof suggestion['names'] == 'function') {
       suggestion['names'] = suggestion['names']()
     }
@@ -27,7 +26,7 @@
 
   const getLastScriptWord = (script: string): string => {
     const words = script.trim().split(' ')
-    return words[words.length - 1]
+    return words[words.length - 1].trim()
   }
 
   const processSuggestions = async (newCmdInput: string, promptContext: object) => {
@@ -92,12 +91,12 @@
     for (let wrp of currentSuggestions) {
       let newWrp = {...wrp}
       if (script[script.length - 1] == " ") {
-        visibleSuggestions.push(newWrp)
+        visibleSuggestions = [...visibleSuggestions, newWrp]
         continue
       }
-      newWrp['values'] = newWrp['values'].filter(sugg => isVisible(sugg))
+      newWrp['values'] = newWrp['values'].filter(sugg => isCandidate(sugg))
       if (newWrp['values'].length > 0) {
-        visibleSuggestions.push(newWrp)
+        visibleSuggestions = [...visibleSuggestions, newWrp]
       }
     }
   }
@@ -124,6 +123,7 @@
 </script>
 
 
+
 <div id="suggestions-box">
   {#each visibleSuggestions as wrapper}
     <div class="suggestions-wrapper">
@@ -135,6 +135,7 @@
     </div>
   {/each}
 </div>
+
 
 
 <style type="scss">
