@@ -9,13 +9,10 @@
   let script: string = ''
   let lastWord = ''
   let currentSuggestions = []
+  let visibleSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
 
   const isVisible = (suggestion) => {
-    if (script[script.length - 1] == " ") {
-      return true
-    }
-
     if (typeof suggestion['names'] == 'function') {
       suggestion['names'] = suggestion['names']()
     }
@@ -90,12 +87,29 @@
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
     await processSuggestions(newCmdInput, promptContext)
     currentSuggestions = suggestionsCarrier[script.length]
+
+    visibleSuggestions = []
+    for (let wrp of currentSuggestions) {
+      let newWrp = {...wrp}
+      if (script[script.length - 1] == " ") {
+        visibleSuggestions.push(newWrp)
+        continue
+      }
+      newWrp['values'] = newWrp['values'].filter(sugg => isVisible(sugg))
+      if (newWrp['values'].length > 0) {
+        visibleSuggestions.push(newWrp)
+      }
+    }
   }
 
   export const bringSuggestionsToCursor = () => {
     const suggestionsElement = document.getElementById('suggestions-box')
     
-    if (suggestionsElement && script.length == 0) {
+    if (!suggestionsElement) {
+      return
+    }
+
+    if (script.length == 0) {
       suggestionsElement.style.display = 'none'
       return
     }
@@ -110,21 +124,17 @@
 </script>
 
 
-{#if currentSuggestions}
-  <div id="suggestions-box">
-      {#each currentSuggestions as wrapper}
-        <div class="suggestions-wrapper">
-          {#each wrapper['values'] as suggestion}
-            {#if isVisible(suggestion)}
-              <div class="suggestion">
-                  {JSON.stringify(suggestion["names"])}
-              </div>
-            {/if}
-          {/each}
+<div id="suggestions-box">
+  {#each visibleSuggestions as wrapper}
+    <div class="suggestions-wrapper">
+      {#each wrapper['values'] as suggestion}            
+        <div class="suggestion">
+            {JSON.stringify(suggestion["names"])}
         </div>
       {/each}
-  </div>
-{/if}
+    </div>
+  {/each}
+</div>
 
 
 <style type="scss">
