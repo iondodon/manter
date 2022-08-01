@@ -80,7 +80,7 @@
       return
     }
 
-    suggestionsCarrier[script.length] = selected['getNext']()
+    suggestionsCarrier[script.length] = selected['next']()
   }
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {

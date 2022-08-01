@@ -25,7 +25,7 @@ export function getDynamicValues(wrapper, cwd): Promise<any[]> {
   const command = new Command(cmd, [...args, wrapper['script']], { cwd: cwd || null, env: _getEnv() })
   
   command.stdout.on('data', line => {
-    res.push(wrapper['processor'](line))
+    res.push(wrapper['postProcessor'](line))
   })
   
   command.spawn()
