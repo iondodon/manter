@@ -59,7 +59,7 @@
       let candidates = candidatesWrapper['values']
       for (const candidate of candidates) {
         if (typeof candidate['names'] == 'function') {
-          candidate['names'] = candidate['names']()
+          candidate['names'] = (candidate['names'] as Function)()
         }
 
         for (const name of candidate['names']) {

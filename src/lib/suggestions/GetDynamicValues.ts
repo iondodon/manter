@@ -18,7 +18,7 @@ function _getEnv() {
   }, {})
 }
 
-export function getDynamicValues(wrapper, cwd) {
+export function getDynamicValues(wrapper, cwd): Promise<any[]> {
   let res = []
 
   child = null
