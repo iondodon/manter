@@ -39,7 +39,7 @@ export const COMMANDS = {
     {
       names: ['sudo'],
       description: "super user do",
-      next: () => { return [] }
+      next: () => { return [COMMANDS] }
     }
   ]
 }
