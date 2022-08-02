@@ -54,6 +54,15 @@
             return
           }
         }
+        // if up arrow
+        if (data == "\x1b[A") {
+          console.log("up")
+          return
+        }
+        if (data == "\x1b[B") {
+          console.log("down")
+          return
+        }
 
         const encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
