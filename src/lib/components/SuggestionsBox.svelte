@@ -10,6 +10,9 @@
   let currentSuggestions = []
   let visibleSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
+  $: hasSuggestionCandidates = visibleSuggestions.length > 0
+  export let isVisibleBox = true
+  
   export let selectedSuggestionIndex = 0
   let totalSuggestions = 0
 
@@ -24,6 +27,7 @@
       selectedSuggestionIndex = 0
     }
   }
+
 
   const isCandidate = (suggestion) => {
     if (typeof suggestion['names'] == 'function') {
@@ -98,6 +102,7 @@
   }
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
+    isVisibleBox = true
     await processSuggestions(newCmdInput, promptContext)
     currentSuggestions = suggestionsCarrier[script.length]
 
@@ -142,26 +147,28 @@
 </script>
 
 
-<div id="suggestions-box">
-  {#each visibleSuggestions as wrapper}
-    <div class="suggestions-wrapper">
-      {#each wrapper['values'] as suggestion}
-        {#if selectedSuggestionIndex == suggestion['index']}
-          <div id="selected-suggestion">
+
+{#if hasSuggestionCandidates && isVisibleBox}
+  <div id="suggestions-box">
+    {#each visibleSuggestions as wrapper}
+      <div class="suggestions-wrapper">
+        {#each wrapper['values'] as suggestion}
+          {#if selectedSuggestionIndex == suggestion['index']}
+            <div id="selected-suggestion">
+              <div class="suggestion">
+                {JSON.stringify(suggestion["names"])}
+              </div>
+            </div>
+          {:else}
             <div class="suggestion">
               {JSON.stringify(suggestion["names"])}
             </div>
-          </div>
-        {:else}
-          <div class="suggestion">
-            {JSON.stringify(suggestion["names"])}
-          </div>
-        {/if}
-      {/each}
-    </div>
-  {/each}
-</div>
-
+          {/if}
+        {/each}
+      </div>
+    {/each}
+  </div>
+{/if}
 
 
 <style type="scss">

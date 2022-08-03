@@ -42,6 +42,28 @@
       })
 
       terminal.onData(async function(data: string) {
+        // if tab 
+        if (data == "\t") {
+          console.log("tab")
+          return
+        }
+        // if esc
+        if (data == "\x1b") {
+          if (suggestionsBox.isVisibleBox) {
+            suggestionsBox.isVisibleBox = false
+            return
+          }
+        }
+        // if up arrow
+        if (data == "\x1b[A") {
+          console.log("up")
+          return
+        }
+        if (data == "\x1b[B") {
+          console.log("down")
+          return
+        }
+
         const encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
         await suggestionsBox.updateSuggestions(data, promptContext)
@@ -59,6 +81,10 @@
             pixel_height: 0
         }
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
+      })
+
+      terminal.onKey(evt => {
+      
       })
 
       terminal.onSelectionChange(() => {
@@ -81,9 +107,10 @@
         document.title = title
       })
 
-      websocket.onmessage = function(evt) {
+      websocket.onmessage = async function(evt) {
         if (evt.data instanceof ArrayBuffer) {
-          terminal.write(ab2str(evt.data.slice(1)))
+          const data = ab2str(evt.data.slice(1))
+          terminal.write(data)
         } else {
           alert(evt.data)
         }
