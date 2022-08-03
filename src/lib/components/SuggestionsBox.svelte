@@ -28,6 +28,18 @@
     }
   }
 
+  export const selectPrevSuggestion = () => {
+    if (totalSuggestions == 0 || totalSuggestions == 1) {
+      return
+    }
+
+    selectedSuggestionIndex--
+
+    if (selectedSuggestionIndex < 0) {
+      selectedSuggestionIndex = totalSuggestions - 1
+    }
+  }
+
 
   const isCandidate = (suggestion) => {
     if (typeof suggestion['names'] == 'function') {
@@ -108,6 +120,7 @@
 
     visibleSuggestions = []
     totalSuggestions = 0
+    selectedSuggestionIndex = 0
     for (let wrp of currentSuggestions) {
       let newWrp = {...wrp}
       if (script[script.length - 1] == " ") {

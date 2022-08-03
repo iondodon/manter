@@ -56,11 +56,11 @@
         }
         // if up arrow
         if (data == "\x1b[A") {
-          console.log("up")
+          suggestionsBox.selectPrevSuggestion()
           return
         }
         if (data == "\x1b[B") {
-          console.log("down")
+          suggestionsBox.selectNextSuggestion()
           return
         }
 
