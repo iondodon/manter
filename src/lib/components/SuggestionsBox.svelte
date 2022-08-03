@@ -16,6 +16,21 @@
   let selectedSuggestionIndex = 0
   let totalSuggestions = 0
 
+  const scrollToSelectedSuggestion = () => {
+    const selectedSuggestionElement = document.getElementById("selected-suggestion")
+    const suggestionsBoxElement = document.getElementById("suggestions-box")
+
+    const selectedSuggestionTop = selectedSuggestionElement.offsetTop
+    const selectedSuggestionBottom = selectedSuggestionTop + selectedSuggestionElement.offsetHeight
+    const suggestionsBoxTop = suggestionsBoxElement.scrollTop
+    const suggestionsBoxBottom = suggestionsBoxTop + suggestionsBoxElement.offsetHeight
+    if (selectedSuggestionTop < suggestionsBoxTop) {
+      suggestionsBoxElement.scrollTop = selectedSuggestionTop - 21
+    } else if (selectedSuggestionBottom > suggestionsBoxBottom) {
+      suggestionsBoxElement.scrollTop = selectedSuggestionBottom - suggestionsBoxElement.offsetHeight + 21
+    }
+  }
+
   export const selectNextSuggestion = () => {
     if (!isVisible) {
       return
@@ -27,6 +42,7 @@
     if (selectedSuggestionIndex == totalSuggestions) {
       selectedSuggestionIndex = 0
     }
+    scrollToSelectedSuggestion()
   }
 
   export const selectPrevSuggestion = () => {
@@ -40,6 +56,7 @@
     if (selectedSuggestionIndex < 0) {
       selectedSuggestionIndex = totalSuggestions - 1
     }
+    scrollToSelectedSuggestion()
   }
 
   export const takeSuggestion = () => {
