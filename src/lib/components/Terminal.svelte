@@ -46,6 +46,7 @@
           // if tab or enter
           if (data == "\t") {
             let nextText = suggestionsBox.takeSuggestion()
+            nextText += ' '
             for (let i = 0; i < nextText.length; i++) {
               const encodedData = new TextEncoder().encode("\x00" + nextText[i])
               websocket.send(encodedData)
