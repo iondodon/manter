@@ -7,39 +7,76 @@
 
   let script: string = ''
   let lastWord = ''
-  let currentSuggestions = []
-  let visibleSuggestions = []
+  export let filteredSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
-  $: hasSuggestionCandidates = visibleSuggestions.length > 0
-  export let isVisibleBox = true
+  $: hasSuggestionCandidates = filteredSuggestions.length > 0
+  export let isVisible = true
   
-  export let selectedSuggestionIndex = 0
+  let selectedSuggestionIndex = 0
   let totalSuggestions = 0
 
   export const selectNextSuggestion = () => {
+    if (!isVisible) {
+      return
+    }
     if (totalSuggestions == 0 || totalSuggestions == 1) {
       return
     }
-
     selectedSuggestionIndex++
-
     if (selectedSuggestionIndex == totalSuggestions) {
       selectedSuggestionIndex = 0
     }
   }
 
   export const selectPrevSuggestion = () => {
+    if (!hasSuggestionCandidates) {
+      return
+    }
     if (totalSuggestions == 0 || totalSuggestions == 1) {
       return
     }
-
     selectedSuggestionIndex--
-
     if (selectedSuggestionIndex < 0) {
       selectedSuggestionIndex = totalSuggestions - 1
     }
   }
 
+  export const takeSuggestion = () => {
+    if (!isVisible || !hasSuggestionCandidates || totalSuggestions < 1) {
+      return
+    }
+    let suggestionTaken = null
+    for (let wrp of filteredSuggestions) {
+      for (let sugg of wrp['values']) {
+        if (sugg['index'] == selectedSuggestionIndex) {
+          suggestionTaken = sugg
+          break
+        }
+      }
+      if (suggestionTaken) {
+        break
+      }
+    }
+
+    if (!suggestionTaken) {
+      alert("Should be a suggestion here")
+    }
+
+    if (script[script.length - 1] == ' ') {
+      return suggestionTaken['names'][0]
+    }
+
+    for (let name of suggestionTaken['names']) {
+      if (name == lastWord) {
+        return ''
+      }
+      if (name.startsWith(lastWord)) {
+        return name.substring(lastWord.length)
+      }
+    }
+
+    alert("matching names not found")
+  }
 
   const isCandidate = (suggestion) => {
     if (typeof suggestion['names'] == 'function') {
@@ -114,21 +151,20 @@
   }
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
-    isVisibleBox = true
+    isVisible = true
     await processSuggestions(newCmdInput, promptContext)
-    currentSuggestions = suggestionsCarrier[script.length]
 
-    visibleSuggestions = []
+    filteredSuggestions = []
     totalSuggestions = 0
     selectedSuggestionIndex = 0
-    for (let wrp of currentSuggestions) {
+    for (let wrp of suggestionsCarrier[script.length]) {
       let newWrp = {...wrp}
       if (script[script.length - 1] == " ") {
-        visibleSuggestions = [...visibleSuggestions, newWrp]
+        filteredSuggestions = [...filteredSuggestions, newWrp]
       } else {
         newWrp['values'] = newWrp['values'].filter(sugg => isCandidate(sugg))
         if (newWrp['values'].length > 0) {
-          visibleSuggestions = [...visibleSuggestions, newWrp]
+          filteredSuggestions = [...filteredSuggestions, newWrp]
         }
       }
       for (let sugg of newWrp['values']) {
@@ -140,16 +176,13 @@
 
   export const bringSuggestionsToCursor = () => {
     const suggestionsElement = document.getElementById('suggestions-box')
-    
     if (!suggestionsElement) {
       return
     }
-
     if (script.length == 0) {
       suggestionsElement.style.display = 'none'
       return
     }
-
     const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
     const rect = cursorHtml.getBoundingClientRect()
 
@@ -161,9 +194,9 @@
 
 
 
-{#if hasSuggestionCandidates && isVisibleBox}
+{#if hasSuggestionCandidates && isVisible}
   <div id="suggestions-box">
-    {#each visibleSuggestions as wrapper}
+    {#each filteredSuggestions as wrapper}
       <div class="suggestions-wrapper">
         {#each wrapper['values'] as suggestion}
           {#if selectedSuggestionIndex == suggestion['index']}

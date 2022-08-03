@@ -42,26 +42,32 @@
       })
 
       terminal.onData(async function(data: string) {
-        // if tab 
-        if (data == "\t") {
-          console.log("tab")
-          return
-        }
-        // if esc
-        if (data == "\x1b") {
-          if (suggestionsBox.isVisibleBox) {
-            suggestionsBox.isVisibleBox = false
+        if (suggestionsBox.isVisible) {
+          // if tab or enter
+          if ((data == "\t" || data == "\r") && suggestionsBox.filteredSuggestions.length > 0) {
+            let nextText = suggestionsBox.takeSuggestion()
+            for (let i = 0; i < nextText.length; i++) {
+              const encodedData = new TextEncoder().encode("\x00" + nextText[i])
+              websocket.send(encodedData)
+              await suggestionsBox.updateSuggestions(nextText[i], promptContext)
+            }
             return
           }
-        }
-        // if up arrow
-        if (data == "\x1b[A") {
-          suggestionsBox.selectPrevSuggestion()
-          return
-        }
-        if (data == "\x1b[B") {
-          suggestionsBox.selectNextSuggestion()
-          return
+          // if esc
+          if (data == "\x1b") {
+            suggestionsBox.isVisible = false
+            return
+          }
+          // up
+          if (data == "\x1b[A") {
+            suggestionsBox.selectPrevSuggestion()
+            return
+          }
+          // down
+          if (data == "\x1b[B") {
+            suggestionsBox.selectNextSuggestion()
+            return
+          }
         }
 
         const encodedData = new TextEncoder().encode("\x00" + data)
