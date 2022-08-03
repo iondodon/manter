@@ -5,12 +5,13 @@
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/library/commands"
 
-  let script: string = ''
+  export let script: string = ''
   export let lastWord = ''
   export let filteredSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
   $: hasSuggestionCandidates = filteredSuggestions.length > 0
   export let isVisible = true
+  let suggestionTaken = null
   
   let selectedSuggestionIndex = 0
   let totalSuggestions = 0
@@ -45,7 +46,7 @@
     if (!isVisible || !hasSuggestionCandidates || totalSuggestions < 1) {
       return
     }
-    let suggestionTaken = null
+    suggestionTaken = null
     for (let wrp of filteredSuggestions) {
       for (let sugg of wrp['values']) {
         if (sugg['index'] == selectedSuggestionIndex) {
@@ -193,27 +194,26 @@
 </script>
 
 
-
-{#if hasSuggestionCandidates && isVisible}
+{#if isVisible}
   <div id="suggestions-box">
-    {#each filteredSuggestions as wrapper}
-      <div class="suggestions-wrapper">
-        {#each wrapper['values'] as suggestion}
-          {#if selectedSuggestionIndex == suggestion['index']}
-            <div id="selected-suggestion">
-              <div class="suggestion">
-                {JSON.stringify(suggestion["names"])}
-              </div>
-            </div>
-          {:else}
+  {#each filteredSuggestions as wrapper}
+    <div class="suggestions-wrapper">
+      {#each wrapper['values'] as suggestion}
+        {#if selectedSuggestionIndex == suggestion['index']}
+          <div id="selected-suggestion">
             <div class="suggestion">
               {JSON.stringify(suggestion["names"])}
             </div>
-          {/if}
-        {/each}
-      </div>
-    {/each}
-  </div>
+          </div>
+        {:else}
+          <div class="suggestion">
+            {JSON.stringify(suggestion["names"])}
+          </div>
+        {/if}
+      {/each}
+    </div>
+  {/each}
+</div>
 {/if}
 
 

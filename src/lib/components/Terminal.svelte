@@ -42,9 +42,9 @@
       })
 
       terminal.onData(async function(data: string) {
-        if (suggestionsBox.isVisible) {
+        if (suggestionsBox.isVisible && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
           // if tab or enter
-          if ((data == "\t" || data == "\r") && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.lastWord.length > 0) {
+          if (data == "\t") {
             let nextText = suggestionsBox.takeSuggestion()
             for (let i = 0; i < nextText.length; i++) {
               const encodedData = new TextEncoder().encode("\x00" + nextText[i])
@@ -104,7 +104,6 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
-        console.log('title change', title)
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
             promptContext = JSON.parse(title)
