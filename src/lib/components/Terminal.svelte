@@ -44,7 +44,7 @@
       terminal.onData(async function(data: string) {
         if (suggestionsBox.isVisible) {
           // if tab or enter
-          if ((data == "\t" || data == "\r") && suggestionsBox.filteredSuggestions.length > 0) {
+          if ((data == "\t" || data == "\r") && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.lastWord.length > 0) {
             let nextText = suggestionsBox.takeSuggestion()
             for (let i = 0; i < nextText.length; i++) {
               const encodedData = new TextEncoder().encode("\x00" + nextText[i])

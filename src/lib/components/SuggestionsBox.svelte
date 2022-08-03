@@ -6,7 +6,7 @@
   import { COMMANDS } from "../suggestions/library/commands"
 
   let script: string = ''
-  let lastWord = ''
+  export let lastWord = ''
   export let filteredSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
   $: hasSuggestionCandidates = filteredSuggestions.length > 0
