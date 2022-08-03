@@ -10,6 +10,8 @@
   let currentSuggestions = []
   let visibleSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
+  $: hasSuggestionCandidates = visibleSuggestions.length > 0
+  export let isVisibleBox = true
 
   const isCandidate = (suggestion) => {
     if (typeof suggestion['names'] == 'function') {
@@ -84,6 +86,7 @@
   }
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
+    isVisibleBox = true
     await processSuggestions(newCmdInput, promptContext)
     currentSuggestions = suggestionsCarrier[script.length]
 
@@ -123,19 +126,19 @@
 </script>
 
 
-
-<div id="suggestions-box">
-  {#each visibleSuggestions as wrapper}
-    <div class="suggestions-wrapper">
-      {#each wrapper['values'] as suggestion}            
-        <div class="suggestion">
-            {JSON.stringify(suggestion["names"])}
-        </div>
-      {/each}
-    </div>
-  {/each}
-</div>
-
+{#if hasSuggestionCandidates && isVisibleBox}
+  <div id="suggestions-box">
+    {#each visibleSuggestions as wrapper}
+      <div class="suggestions-wrapper">
+        {#each wrapper['values'] as suggestion}            
+          <div class="suggestion">
+              {JSON.stringify(suggestion["names"])}
+          </div>
+        {/each}
+      </div>
+    {/each}
+  </div>  
+{/if}
 
 
 <style type="scss">
