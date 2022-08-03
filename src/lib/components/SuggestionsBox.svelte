@@ -10,6 +10,20 @@
   let currentSuggestions = []
   let visibleSuggestions = []
   let suggestionsCarrier = [ [COMMANDS] ]
+  export let selectedSuggestionIndex = 0
+  let totalSuggestions = 0
+
+  export const selectNextSuggestion = () => {
+    if (totalSuggestions == 0 || totalSuggestions == 1) {
+      return
+    }
+
+    selectedSuggestionIndex++
+
+    if (selectedSuggestionIndex == totalSuggestions) {
+      selectedSuggestionIndex = 0
+    }
+  }
 
   const isCandidate = (suggestion) => {
     if (typeof suggestion['names'] == 'function') {
@@ -88,15 +102,20 @@
     currentSuggestions = suggestionsCarrier[script.length]
 
     visibleSuggestions = []
+    totalSuggestions = 0
     for (let wrp of currentSuggestions) {
       let newWrp = {...wrp}
       if (script[script.length - 1] == " ") {
         visibleSuggestions = [...visibleSuggestions, newWrp]
-        continue
+      } else {
+        newWrp['values'] = newWrp['values'].filter(sugg => isCandidate(sugg))
+        if (newWrp['values'].length > 0) {
+          visibleSuggestions = [...visibleSuggestions, newWrp]
+        }
       }
-      newWrp['values'] = newWrp['values'].filter(sugg => isCandidate(sugg))
-      if (newWrp['values'].length > 0) {
-        visibleSuggestions = [...visibleSuggestions, newWrp]
+      for (let sugg of newWrp['values']) {
+        sugg['index'] = totalSuggestions
+        totalSuggestions++
       }
     }
   }
@@ -123,14 +142,21 @@
 </script>
 
 
-
 <div id="suggestions-box">
   {#each visibleSuggestions as wrapper}
     <div class="suggestions-wrapper">
-      {#each wrapper['values'] as suggestion}            
-        <div class="suggestion">
+      {#each wrapper['values'] as suggestion}
+        {#if selectedSuggestionIndex == suggestion['index']}
+          <div id="selected-suggestion">
+            <div class="suggestion">
+              {JSON.stringify(suggestion["names"])}
+            </div>
+          </div>
+        {:else}
+          <div class="suggestion">
             {JSON.stringify(suggestion["names"])}
-        </div>
+          </div>
+        {/if}
       {/each}
     </div>
   {/each}
@@ -153,6 +179,10 @@
     border: 1px solid rgb(222, 21, 21);
     display: none;
     overflow-y: scroll;
+  }
+
+  #selected-suggestion {
+    background-color: aqua;
   }
 
   .suggestion {
