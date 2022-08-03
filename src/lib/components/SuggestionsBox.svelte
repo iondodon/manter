@@ -149,7 +149,7 @@
 
         for (const name of candidate['names']) {
           if (!selected && name == lastWord) {
-            selected = candidate
+            selected = { ...candidate }
             break
           }
         }
@@ -165,7 +165,10 @@
       return
     }
 
-    suggestionsCarrier[script.length] = selected['next']()
+    if (typeof selected['next'] == "function") {
+      selected['next'] = selected['next']()
+    }
+    suggestionsCarrier[script.length] = selected['next']
   }
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
