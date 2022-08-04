@@ -8,16 +8,14 @@
   import { IS_WINDOWS, PTY_WS_ADDRESS } from "../config/config"
   import { ab2str } from "../utils/utils"
 
+  let loggedIn = false
   let suggestionsBox: SuggestionsBox;
   let promptContext = {
     cwd: "~"
   }
 
   const setupShell = (websocket: WebSocket) => {
-    const setupData = {
-      password: "eronat98"
-    }
-    websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(setupData)))
+    websocket.send(new TextEncoder().encode("\x02"))
   }
 
   onMount(async () => {
@@ -105,6 +103,12 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
+        if (!loggedIn) {
+          if (!IS_WINDOWS) {
+            setupShell(websocket)
+          }
+          loggedIn = true
+        }
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
             promptContext = JSON.parse(title)
@@ -131,10 +135,6 @@
         if (typeof console.log == "function") {
           console.log(evt)
         }
-      }
-
-      if (!IS_WINDOWS) {
-        setupShell(websocket)
       }
     }
   })

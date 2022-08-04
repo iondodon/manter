@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::io::{Write, Read};
 use futures::{StreamExt, SinkExt};
 use futures::stream::{SplitSink, SplitStream};
@@ -25,11 +24,6 @@ struct WindowSize {
   /// The height of a cell in pixels.  Note that some systems never
   /// fill this value and ignore it.
   pub pixel_height: u16,
-}
-
-#[derive(Deserialize, Debug)]
-struct ShellSetupData {
-    pub password: String,
 }
 
 async fn feed_client_from_pty(
@@ -80,29 +74,9 @@ async fn feed_pty_from_ws(
               pty_pair.master.resize(pty_size).unwrap();
             }
             2 => {
-              mt_log!(Level::Info, "Writing password...");
-              let shell_setup_msg: ShellSetupData = serde_json::from_slice(&msg_bytes[1..]).unwrap();
-              pty_writer.write_all(shell_setup_msg.password.as_bytes()).unwrap();
-              
-              // send a newline to the pty to start the shell
-              pty_writer.write_all(b"\n").unwrap();
-
-              std::thread::sleep(std::time::Duration::from_secs(1));
-              mt_log!(Level::Info, "Password written.");
-
-              mt_log!(Level::Info, "Load Env Vars...");
-              let mut env_vars = HashMap::new();
-              for (key, value) in std::env::vars() {
-                env_vars.insert(key, value);
-              }
-
-              std::thread::sleep(std::time::Duration::from_secs(1));
+              mt_log!(Level::Info, "Setup...");
 
               let mut load_env_var_script = String::from("export ");
-
-              for (key, value) in env_vars.iter() {
-                load_env_var_script.push_str(&format!("{}=\"{}\" ", key, value));
-              }
 
               let prompt_commnd = r#"PROMPT_COMMAND='echo -en "\033]0; [manter] {\"cwd\": \"$(pwd)\"} \a"' "#;
               load_env_var_script.push_str(prompt_commnd);
@@ -113,8 +87,6 @@ async fn feed_pty_from_ws(
               load_env_var_script.push_str("\n");
               pty_writer.write_all(load_env_var_script.as_bytes()).unwrap();
 
-              std::thread::sleep(std::time::Duration::from_secs(1));
-
               #[cfg(target_os = "macos")]
               pty_writer.write_all(r#" prmptcmd() { eval "$PROMPT_COMMAND" } "#.as_bytes()).unwrap();
               #[cfg(target_os = "macos")]
@@ -124,19 +96,15 @@ async fn feed_pty_from_ws(
               #[cfg(target_os = "macos")]
               pty_writer.write_all("\n".as_bytes()).unwrap();
 
-              std::thread::sleep(std::time::Duration::from_secs(1));
-
               #[cfg(target_os = "linux")]
               pty_writer.write_all("source ~/.bashrc \n".as_bytes()).unwrap();
 
               #[cfg(target_os = "macos")]
               pty_writer.write_all("source ~/.profile \n".as_bytes()).unwrap();
 
-              std::thread::sleep(std::time::Duration::from_secs(1));
-
               #[cfg(target_os = "macos")]
               pty_writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap();
-              mt_log!(Level::Info, "Env Vars loaded");
+              mt_log!(Level::Info, "Setup done!");
             }
             _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
           }
@@ -168,9 +136,9 @@ async fn accept_connection(stream: TcpStream) {
   let cmd = if cfg!(target_os = "windows") { 
     CommandBuilder::new("powershell")
   } else {
-    let mut cmd = CommandBuilder::new("su");  
     let user = crate::get_setting("default_login_user");
-    cmd.args(["-", user.as_str()]);
+    let mut cmd = CommandBuilder::new("su");  
+    cmd.args(["--preserve-environment", user.as_str()]);
     cmd
   };
 
