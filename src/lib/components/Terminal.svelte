@@ -7,8 +7,9 @@
   import SuggestionsBox from "./SuggestionsBox.svelte"
   import { IS_WINDOWS, PTY_WS_ADDRESS } from "../config/config"
   import { ab2str } from "../utils/utils"
+  import { invoke } from '@tauri-apps/api/tauri'
 
-  let loggedIn = false
+  let isLoggedIn = false
   let suggestionsBox: SuggestionsBox;
   let promptContext = {
     cwd: "~"
@@ -32,7 +33,21 @@
 
       terminal.loadAddon(fitAddon)
 
+
+      const getSettings = async () => {
+        const settings: string = await invoke('get_settings')
+        return JSON.parse(settings)
+      }
+
       terminal.open(document.getElementById('terminal'))
+      terminal.writeln("Wellcome to Manter!")
+      if (!IS_WINDOWS) {
+        const settings = await getSettings()
+        terminal.writeln(`Login to user ${settings['default_login_user']}`)
+        terminal.write("Password: ")
+      }
+
+
       fitAddon.fit()
 
       addEventListener('resize', (_event) => {
@@ -103,11 +118,9 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
-        if (!loggedIn) {
-          if (!IS_WINDOWS) {
-            setupShell(websocket)
-          }
-          loggedIn = true
+        if (!isLoggedIn && !IS_WINDOWS) {
+          setupShell(websocket)
+          isLoggedIn = true
         }
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")

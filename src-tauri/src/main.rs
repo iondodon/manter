@@ -18,8 +18,8 @@ pub struct Settings {
     pub default_login_user: String
 }
 
-
-pub fn get_setting(setting_name: &str) -> String {
+#[tauri::command]
+fn get_settings() -> String {
   let home_dir = dirs::home_dir().unwrap();
   let home_dir = home_dir.to_str().unwrap();
   let settings_file = format!("{}/.manter.json", home_dir);
@@ -28,11 +28,16 @@ pub fn get_setting(setting_name: &str) -> String {
   if !settings_file_path.exists() {
     panic!("Settings file not found");
   }
-  
-  mt_log!(Level::Info, "Get setting {:?}", setting_name);
 
-  let settings_file_string = fs::read_to_string(settings_file_path).unwrap();
+  fs::read_to_string(settings_file_path).unwrap()
+}
+
+
+pub fn get_setting(setting_name: &str) -> String {
+  let settings_file_string = get_settings();
   let settings: Settings = serde_json::from_str(&settings_file_string).unwrap();
+
+  mt_log!(Level::Info, "Get setting {:?}", setting_name);
   
   match setting_name {
     "default_login_user" => settings.default_login_user,
@@ -80,6 +85,7 @@ async fn main() {
 
   let context = tauri::generate_context!();
   tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![get_settings])
     .menu(tauri::Menu::os_default(&context.package_info().name))
     .run(context)
     .expect("error while running tauri application");
