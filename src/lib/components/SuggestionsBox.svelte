@@ -17,7 +17,6 @@
   
   export let filteredSuggestions = []
   let totalAfterFilterSuggestions = 0
-  $: hasSuggestionCandidates = filteredSuggestions.length > 0
 
   const scrollToSelectedSuggestion = () => {
     const selectedSuggestionElement = document.getElementById("selected-suggestion")
@@ -49,7 +48,7 @@
   }
 
   export const selectPrevSuggestion = () => {
-    if (!hasSuggestionCandidates) {
+    if (filteredSuggestions.length < 1) {
       return
     }
     if (totalAfterFilterSuggestions == 0 || totalAfterFilterSuggestions == 1) {
@@ -63,7 +62,7 @@
   }
 
   export const takeSuggestion = () => {
-    if (!isVisible || !hasSuggestionCandidates || totalAfterFilterSuggestions < 1) {
+    if (!isVisible || filteredSuggestions.length < 1 || totalAfterFilterSuggestions < 1) {
       return
     }
     suggestionTaken = null
