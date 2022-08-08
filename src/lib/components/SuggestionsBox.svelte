@@ -143,15 +143,15 @@
         candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, promptContext["cwd"])
       }
       
-      let candidates = candidatesWrapper['values']
-      for (const candidate of candidates) {
-        if (typeof candidate['names'] == 'function') {
-          candidate['names'] = (candidate['names'] as Function)()
+      let suggestionsCandidates = candidatesWrapper['values']
+      for (const suggestionCandidate of suggestionsCandidates) {
+        if (typeof suggestionCandidate['names'] == 'function') {
+          suggestionCandidate['names'] = (suggestionCandidate['names'] as Function)()
         }
 
-        for (const name of candidate['names']) {
+        for (const name of suggestionCandidate['names']) {
           if (!selected && name == lastWord) {
-            selected = { ...candidate }
+            selected = { ...suggestionCandidate }
             break
           }
         }
@@ -171,6 +171,23 @@
       selected['next'] = selected['next']()
     }
     suggestionsCarrier[script.length] = selected['next']
+  }
+
+  export const bringSuggestionsToCursor = () => {
+    const suggestionsElement = document.getElementById('suggestions-box')
+    if (!suggestionsElement) {
+      return
+    }
+    if (script.length == 0) {
+      suggestionsElement.style.display = 'none'
+      return
+    }
+    const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
+    const rect = cursorHtml.getBoundingClientRect()
+
+    suggestionsElement.style.display = 'block'
+    suggestionsElement.style.top = `${rect.top + 20}px`
+    suggestionsElement.style.left = `${rect.left + 10}px`
   }
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
@@ -196,27 +213,10 @@
       }
     }
   }
-
-  export const bringSuggestionsToCursor = () => {
-    const suggestionsElement = document.getElementById('suggestions-box')
-    if (!suggestionsElement) {
-      return
-    }
-    if (script.length == 0) {
-      suggestionsElement.style.display = 'none'
-      return
-    }
-    const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
-    const rect = cursorHtml.getBoundingClientRect()
-
-    suggestionsElement.style.display = 'block'
-    suggestionsElement.style.top = `${rect.top + 20}px`
-    suggestionsElement.style.left = `${rect.left + 10}px`
-  }
 </script>
 
 
-{#if isVisible}
+{#if isVisible && totalAfterFilterSuggestions > 0}
   <div id="suggestions-box">
   {#each filteredSuggestions as wrapper}
     <div class="suggestions-wrapper">
