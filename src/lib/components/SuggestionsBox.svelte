@@ -116,6 +116,25 @@
     return words[words.length - 1].trim()
   }
 
+
+  export const bringSuggestionsToCursor = () => {
+    const suggestionsElement = document.getElementById('suggestions-box')
+    if (!suggestionsElement) {
+      return
+    }
+    if (script.length == 0) {
+      suggestionsElement.style.display = 'none'
+      return
+    }
+    const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
+    const rect = cursorHtml.getBoundingClientRect()
+
+    suggestionsElement.style.display = 'block'
+    suggestionsElement.style.top = `${rect.top + 20}px`
+    suggestionsElement.style.left = `${rect.left + 10}px`
+  }
+
+
   const processSuggestions = async (newCmdInput: string, promptContext: object) => {
     if (newCmdInput === '\n' || newCmdInput === '\r' || newCmdInput == '\x03') {
       suggestionsCarrier = [ [COMMANDS] ]
@@ -173,22 +192,6 @@
     suggestionsCarrier[script.length] = selected['next']
   }
 
-  export const bringSuggestionsToCursor = () => {
-    const suggestionsElement = document.getElementById('suggestions-box')
-    if (!suggestionsElement) {
-      return
-    }
-    if (script.length == 0) {
-      suggestionsElement.style.display = 'none'
-      return
-    }
-    const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
-    const rect = cursorHtml.getBoundingClientRect()
-
-    suggestionsElement.style.display = 'block'
-    suggestionsElement.style.top = `${rect.top + 20}px`
-    suggestionsElement.style.left = `${rect.left + 10}px`
-  }
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
     isVisible = true
