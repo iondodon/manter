@@ -7,14 +7,17 @@
 
   export let script: string = ''
   export let lastWord = ''
-  export let filteredSuggestions = []
-  let suggestionsCarrier = [ [COMMANDS] ]
-  $: hasSuggestionCandidates = filteredSuggestions.length > 0
-  export let isVisible = true
-  let suggestionTaken = null
   
+  let suggestionsCarrier = [ [COMMANDS] ]
+
+  export let isVisible = true
+  
+  let suggestionTaken = null
   let selectedSuggestionIndex = 0
-  let totalSuggestions = 0
+  
+  export let filteredSuggestions = []
+  let totalAfterFilterSuggestions = 0
+  $: hasSuggestionCandidates = filteredSuggestions.length > 0
 
   const scrollToSelectedSuggestion = () => {
     const selectedSuggestionElement = document.getElementById("selected-suggestion")
@@ -35,11 +38,11 @@
     if (!isVisible) {
       return
     }
-    if (totalSuggestions == 0 || totalSuggestions == 1) {
+    if (totalAfterFilterSuggestions == 0 || totalAfterFilterSuggestions == 1) {
       return
     }
     selectedSuggestionIndex++
-    if (selectedSuggestionIndex == totalSuggestions) {
+    if (selectedSuggestionIndex == totalAfterFilterSuggestions) {
       selectedSuggestionIndex = 0
     }
     scrollToSelectedSuggestion()
@@ -49,18 +52,18 @@
     if (!hasSuggestionCandidates) {
       return
     }
-    if (totalSuggestions == 0 || totalSuggestions == 1) {
+    if (totalAfterFilterSuggestions == 0 || totalAfterFilterSuggestions == 1) {
       return
     }
     selectedSuggestionIndex--
     if (selectedSuggestionIndex < 0) {
-      selectedSuggestionIndex = totalSuggestions - 1
+      selectedSuggestionIndex = totalAfterFilterSuggestions - 1
     }
     scrollToSelectedSuggestion()
   }
 
   export const takeSuggestion = () => {
-    if (!isVisible || !hasSuggestionCandidates || totalSuggestions < 1) {
+    if (!isVisible || !hasSuggestionCandidates || totalAfterFilterSuggestions < 1) {
       return
     }
     suggestionTaken = null
@@ -176,7 +179,7 @@
     await processSuggestions(newCmdInput, promptContext)
 
     filteredSuggestions = []
-    totalSuggestions = 0
+    totalAfterFilterSuggestions = 0
     selectedSuggestionIndex = 0
     for (let wrp of suggestionsCarrier[script.length]) {
       let newWrp = {...wrp}
@@ -189,8 +192,8 @@
         }
       }
       for (let sugg of newWrp['values']) {
-        sugg['index'] = totalSuggestions
-        totalSuggestions++
+        sugg['index'] = totalAfterFilterSuggestions
+        totalAfterFilterSuggestions++
       }
     }
   }
