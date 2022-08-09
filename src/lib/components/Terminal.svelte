@@ -19,6 +19,14 @@
     websocket.send(new TextEncoder().encode("\x02"))
   }
 
+  const setCanvasSize = (fitAddon) => {
+    fitAddon.fit()
+    const canvasCursorLayerElement = document.getElementsByClassName('xterm-viewport')[0] as HTMLElement
+    const terminalElement = document.getElementById('terminal')
+    canvasCursorLayerElement.style.width = `${terminalElement.offsetWidth}px`
+    canvasCursorLayerElement.style.height = `${terminalElement.offsetHeight}px`
+  }
+
   onMount(async () => {
     const websocket = new WebSocket(PTY_WS_ADDRESS)
     websocket.binaryType = "arraybuffer"
@@ -33,7 +41,6 @@
 
       terminal.loadAddon(fitAddon)
 
-
       const getSettings = async () => {
         const settings: string = await invoke('get_settings')
         return JSON.parse(settings)
@@ -44,14 +51,12 @@
       if (!IS_WINDOWS) {
         const settings = await getSettings()
         terminal.writeln(`Login to user ${settings['default_login_user']}`)
-        terminal.write("Password: ")
+        // terminal.write("Password: ")
       }
 
-
-      fitAddon.fit()
-
+      setCanvasSize(fitAddon)
       addEventListener('resize', (_event) => {
-        fitAddon.fit()
+        setCanvasSize(fitAddon)
       })
 
       terminal.onData(async function(data: string) {
@@ -93,7 +98,8 @@
         suggestionsBox.bringSuggestionsToCursor()
       })
 
-      terminal.onResize(function(evt) {
+      terminal.onResize(function(evt) {      
+        setCanvasSize(fitAddon)
         const resizeData = {
             cols: evt.cols, 
             rows: evt.rows, 
@@ -154,17 +160,17 @@
 
 </script>
 
-<div>
-  <div id="terminal">
-    <SuggestionsBox bind:this={suggestionsBox} />
-  </div>
+
+<div id="terminal">
+  <SuggestionsBox bind:this={suggestionsBox} />
 </div>
+
 
 <style lang="scss">
   #terminal {
     width: 100%;
     height: 100%;
-    margin: 0%;
     padding: 0%;
+    margin: 0%;
   }
 </style>
