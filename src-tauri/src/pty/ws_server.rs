@@ -26,6 +26,11 @@ struct WindowSize {
   pub pixel_height: u16,
 }
 
+#[derive(Deserialize, Debug)]
+struct LoginData {
+  pub password: String
+}
+
 async fn feed_client_from_pty(
   mut pty_reader: Box<dyn Read + Send>, 
   mut ws_sender: SplitSink<WebSocketStream<TcpStream>, Message>
@@ -74,7 +79,14 @@ async fn feed_pty_from_ws(
               pty_pair.master.resize(pty_size).unwrap();
             }
             2 => {
-              mt_log!(Level::Info, "Setup...");
+              mt_log!(Level::Info, "Login...");
+
+              let login_data: LoginData = serde_json::from_slice(&msg_bytes[1..]).unwrap();
+
+              std::thread::sleep(std::time::Duration::from_secs(1));
+              pty_writer.write_all(login_data.password.as_bytes()).unwrap();
+              pty_writer.write_all("\n".as_bytes()).unwrap();
+              std::thread::sleep(std::time::Duration::from_secs(1));
 
               let mut load_env_var_script = String::from("export ");
 
@@ -87,6 +99,9 @@ async fn feed_pty_from_ws(
               load_env_var_script.push_str("\n");
               pty_writer.write_all(load_env_var_script.as_bytes()).unwrap();
 
+              #[cfg(target_os = "linux")]
+              pty_writer.write_all("source ~/.bashrc \n".as_bytes()).unwrap();
+
               #[cfg(target_os = "macos")]
               pty_writer.write_all(r#" prmptcmd() { eval "$PROMPT_COMMAND" } "#.as_bytes()).unwrap();
               #[cfg(target_os = "macos")]
@@ -95,16 +110,12 @@ async fn feed_pty_from_ws(
               pty_writer.write_all(r#" precmd_functions=(prmptcmd) "#.as_bytes()).unwrap();
               #[cfg(target_os = "macos")]
               pty_writer.write_all("\n".as_bytes()).unwrap();
-
-              #[cfg(target_os = "linux")]
-              pty_writer.write_all("source ~/.bashrc \n".as_bytes()).unwrap();
-
               #[cfg(target_os = "macos")]
               pty_writer.write_all("source ~/.profile \n".as_bytes()).unwrap();
-
               #[cfg(target_os = "macos")]
               pty_writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap();
-              mt_log!(Level::Info, "Setup done!");
+
+              mt_log!(Level::Info, "Logged in!");
             }
             _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
           }

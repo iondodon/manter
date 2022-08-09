@@ -15,8 +15,11 @@
     cwd: "~"
   }
 
-  const setupShell = (websocket: WebSocket) => {
-    websocket.send(new TextEncoder().encode("\x02"))
+  let debugText = ""
+
+  const login = (websocket: WebSocket) => {
+    const loginData = { password: "eronat98" }
+    websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
   const setCanvasSize = (fitAddon) => {
@@ -51,13 +54,17 @@
       if (!IS_WINDOWS) {
         const settings = await getSettings()
         terminal.writeln(`Login to user ${settings['default_login_user']}`)
-        // terminal.write("Password: ")
+        terminal.write("Password: ")
       }
 
       setCanvasSize(fitAddon)
       addEventListener('resize', (_event) => {
         setCanvasSize(fitAddon)
       })
+
+      if (!IS_WINDOWS) {
+        login(websocket)
+      }
 
       terminal.onData(async function(data: string) {
         if (suggestionsBox.isVisible && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
@@ -124,8 +131,8 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
+        debugText = title
         if (!isLoggedIn && !IS_WINDOWS) {
-          setupShell(websocket)
           isLoggedIn = true
         }
         if (title.includes("[manter]")) {
@@ -163,6 +170,7 @@
 
 <div id="terminal">
   <SuggestionsBox bind:this={suggestionsBox} />
+  <div>{debugText}</div>
 </div>
 
 
