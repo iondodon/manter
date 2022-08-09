@@ -29,6 +29,35 @@ const lsOptions = {
   ]
 }
 
+
+const containersIds = {
+  values: [
+    {
+      names: ['ids'],
+      description: 'ides description',
+      next: []
+    }
+  ],
+  script: "sudo docker container ps -a",
+  postProcessor: (line) => {
+    return {
+      names: [line],
+      description: 'container id',
+      next: () => [containersIds]
+    }
+  }
+}
+
+const dockerOptions = {
+  values: [
+    {
+      names: ['rm'],
+      description: 'remove container',
+      next: [containersIds]
+    }
+  ]
+}
+
 export const COMMANDS = {
   values: [
     {
@@ -40,6 +69,11 @@ export const COMMANDS = {
       names: ['sudo'],
       description: "super user do",
       next: () => [COMMANDS]
+    },
+    {
+      names: ['docker'],
+      description: "docker description",
+      next: [dockerOptions]
     }
   ]
 }

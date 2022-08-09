@@ -215,11 +215,15 @@
         totalAfterFilterSuggestions++
       }
     }
+
+    if (filteredSuggestions.length == 0) {
+      isVisible = false
+    }
   }
 </script>
 
 
-{#if isVisible && totalAfterFilterSuggestions > 0}
+{#if isVisible}
   <div id="suggestions-box">
   {#each filteredSuggestions as wrapper}
     <div class="suggestions-wrapper">
