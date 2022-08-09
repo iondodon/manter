@@ -188,6 +188,7 @@ import { compute_slots } from "svelte/internal";
     <label for="name">Password:</label>
     <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
     <button on:click={start} type="button">Login</button>
+    <br/>
     <span id="login-result"></span>
   </div>
 {/if}
