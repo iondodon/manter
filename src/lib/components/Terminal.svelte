@@ -37,10 +37,13 @@ import { compute_slots } from "svelte/internal";
     websocket.binaryType = "arraybuffer"
 
     setTimeout(() => {
+      const loginResultElement = document.getElementById('login-result') as HTMLDivElement
       if (!isLoggedIn) {
+        loginResultElement.innerText = "Login failed"
         websocket.close()
         return
       }
+      loginResultElement.innerText = "Login successful"
       const terminalElement = document.getElementById('terminal')
       terminalElement.style.visibility = "visible"
     }, 5000)
@@ -186,6 +189,7 @@ import { compute_slots } from "svelte/internal";
     <label for="name">Password:</label>
     <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
     <button on:click={start} type="button">Login</button>
+    <span id="login-result"></span>
   </div>
 {/if}
 
