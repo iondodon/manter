@@ -43,7 +43,6 @@ import { compute_slots } from "svelte/internal";
         websocket.close()
         return
       }
-      loginResultElement.innerText = "Login successful"
       const terminalElement = document.getElementById('terminal')
       terminalElement.style.visibility = "visible"
     }, 5000)
