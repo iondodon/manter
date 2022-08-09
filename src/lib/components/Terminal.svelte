@@ -15,8 +15,6 @@
     cwd: "~"
   }
 
-  let debugText = ""
-
   const login = (websocket: WebSocket) => {
     const loginData = { password: "eronat98" }
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
@@ -128,10 +126,13 @@
         console.log("bell")
       })
 
+      // terminal.onScroll((_rows) => {
+      //   setCanvasSize(fitAddon)
+      // })
+
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
-        debugText = title
         if (!isLoggedIn && !IS_WINDOWS) {
           isLoggedIn = true
         }
@@ -170,7 +171,6 @@
 
 <div id="terminal">
   <SuggestionsBox bind:this={suggestionsBox} />
-  <div>{debugText}</div>
 </div>
 
 
@@ -178,7 +178,7 @@
   #terminal {
     width: 100%;
     height: 100%;
-    padding: 0%;
-    margin: 0%;
+    padding: 0;
+    margin: 0;
   }
 </style>
