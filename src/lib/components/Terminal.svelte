@@ -8,6 +8,7 @@
   import { IS_WINDOWS, PTY_WS_ADDRESS } from "../config/config"
   import { ab2str } from "../utils/utils"
   import { invoke } from '@tauri-apps/api/tauri'
+import { compute_slots } from "svelte/internal";
 
   let isLoggedIn = false
   let suggestionsBox: SuggestionsBox;
@@ -15,8 +16,8 @@
     cwd: "~"
   }
 
-  const login = (websocket: WebSocket) => {
-    const loginData = { password: "eronat98" }
+  const login = (websocket: WebSocket, password) => {
+    const loginData = { password: password}
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
@@ -28,9 +29,21 @@
     canvasCursorLayerElement.style.height = `${terminalElement.offsetHeight}px`
   }
 
-  onMount(async () => {
+  const start = async (_evt) => {
+    const passwordElement = document.getElementById('password') as HTMLInputElement
+    const password = passwordElement.value
+
     const websocket = new WebSocket(PTY_WS_ADDRESS)
     websocket.binaryType = "arraybuffer"
+
+    setTimeout(() => {
+      if (!isLoggedIn) {
+        websocket.close()
+        return
+      }
+      const terminalElement = document.getElementById('terminal')
+      terminalElement.style.visibility = "visible"
+    }, 5000)
 
     websocket.onopen = async function(_evt) {
       const fitAddon: FitAddon = new FitAddon()
@@ -61,7 +74,7 @@
       })
 
       if (!IS_WINDOWS) {
-        login(websocket)
+        login(websocket, password)
       }
 
       terminal.onData(async function(data: string) {
@@ -114,7 +127,7 @@
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
       })
 
-      terminal.onKey(evt => {
+      terminal.onKey(_evt => {
       
       })
 
@@ -125,10 +138,6 @@
       terminal.onBell(() => {
         console.log("bell")
       })
-
-      // terminal.onScroll((_rows) => {
-      //   setCanvasSize(fitAddon)
-      // })
 
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
@@ -152,7 +161,7 @@
           alert(evt.data)
         }
       }
-
+ 
       websocket.onclose = function(_evt) {
         terminal.write("Session terminated")
         terminal.dispose()
@@ -164,21 +173,38 @@
         }
       }
     }
-  })
+  }
 
 </script>
 
-
 <div id="terminal">
-  <SuggestionsBox bind:this={suggestionsBox} />
+    <SuggestionsBox bind:this={suggestionsBox} />
 </div>
 
+{#if !isLoggedIn}
+  <div id="login-form">
+    <label for="name">Password:</label>
+    <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
+    <button on:click={start} type="button">Login</button>
+  </div>
+{/if}
 
 <style lang="scss">
   #terminal {
+    visibility: hidden;
     width: 100%;
     height: 100%;
     padding: 0;
     margin: 0;
+  }
+
+  // put login form on top of terminal and in the center of the screen
+  #login-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
   }
 </style>
