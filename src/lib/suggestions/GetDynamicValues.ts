@@ -2,7 +2,7 @@ import { Command } from "@tauri-apps/api/shell"
 
 const windows = navigator.userAgent.includes('Windows')
 let cmd = windows ? 'cmd' : 'sh'
-let args = windows ? ['/C'] : ['-c']
+let args = windows ? ['/C'] : ['-c', 'SUDO_ASKPASS=/usr/bin/ssh-askpass', 'sudo', '-A']
 
 let env = 'SOMETHING=value ANOTHER=2'
 let stdin = ''
