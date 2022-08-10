@@ -7,8 +7,6 @@
   import SuggestionsBox from "./SuggestionsBox.svelte"
   import { IS_WINDOWS, PTY_WS_ADDRESS } from "../config/config"
   import { ab2str } from "../utils/utils"
-  import { invoke } from '@tauri-apps/api/tauri'
-import { compute_slots } from "svelte/internal";
 
   let isLoggedIn = false
   let suggestionsBox: SuggestionsBox;
@@ -23,10 +21,12 @@ import { compute_slots } from "svelte/internal";
 
   const setCanvasSize = (fitAddon) => {
     fitAddon.fit()
-    const canvasCursorLayerElement = document.getElementsByClassName('xterm-viewport')[0] as HTMLElement
-    const terminalElement = document.getElementById('terminal')
-    canvasCursorLayerElement.style.width = `${terminalElement.offsetWidth}px`
-    canvasCursorLayerElement.style.height = `${terminalElement.offsetHeight}px`
+    if (isLoggedIn) {
+      const canvasCursorLayerElement = document.getElementsByClassName('xterm-viewport')[0] as HTMLElement
+      const terminalElement = document.getElementById('terminal')
+      canvasCursorLayerElement.style.width = `${terminalElement.offsetWidth}px`
+      canvasCursorLayerElement.style.height = `${terminalElement.offsetHeight}px`
+    }
   }
 
   const start = async (_evt) => {
@@ -43,8 +43,6 @@ import { compute_slots } from "svelte/internal";
         websocket.close()
         return
       }
-      const terminalElement = document.getElementById('terminal')
-      terminalElement.style.visibility = "visible"
     }, 5000)
 
     websocket.onopen = async function(_evt) {
@@ -57,27 +55,14 @@ import { compute_slots } from "svelte/internal";
 
       terminal.loadAddon(fitAddon)
 
-      const getSettings = async () => {
-        const settings: string = await invoke('get_settings')
-        return JSON.parse(settings)
-      }
-
-      terminal.open(document.getElementById('terminal'))
-      terminal.writeln("Wellcome to Manter!")
       if (!IS_WINDOWS) {
-        const settings = await getSettings()
-        terminal.writeln(`Login to user ${settings['default_login_user']}`)
-        terminal.write("Password: ")
+        login(websocket, password)
       }
 
       setCanvasSize(fitAddon)
       addEventListener('resize', (_event) => {
         setCanvasSize(fitAddon)
       })
-
-      if (!IS_WINDOWS) {
-        login(websocket, password)
-      }
 
       terminal.onData(async function(data: string) {
         if (suggestionsBox.isVisible && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
@@ -145,6 +130,7 @@ import { compute_slots } from "svelte/internal";
 
       terminal.onTitleChange(function(title) {
         if (!isLoggedIn && !IS_WINDOWS) {
+          terminal.open(document.getElementById('terminal'))
           isLoggedIn = true
         }
         if (title.includes("[manter]")) {
@@ -183,7 +169,7 @@ import { compute_slots } from "svelte/internal";
     <SuggestionsBox bind:this={suggestionsBox} />
 </div>
 
-{#if !isLoggedIn}
+{#if !IS_WINDOWS && !isLoggedIn}
   <div id="login-form">
     <label for="name">Password:</label>
     <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
@@ -195,14 +181,12 @@ import { compute_slots } from "svelte/internal";
 
 <style lang="scss">
   #terminal {
-    visibility: hidden;
     width: 100%;
     height: 100%;
     padding: 0;
     margin: 0;
   }
 
-  // put login form on top of terminal and in the center of the screen
   #login-form {
     position: absolute;
     top: 0;
