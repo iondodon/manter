@@ -19,16 +19,6 @@
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
-  const setCanvasSize = (fitAddon) => {
-    fitAddon.fit()
-    if (isLoggedIn) {
-      const canvasCursorLayerElement = document.getElementsByClassName('xterm-viewport')[0] as HTMLElement
-      const terminalElement = document.getElementById('terminal')
-      canvasCursorLayerElement.style.width = `${terminalElement.offsetWidth}px`
-      canvasCursorLayerElement.style.height = `${terminalElement.offsetHeight}px`
-    }
-  }
-
   const start = async (_evt) => {
     const passwordElement = document.getElementById('password') as HTMLInputElement
     const password = passwordElement.value
@@ -59,9 +49,8 @@
         login(websocket, password)
       }
 
-      setCanvasSize(fitAddon)
       addEventListener('resize', (_event) => {
-        setCanvasSize(fitAddon)
+        fitAddon.fit()
       })
 
       terminal.onData(async function(data: string) {
@@ -104,7 +93,7 @@
       })
 
       terminal.onResize(function(evt) {      
-        setCanvasSize(fitAddon)
+        fitAddon.fit()
         const resizeData = {
             cols: evt.cols, 
             rows: evt.rows, 
@@ -131,6 +120,7 @@
       terminal.onTitleChange(function(title) {
         if (!isLoggedIn && !IS_WINDOWS) {
           terminal.open(document.getElementById('terminal'))
+          fitAddon.fit()
           isLoggedIn = true
         }
         if (title.includes("[manter]")) {
@@ -185,6 +175,7 @@
     height: 100%;
     padding: 0;
     margin: 0;
+    background-color: black;
   }
 
   #login-form {
@@ -194,5 +185,6 @@
     width: 100%;
     height: 100%;
     text-align: center;
+    color: white;
   }
 </style>
