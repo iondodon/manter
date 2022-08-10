@@ -19,7 +19,7 @@
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
-  const start = async (_evt) => {
+  const newTerminal = async (_evt) => {
     const passwordElement = document.getElementById('password') as HTMLInputElement
     const password = passwordElement.value
 
@@ -33,7 +33,7 @@
         websocket.close()
         return
       }
-    }, 5000)
+    }, 4000)
 
     websocket.onopen = async function(_evt) {
       const fitAddon: FitAddon = new FitAddon()
@@ -163,7 +163,7 @@
   <div id="login-form">
     <label for="name">Password:</label>
     <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
-    <button on:click={start} type="button">Login</button>
+    <button on:click={newTerminal} type="button">Login</button>
     <br/>
     <span id="login-result"></span>
   </div>

@@ -79,14 +79,14 @@ async fn feed_pty_from_ws(
               pty_pair.master.resize(pty_size).unwrap();
             }
             2 => {
-              mt_log!(Level::Info, "Login...");
+              mt_log!(Level::Info, "Login & Environment initialization...");
 
               let login_data: LoginData = serde_json::from_slice(&msg_bytes[1..]).unwrap();
 
-              std::thread::sleep(std::time::Duration::from_secs(1));
+              std::thread::sleep(std::time::Duration::from_secs(0.5 as u64));
               pty_writer.write_all(login_data.password.as_bytes()).unwrap();
               pty_writer.write_all("\n".as_bytes()).unwrap();
-              std::thread::sleep(std::time::Duration::from_secs(1));
+              std::thread::sleep(std::time::Duration::from_secs(0.5 as u64));
 
               let mut load_env_var_script = String::from("export ");
 
@@ -115,7 +115,7 @@ async fn feed_pty_from_ws(
               #[cfg(target_os = "macos")]
               pty_writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap();
 
-              mt_log!(Level::Info, "Logged in!");
+              mt_log!(Level::Info, "Login & Environment initialization finished");
             }
             _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
           }
