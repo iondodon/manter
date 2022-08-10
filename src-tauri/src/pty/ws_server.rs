@@ -83,10 +83,8 @@ async fn feed_pty_from_ws(
 
               let login_data: LoginData = serde_json::from_slice(&msg_bytes[1..]).unwrap();
 
-              std::thread::sleep(std::time::Duration::from_secs(0.5 as u64));
               pty_writer.write_all(login_data.password.as_bytes()).unwrap();
               pty_writer.write_all("\n".as_bytes()).unwrap();
-              std::thread::sleep(std::time::Duration::from_secs(0.5 as u64));
 
               let mut load_env_var_script = String::from("export ");
 

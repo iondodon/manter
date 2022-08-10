@@ -1,6 +1,4 @@
 <script lang="ts">
-
-  import { onMount } from "svelte"
   import { Terminal }  from "xterm"
   import { FitAddon }   from "xterm-addon-fit"
   import "xterm/css/xterm.css"
@@ -19,21 +17,12 @@
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
-  const newTerminal = async (_evt) => {
+  const loginToNewTerminal = async (_evt) => {
     const passwordElement = document.getElementById('password') as HTMLInputElement
     const password = passwordElement.value
 
     const websocket = new WebSocket(PTY_WS_ADDRESS)
     websocket.binaryType = "arraybuffer"
-
-    setTimeout(() => {
-      const loginResultElement = document.getElementById('login-result') as HTMLDivElement
-      if (!isLoggedIn) {
-        loginResultElement.innerText = "Login failed"
-        websocket.close()
-        return
-      }
-    }, 4000)
 
     websocket.onopen = async function(_evt) {
       const fitAddon: FitAddon = new FitAddon()
@@ -46,7 +35,16 @@
       terminal.loadAddon(fitAddon)
 
       if (!IS_WINDOWS) {
+        const loginResultElement = document.getElementById('login-result') as HTMLDivElement
+        loginResultElement.innerText = ""
         login(websocket, password)
+        setTimeout(() => {
+          if (!isLoggedIn) {
+            loginResultElement.innerText = "Login failed"
+            websocket.close()
+            return
+          }
+        }, 1000)
       }
 
       addEventListener('resize', (_event) => {
@@ -118,7 +116,7 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
-        if (!isLoggedIn && !IS_WINDOWS) {
+        if (!IS_WINDOWS && !isLoggedIn) {
           terminal.open(document.getElementById('terminal'))
           fitAddon.fit()
           isLoggedIn = true
@@ -153,21 +151,22 @@
     }
   }
 
+  if (IS_WINDOWS) {
+    loginToNewTerminal(null)
+  }
+
 </script>
 
 <div id="terminal">
     <SuggestionsBox bind:this={suggestionsBox} />
+    <div id="login-form">
+      <label for="name">Password:</label>
+      <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
+      <button on:click={loginToNewTerminal} type="button">Login</button>
+      <br/>
+      <span id="login-result"></span>
+    </div>
 </div>
-
-{#if !IS_WINDOWS && !isLoggedIn}
-  <div id="login-form">
-    <label for="name">Password:</label>
-    <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
-    <button on:click={newTerminal} type="button">Login</button>
-    <br/>
-    <span id="login-result"></span>
-  </div>
-{/if}
 
 <style lang="scss">
   #terminal {
