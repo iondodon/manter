@@ -7,6 +7,7 @@
 
   export let script: string = ''
   export let lastWord = ''
+  export let pass = null
   
   let suggestionsCarrier = [ [COMMANDS] ]
 
@@ -159,7 +160,7 @@
     let selected = null
     for (let candidatesWrapper of suggestionsCarrier[script.length - 1]) {
       if (!IS_WINDOWS && candidatesWrapper['postProcessor']) {
-        candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, promptContext["cwd"])
+        candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, promptContext["cwd"], pass)
       }
       
       let suggestionsCandidates = candidatesWrapper['values']

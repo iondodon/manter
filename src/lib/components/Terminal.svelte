@@ -11,16 +11,19 @@
   let promptContext = {
     cwd: "~"
   }
+  let pass = null
 
-  const login = (websocket: WebSocket, password) => {
-    const loginData = { password: password}
+  const login = (websocket: WebSocket) => {
+    pass = getInputPass()
+    const loginData = { password: pass}
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
-  const loginToNewTerminal = async (_evt) => {
-    const passwordElement = document.getElementById('password') as HTMLInputElement
-    const password = passwordElement.value
+  const getInputPass = () => {
+    return (document.getElementById('password') as HTMLInputElement).value
+  }
 
+  const loginToNewTerminal = async (_evt) => {
     const websocket = new WebSocket(PTY_WS_ADDRESS)
     websocket.binaryType = "arraybuffer"
 
@@ -123,13 +126,14 @@
           if (!IS_WINDOWS && !isLoggedIn && data.includes("Password:")) {
             const loginResultElement = document.getElementById('login-result') as HTMLDivElement
             loginResultElement.innerText = ""
-            login(websocket, password)
+            login(websocket)
             setTimeout(() => {
               if (isLoggedIn) {
                 return
               }
               loginResultElement.innerText = "Login failed"
               websocket.close()
+              console.log('WS closed')
             }, 2000)
           }
         } else {
@@ -157,7 +161,7 @@
 </script>
 
 <div id="terminal">
-    <SuggestionsBox bind:this={suggestionsBox} />
+    <SuggestionsBox bind:this={suggestionsBox} bind:pass={pass} />
     {#if !isLoggedIn}
        <div id="login-form">
         <label for="name">Password:</label>

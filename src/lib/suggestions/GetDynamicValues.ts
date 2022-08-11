@@ -2,7 +2,7 @@ import { Command } from "@tauri-apps/api/shell"
 
 const windows = navigator.userAgent.includes('Windows')
 let cmd = windows ? 'cmd' : 'sh'
-let args = windows ? ['/C'] : ['-c', 'SUDO_ASKPASS=/usr/bin/ssh-askpass', 'sudo', '-A']
+let args = windows ? ['/C'] : ['-c']
 
 let env = 'SOMETHING=value ANOTHER=2'
 let stdin = ''
@@ -18,12 +18,13 @@ function _getEnv() {
   }, {})
 }
 
-export function getDynamicValues(wrapper, cwd): Promise<any[]> {
+export function getDynamicValues(wrapper, cwd, pass): Promise<any[]> {
   let res = []
 
   child = null
-  const command = new Command(cmd, [...args, wrapper['script']], { cwd: cwd || null, env: _getEnv() })
-  
+  const script = "echo \"" + pass + "\" | sudo -S " + wrapper['script'] + "; sudo -K;"
+  const command = new Command(cmd, [...args, script], { cwd: cwd || null, env: _getEnv() })
+
   command.stdout.on('data', line => {
     res.push(wrapper['postProcessor'](line))
   })
@@ -34,6 +35,10 @@ export function getDynamicValues(wrapper, cwd): Promise<any[]> {
     })
     .catch(r => console.log(r))
 
+    command.stderr.on('data', line => {
+      console.log('stderr ' + line)
+    })
+
   return new Promise((resolve, reject) => {
       command.on('close', data => {
         console.log(`command finished with code ${data.code} and signal ${data.signal}`)
@@ -42,12 +47,7 @@ export function getDynamicValues(wrapper, cwd): Promise<any[]> {
       })
 
       command.on('error', error => {
-        console.log(error)
-        reject(error)
-      })
-      command.stderr.on('data', line => {
-        console.log(line)
-        reject(line)
+        reject("error " + error)
       })
   })
 }
