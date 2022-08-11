@@ -94,9 +94,6 @@ async fn feed_pty_from_ws(
               let term_var = "TERM=xterm-256color ";
               load_env_var_script.push_str(term_var);
 
-              let sudo_ask_pass_var = "SUDO_ASKPASS=/usr/bin/ssh-askpass ";
-              load_env_var_script.push_str(sudo_ask_pass_var);
-
               load_env_var_script.push_str("\n");
               pty_writer.write_all(load_env_var_script.as_bytes()).unwrap();
 

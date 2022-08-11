@@ -34,19 +34,6 @@
 
       terminal.loadAddon(fitAddon)
 
-      if (!IS_WINDOWS) {
-        const loginResultElement = document.getElementById('login-result') as HTMLDivElement
-        loginResultElement.innerText = ""
-        login(websocket, password)
-        setTimeout(() => {
-          if (!isLoggedIn) {
-            loginResultElement.innerText = "Login failed"
-            websocket.close()
-            return
-          }
-        }, 1500)
-      }
-
       addEventListener('resize', (_event) => {
         fitAddon.fit()
       })
@@ -131,8 +118,20 @@
 
       websocket.onmessage = async function(evt) {
         if (evt.data instanceof ArrayBuffer) {
-          const data = ab2str(evt.data.slice(1))
+          const data: string = ab2str(evt.data.slice(1))
           terminal.write(data)
+          if (!IS_WINDOWS && !isLoggedIn && data.includes("Password:")) {
+            const loginResultElement = document.getElementById('login-result') as HTMLDivElement
+            loginResultElement.innerText = ""
+            login(websocket, password)
+            setTimeout(() => {
+              if (isLoggedIn) {
+                return
+              }
+              loginResultElement.innerText = "Login failed"
+              websocket.close()
+            }, 2000)
+          }
         } else {
           alert(evt.data)
         }
@@ -159,21 +158,25 @@
 
 <div id="terminal">
     <SuggestionsBox bind:this={suggestionsBox} />
-    <div id="login-form">
-      <label for="name">Password:</label>
-      <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
-      <button on:click={loginToNewTerminal} type="button">Login</button>
-      <br/>
-      <span id="login-result"></span>
-    </div>
+    {#if !isLoggedIn}
+       <div id="login-form">
+        <label for="name">Password:</label>
+        <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
+        <button on:click={loginToNewTerminal} type="button">Login</button>
+        <br/>
+        <span id="login-result"></span>
+      </div>
+    {/if}
 </div>
 
 <style lang="scss">
   #terminal {
     top: 0;
+
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: auto;
+
     width: 100%;
     padding: 0;
     margin: 0;
