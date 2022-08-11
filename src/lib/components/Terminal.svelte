@@ -9,18 +9,15 @@
   let isLoggedIn = false
   let suggestionsBox: SuggestionsBox;
   let promptContext = {
-    cwd: "~"
+    cwd: "~",
+    password: ""
   }
-  let pass = null
 
   const login = (websocket: WebSocket) => {
-    pass = getInputPass()
-    const loginData = { password: pass}
+    promptContext['password'] = (document.getElementById('password') as HTMLInputElement).value
+    console.log('changing pass', promptContext['password'])
+    const loginData = { password: promptContext['password']}
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
-  }
-
-  const getInputPass = () => {
-    return (document.getElementById('password') as HTMLInputElement).value
   }
 
   const loginToNewTerminal = async (_evt) => {
@@ -77,6 +74,7 @@
 
         const encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
+        console.log('before before', promptContext)
         await suggestionsBox.updateSuggestions(data, promptContext)
       })
 
@@ -117,7 +115,8 @@
         }
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
-            promptContext = JSON.parse(title)
+            let promptUpdatedData = JSON.parse(title)
+            promptContext = {...promptContext, ...promptUpdatedData}
             return
         }
         document.title = title
@@ -172,7 +171,7 @@
 </script>
 
 <div id="terminal">
-    <SuggestionsBox bind:this={suggestionsBox} bind:pass={pass} />
+    <SuggestionsBox bind:this={suggestionsBox} />
     {#if !IS_WINDOWS && !isLoggedIn}
        <div id="login-form">
         <label for="name">Password:</label>
