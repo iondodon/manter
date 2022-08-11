@@ -36,6 +36,10 @@
       })
 
       terminal.loadAddon(fitAddon)
+      if (IS_WINDOWS) {
+        terminal.open(document.getElementById('terminal'))
+        fitAddon.fit()
+      }
 
       addEventListener('resize', (_event) => {
         fitAddon.fit()
@@ -151,6 +155,7 @@
           console.log(evt)
         }
       }
+
     }
   }
 
@@ -162,7 +167,7 @@
 
 <div id="terminal">
     <SuggestionsBox bind:this={suggestionsBox} bind:pass={pass} />
-    {#if !isLoggedIn}
+    {#if !IS_WINDOWS && !isLoggedIn}
        <div id="login-form">
         <label for="name">Password:</label>
         <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
