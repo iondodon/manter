@@ -15,7 +15,6 @@
 
   const login = (websocket: WebSocket) => {
     promptContext['password'] = (document.getElementById('password') as HTMLInputElement).value
-    console.log('changing pass', promptContext['password'])
     const loginData = { password: promptContext['password']}
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
