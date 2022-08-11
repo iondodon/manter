@@ -73,7 +73,6 @@
 
         const encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
-        console.log('before before', promptContext)
         await suggestionsBox.updateSuggestions(data, promptContext)
       })
 
