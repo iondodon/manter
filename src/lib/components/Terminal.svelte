@@ -8,14 +8,14 @@
 
   let isLoggedIn = false
   let suggestionsBox: SuggestionsBox;
-  let promptContext = {
+  let sessionContext = {
     cwd: "~",
     password: ""
   }
 
   const login = (websocket: WebSocket) => {
-    promptContext['password'] = (document.getElementById('password') as HTMLInputElement).value
-    const loginData = { password: promptContext['password']}
+    sessionContext['password'] = (document.getElementById('password') as HTMLInputElement).value
+    const loginData = { password: sessionContext['password']}
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
@@ -50,7 +50,7 @@
             for (let i = 0; i < nextText.length; i++) {
               const encodedData = new TextEncoder().encode("\x00" + nextText[i])
               websocket.send(encodedData)
-              await suggestionsBox.updateSuggestions(nextText[i], promptContext)
+              await suggestionsBox.updateSuggestions(nextText[i], sessionContext)
             }
             return
           }
@@ -73,7 +73,7 @@
 
         const encodedData = new TextEncoder().encode("\x00" + data)
         websocket.send(encodedData)
-        await suggestionsBox.updateSuggestions(data, promptContext)
+        await suggestionsBox.updateSuggestions(data, sessionContext)
       })
 
       terminal.onCursorMove(() => {
@@ -114,7 +114,7 @@
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
             let promptUpdatedData = JSON.parse(title)
-            promptContext = {...promptContext, ...promptUpdatedData}
+            sessionContext = {...sessionContext, ...promptUpdatedData}
             return
         }
         document.title = title

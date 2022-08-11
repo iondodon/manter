@@ -135,7 +135,7 @@
   }
 
 
-  const processSuggestions = async (newCmdInput: string, promptContext: object) => {
+  const processSuggestions = async (newCmdInput: string, sessionContext: object) => {
     if (newCmdInput === '\n' || newCmdInput === '\r' || newCmdInput == '\x03') {
       suggestionsCarrier = [ [COMMANDS] ]
       script = ''
@@ -159,7 +159,7 @@
     let selected = null
     for (let candidatesWrapper of suggestionsCarrier[script.length - 1]) {
       if (!IS_WINDOWS && candidatesWrapper['postProcessor']) {
-        candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, promptContext)
+        candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, sessionContext)
       }
       
       let suggestionsCandidates = candidatesWrapper['values']

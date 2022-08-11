@@ -18,9 +18,9 @@ function _getEnv() {
   }, {})
 }
 
-export function getDynamicValues(wrapper, promptContext): Promise<any[]> {
-  const cwd = promptContext['cwd']
-  const pass = promptContext['password']
+export function getDynamicValues(wrapper, sessionContext): Promise<any[]> {
+  const cwd = sessionContext['cwd']
+  const pass = sessionContext['password']
   let res = []
 
   child = null
