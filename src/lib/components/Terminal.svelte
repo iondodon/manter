@@ -163,6 +163,12 @@
     loginToNewTerminal(null)
   }
 
+  const passInputOnKeyPress = (evt) => {
+    if (evt.charCode === 13) {
+      loginToNewTerminal(null)
+    }
+  }
+
 </script>
 
 <div id="terminal">
@@ -170,7 +176,16 @@
     {#if !IS_WINDOWS && !isLoggedIn}
        <div id="login-form">
         <label for="name">Password:</label>
-        <input type="text" id="password" name="password" required minlength="4" maxlength="20" size="10">
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          required 
+          minlength="4" 
+          maxlength="20" 
+          size="10"
+          on:keypress={passInputOnKeyPress}
+        >
         <button on:click={loginToNewTerminal} type="button">Login</button>
         <br/>
         <span id="login-result"></span>
