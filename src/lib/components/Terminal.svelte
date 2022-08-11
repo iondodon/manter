@@ -44,7 +44,7 @@
             websocket.close()
             return
           }
-        }, 1000)
+        }, 1500)
       }
 
       addEventListener('resize', (_event) => {
@@ -170,19 +170,17 @@
 
 <style lang="scss">
   #terminal {
+    top: 0;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
     width: 100%;
-    height: 100%;
     padding: 0;
     margin: 0;
     background-color: black;
   }
 
   #login-form {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     text-align: center;
     color: white;
   }
