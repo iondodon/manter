@@ -10,10 +10,9 @@
 
 <style type="scss">
   main {
-    display: flex;
-    flex-flow: column;
-    width: 100%;
     height: 100%;
+    overflow-y: hidden;
+    width: 100%;
     padding: 0;
     margin: 0;
   }

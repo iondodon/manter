@@ -6,9 +6,9 @@
   import { IS_WINDOWS, PTY_WS_ADDRESS } from "../config/config"
   import { ab2str } from "../utils/utils"
 
-  let isLoggedIn = false
   let suggestionsBox: SuggestionsBox;
   let sessionContext = {
+    isLoggedIn: false,
     cwd: "~",
     password: ""
   }
@@ -106,10 +106,10 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
-        if (!IS_WINDOWS && !isLoggedIn) {
+        if (!IS_WINDOWS && !sessionContext['isLoggedIn']) {
           terminal.open(document.getElementById('terminal'))
           fitAddon.fit()
-          isLoggedIn = true
+          sessionContext['isLoggedIn'] = true
         }
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
@@ -124,18 +124,18 @@
         if (evt.data instanceof ArrayBuffer) {
           const data: string = ab2str(evt.data.slice(1))
           terminal.write(data)
-          if (!IS_WINDOWS && !isLoggedIn && data.includes("Password:")) {
+          if (!IS_WINDOWS && !sessionContext['isLoggedIn'] && data.includes("Password:")) {
             const loginResultElement = document.getElementById('login-result') as HTMLDivElement
             loginResultElement.innerText = ""
             login(websocket)
             setTimeout(() => {
-              if (isLoggedIn) {
+              if (sessionContext['isLoggedIn']) {
                 return
               }
               loginResultElement.innerText = "Login failed"
               websocket.close()
               console.log('WS closed')
-            }, 2000)
+            }, 1000)
           }
         } else {
           alert(evt.data)
@@ -170,7 +170,7 @@
 
 <div id="terminal">
     <SuggestionsBox bind:this={suggestionsBox} />
-    {#if !IS_WINDOWS && !isLoggedIn}
+    {#if !IS_WINDOWS && !sessionContext['isLoggedIn']}
        <div id="login-form">
         <label for="name">Password:</label>
         <input 
@@ -192,12 +192,9 @@
 
 <style lang="scss">
   #terminal {
+    height: 97vh;
+
     top: 0;
-
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: auto;
-
     width: 100%;
     padding: 0;
     margin: 0;
