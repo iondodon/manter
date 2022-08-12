@@ -86,7 +86,7 @@ async fn feed_pty_from_ws(
               pty_writer.write_all(login_data.password.as_bytes()).unwrap();
               pty_writer.write_all("\n".as_bytes()).unwrap();
 
-              let mut load_env_var_script = String::from("export ");
+              let mut load_env_var_script = String::from(" export ");
 
               let prompt_commnd = r#"PROMPT_COMMAND='echo -en "\033]0; [manter] {\"cwd\": \"$(pwd)\"} \a"' "#;
               load_env_var_script.push_str(prompt_commnd);
@@ -98,7 +98,7 @@ async fn feed_pty_from_ws(
               pty_writer.write_all(load_env_var_script.as_bytes()).unwrap();
 
               #[cfg(target_os = "linux")]
-              pty_writer.write_all("source ~/.bashrc \n".as_bytes()).unwrap();
+              pty_writer.write_all(" source ~/.bashrc \n".as_bytes()).unwrap();
 
               #[cfg(target_os = "macos")]
               pty_writer.write_all(r#" prmptcmd() { eval "$PROMPT_COMMAND" } "#.as_bytes()).unwrap();
@@ -109,9 +109,9 @@ async fn feed_pty_from_ws(
               #[cfg(target_os = "macos")]
               pty_writer.write_all("\n".as_bytes()).unwrap();
               #[cfg(target_os = "macos")]
-              pty_writer.write_all("source ~/.profile \n".as_bytes()).unwrap();
+              pty_writer.write_all(" source ~/.profile \n".as_bytes()).unwrap();
               #[cfg(target_os = "macos")]
-              pty_writer.write_all("source ~/.zshenv \n".as_bytes()).unwrap();
+              pty_writer.write_all(" source ~/.zshenv \n".as_bytes()).unwrap();
 
               mt_log!(Level::Info, "Login & Environment initialization finished");
             }
