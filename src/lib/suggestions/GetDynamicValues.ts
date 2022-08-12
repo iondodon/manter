@@ -23,12 +23,7 @@ export function getDynamicValues(wrapper, sessionContext): Promise<any[]> {
   let res = []
 
   child = null
-  let script = wrapper['script']
-  // if (script.startsWith('sudo -S')) {
-  //   script = 'echo "' + password + '" | ' + script + '; sudo -K'
-  // }
-
-  const command = new Command(cmd, [...args, script], { cwd: cwd || null, env: getEnv() })
+  const command = new Command(cmd, [...args, wrapper['script']], { cwd: cwd || null, env: getEnv() })
 
   command.stdout.on('data', line => {
     res.push(wrapper['postProcessor'](line))
