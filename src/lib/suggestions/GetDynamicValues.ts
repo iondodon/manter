@@ -1,10 +1,16 @@
 import { Command } from "@tauri-apps/api/shell"
+import { IS_MACINTOSH } from "../config/config"
 
 const windows = navigator.userAgent.includes('Windows')
 let cmd = windows ? 'cmd' : 'sh'
 let args = windows ? ['/C'] : ['-c']
 
-let env = 'SUDO_ASKPASS=/usr/bin/ssh-askpass'
+let SUDO_ASKPASS = 'SUDO_ASKPASS=/usr/bin/ssh-askpass'
+if (IS_MACINTOSH) {
+  SUDO_ASKPASS = 'SUDO_ASKPASS=/usr/local/bin/ssh-askpass'
+}
+let env = `${SUDO_ASKPASS}`
+
 let child
 
 function getEnv() {
@@ -19,7 +25,6 @@ function getEnv() {
 
 export function getDynamicValues(wrapper, sessionContext): Promise<any[]> {
   const cwd = sessionContext['cwd']
-  const password = sessionContext['password']
   let res = []
 
   child = null

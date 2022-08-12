@@ -147,7 +147,7 @@ async fn accept_connection(stream: TcpStream) {
   } else {
     let user = crate::get_setting("default_login_user");
     let mut cmd = CommandBuilder::new("su");  
-    cmd.args(["--preserve-environment", user.as_str()]);
+    cmd.args(["-m", user.as_str()]);
     cmd
   };
 

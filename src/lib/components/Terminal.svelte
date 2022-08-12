@@ -10,12 +10,11 @@
   let sessionContext = {
     isLoggedIn: false,
     cwd: "~",
-    password: ""
   }
 
   const login = (websocket: WebSocket) => {
-    sessionContext['password'] = (document.getElementById('password') as HTMLInputElement).value
-    const loginData = { password: sessionContext['password']}
+    const password = (document.getElementById('password') as HTMLInputElement).value
+    const loginData = { password: password}
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
