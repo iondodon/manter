@@ -4,10 +4,10 @@ const windows = navigator.userAgent.includes('Windows')
 let cmd = windows ? 'cmd' : 'sh'
 let args = windows ? ['/C'] : ['-c']
 
-let env = 'SOMETHING=value ANOTHER=2'
+let env = 'SUDO_ASKPASS=/usr/bin/ssh-askpass'
 let child
 
-function _getEnv() {
+function getEnv() {
   return env.split(' ').reduce((env, clause) => {
     let [key, value] = clause.split('=')
     return {
@@ -24,11 +24,11 @@ export function getDynamicValues(wrapper, sessionContext): Promise<any[]> {
 
   child = null
   let script = wrapper['script']
-  if (script.startsWith('sudo -S')) {
-    script = 'echo "' + password + '" | ' + script + '; sudo -K'
-  }
+  // if (script.startsWith('sudo -S')) {
+  //   script = 'echo "' + password + '" | ' + script + '; sudo -K'
+  // }
 
-  const command = new Command(cmd, [...args, script], { cwd: cwd || null, env: _getEnv() })
+  const command = new Command(cmd, [...args, script], { cwd: cwd || null, env: getEnv() })
 
   command.stdout.on('data', line => {
     res.push(wrapper['postProcessor'](line))
