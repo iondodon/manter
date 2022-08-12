@@ -38,7 +38,7 @@ const containersIds = {
       next: []
     }
   ],
-  script: "sudo -A docker container ps -a",
+  script: "sudo -S docker container ps -a",
   postProcessor: (line) => {
     return {
       names: [line],
