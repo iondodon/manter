@@ -156,7 +156,7 @@
       return
     }
 
-    let selected = null
+    let selectedMatched = null
     for (let candidatesWrapper of suggestionsCarrier[script.length - 1]) {
       if (!IS_WINDOWS && candidatesWrapper['postProcessor']) {
         candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, sessionContext)
@@ -169,27 +169,27 @@
         }
 
         for (const name of suggestionCandidate['names']) {
-          if (!selected && name == lastWord) {
-            selected = { ...suggestionCandidate }
+          if (!selectedMatched && name == lastWord) {
+            selectedMatched = { ...suggestionCandidate }
             break
           }
         }
-        if (selected) {
+        if (selectedMatched) {
           break
         }
       }
 
     }
 
-    if (!selected) {
+    if (!selectedMatched) {
       suggestionsCarrier[script.length] = suggestionsCarrier[script.length - 1]
       return
     }
 
-    if (typeof selected['next'] == "function") {
-      selected['next'] = selected['next']()
+    if (typeof selectedMatched['next'] == "function") {
+      selectedMatched['next'] = selectedMatched['next']()
     }
-    suggestionsCarrier[script.length] = selected['next']
+    suggestionsCarrier[script.length] = selectedMatched['next']
   }
 
 
