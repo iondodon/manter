@@ -194,7 +194,6 @@
     <SuggestionsBox bind:this={suggestionsBox} />
     {#if !IS_WINDOWS && !sessionContext['isLoggedIn']}
        <div id="login-form">
-        <label for="name">Password:</label>
         <input 
           type="password" 
           id="password" 
@@ -205,6 +204,7 @@
           size="10"
           on:keypress={passInputOnKeyPress}
         >
+        <br/>
         <button on:click={loginToNewTerminal} type="button">Login</button>
         <br/>
         <span id="login-result"></span>
@@ -214,6 +214,10 @@
 
 <style lang="scss">
   #terminal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
     top: 0em;
     right: 0em;
     height: calc(100% - 1.2em);
@@ -223,7 +227,13 @@
   }
 
   #login-form {
-    text-align: center;
-    color: white;
+    width: 20%;
+    display: inline-block;
+    color: hsl(0, 0%, 79%);
+  }
+
+  #login-form button, #login-form input, #login-form span {
+    margin: 0.3em;
+    width: 100%;
   }
 </style>
