@@ -219,11 +219,7 @@
     height: calc(100% - 1.2em);
     width: 100%;
 
-    background-color: green;
-
-    border: 0%;
-    padding: 0%;
-    margin: 0%;
+    background-color: black;
   }
 
   #login-form {

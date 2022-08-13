@@ -11,7 +11,7 @@
 <style type="scss">
   :root {
     font-family: monospace;
-    background-color: yellow;
+    background-color: black;
   }
 
   main {
@@ -20,9 +20,6 @@
     height: 99.8%;
     width: 99.8%;
     margin: auto;
-
-    border: 0%;
-    padding: 0%;
 
     overflow-y: hidden;
     overflow-x: hidden;
