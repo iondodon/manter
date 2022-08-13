@@ -59,6 +59,21 @@
         adjustTerminalSize(fitAddon)
       })
 
+      terminal.onResize(function(evt) {      
+        const resizeData = {
+            cols: evt.cols, 
+            rows: evt.rows, 
+            pixel_width: 4, 
+            pixel_height: 4
+        }
+        websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
+        adjustTerminalSize(fitAddon)
+      })
+
+      terminal.onScroll((_evt) => {
+        
+      })
+
       terminal.onData(async function(data: string) {
         if (suggestionsBox.isVisible && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
           // if tab or enter
@@ -98,17 +113,6 @@
         suggestionsBox.bringSuggestionsToCursor()
       })
 
-      terminal.onResize(function(evt) {      
-        adjustTerminalSize(fitAddon)
-        const resizeData = {
-            cols: evt.cols, 
-            rows: evt.rows, 
-            pixel_width: 0, 
-            pixel_height: 0
-        }
-        websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
-      })
-
       terminal.onKey(_evt => {
       
       })
@@ -126,8 +130,8 @@
       terminal.onTitleChange(function(title) {
         if (!IS_WINDOWS && !sessionContext['isLoggedIn']) {
           terminal.open(document.getElementById('terminal'))
-        adjustTerminalSize(fitAddon)
           sessionContext['isLoggedIn'] = true
+          adjustTerminalSize(fitAddon)
         }
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
