@@ -202,6 +202,7 @@
           minlength="4" 
           maxlength="20" 
           size="10"
+          placeholder="password"
           on:keypress={passInputOnKeyPress}
         >
         <br/>
@@ -235,5 +236,9 @@
   #login-form button, #login-form input, #login-form span {
     margin: 0.3em;
     width: 100%;
+  }
+
+  #login-form input {
+    text-align: center;
   }
 </style>
