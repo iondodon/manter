@@ -8,15 +8,16 @@
 
 <style lang="scss">
   #bottom-bar {
-    height: 3vh;
-    font-size: 2vh;
-
-    bottom: 0;
-    text-align: right;
+    bottom: 0em;
+    height: 1.2em;
     width: 100%;
+
+    text-align: right;
     background-color: rgb(29, 29, 29);
     color: rgb(156, 156, 156);
-    margin: 0;
-    padding: 0;
+
+    border: 0%;
+    margin: 0%;
+    padding: 0%;
   }
 </style>

@@ -13,6 +13,23 @@
     password: ""
   }
 
+  const adjustTerminalSize = (fitAddon) => {
+    fitAddon.fit()
+    
+    const terminal = document.getElementById("terminal") as HTMLElement;
+    const terminalHeight = terminal.clientHeight;
+    const terminalWidth = terminal.clientWidth;
+
+    const xtermElement = document.getElementsByClassName("xterm")[0] as HTMLElement;
+    const xtermViewPortElement = document.getElementsByClassName("xterm-viewport")[0] as HTMLElement;
+
+    xtermElement.style.height = `${terminalHeight}px`;
+    xtermElement.style.width = `${terminalWidth}px`;
+
+    xtermViewPortElement.style.height = `${terminalHeight}px`;
+    xtermViewPortElement.style.width = `${terminalWidth}px`;
+  }
+
   const login = (websocket: WebSocket) => {
     const password = (document.getElementById('password') as HTMLInputElement).value
     sessionContext['password'] = password
@@ -35,11 +52,11 @@
       terminal.loadAddon(fitAddon)
       if (IS_WINDOWS) {
         terminal.open(document.getElementById('terminal'))
-        fitAddon.fit()
+        adjustTerminalSize(fitAddon)
       }
 
       addEventListener('resize', (_event) => {
-        fitAddon.fit()
+        adjustTerminalSize(fitAddon)
       })
 
       terminal.onData(async function(data: string) {
@@ -82,7 +99,7 @@
       })
 
       terminal.onResize(function(evt) {      
-        fitAddon.fit()
+        adjustTerminalSize(fitAddon)
         const resizeData = {
             cols: evt.cols, 
             rows: evt.rows, 
@@ -109,7 +126,7 @@
       terminal.onTitleChange(function(title) {
         if (!IS_WINDOWS && !sessionContext['isLoggedIn']) {
           terminal.open(document.getElementById('terminal'))
-          fitAddon.fit()
+        adjustTerminalSize(fitAddon)
           sessionContext['isLoggedIn'] = true
         }
         if (title.includes("[manter]")) {
@@ -193,13 +210,16 @@
 
 <style lang="scss">
   #terminal {
-    height: 97vh;
-
-    top: 0;
+    top: 0em;
+    right: 0em;
+    height: calc(100% - 1.2em);
     width: 100%;
-    padding: 0;
-    margin: 0;
-    background-color: burlywood;
+
+    background-color: green;
+
+    border: 0%;
+    padding: 0%;
+    margin: 0%;
   }
 
   #login-form {

@@ -9,11 +9,26 @@
 </main>
 
 <style type="scss">
+  :root {
+    font-family: monospace;
+    padding: 0%;
+    margin: 0%;
+    border: 0%;
+
+    background-color: yellow;
+  }
+
   main {
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 99.8%;
+    width: 99.8%;
+    margin: auto;
+
+    border: 0%;
+    padding: 0%;
+
     overflow-y: hidden;
-    width: 100%;
-    padding: 0;
-    margin: 0;
+    overflow-x: hidden;
   }
 </style>
