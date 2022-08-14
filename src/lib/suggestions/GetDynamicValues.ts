@@ -44,23 +44,23 @@ function executeScript(wrapper, sessionContext, script): Promise<{code: any, res
   })
 }
 
-function tryNonSudo(wrapper, sessionContext): Promise<{code: any, res: any[]}> {
+function tryNonSudoScript(wrapper, sessionContext): Promise<{code: any, res: any[]}> {
   const script = wrapper['script']
   return executeScript(wrapper, sessionContext, script)
 }
 
-function trySudo(wrapper, sessionContext): Promise<{code: any, res: any[]}> {
+function trySudoScript(wrapper, sessionContext): Promise<{code: any, res: any[]}> {
   const script = ' echo "' + sessionContext['password'] + '" | sudo -S ' + wrapper['script'] + '; sudo -K;'
   return executeScript(wrapper, sessionContext, script)
 }
 
 export function getDynamicValues(wrapper, sessionContext): Promise<any[]> {
   return new Promise((resolve, reject) => {
-    tryNonSudo(wrapper, sessionContext)
+    tryNonSudoScript(wrapper, sessionContext)
       .then(responseTryNonSudo => resolve(responseTryNonSudo.res))
       .catch(errResponseTryNonSudo => {
         console.log("Try sudo, because of " + JSON.stringify(errResponseTryNonSudo))
-        trySudo(wrapper, sessionContext)
+        trySudoScript(wrapper, sessionContext)
           .then(responseTrySudo => resolve(responseTrySudo.res))
           .catch(errResponseTrySudo => reject(errResponseTrySudo))
       })
