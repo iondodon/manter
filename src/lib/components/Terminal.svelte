@@ -6,7 +6,7 @@
   import { IS_WINDOWS, IS_UNIX, PTY_WS_ADDRESS } from "../config/config"
   import { ab2str } from "../utils/utils"
 
-  let suggestionsBox: SuggestionsBox;
+  let suggestionsBox: SuggestionsBox
   let sessionContext = {
     isLoggedIn: false,
     cwd: "~",
