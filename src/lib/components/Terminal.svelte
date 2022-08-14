@@ -16,18 +16,18 @@
   const adjustTerminalSize = (fitAddon) => {
     fitAddon.fit()
     
-    const terminal = document.getElementById("terminal") as HTMLElement;
-    const terminalHeight = terminal.clientHeight;
-    const terminalWidth = terminal.clientWidth;
+    const terminal = document.getElementById("terminal") as HTMLElement
+    const terminalHeight = terminal.clientHeight
+    const terminalWidth = terminal.clientWidth
 
-    const xtermElement = document.getElementsByClassName("xterm")[0] as HTMLElement;
-    const xtermViewPortElement = document.getElementsByClassName("xterm-viewport")[0] as HTMLElement;
+    const xtermElement = document.getElementsByClassName("xterm")[0] as HTMLElement
+    const xtermViewPortElement = document.getElementsByClassName("xterm-viewport")[0] as HTMLElement
 
-    xtermElement.style.height = `${terminalHeight}px`;
-    xtermElement.style.width = `${terminalWidth}px`;
+    xtermElement.style.height = `${terminalHeight}px`
+    xtermElement.style.width = `${terminalWidth}px`
 
-    xtermViewPortElement.style.height = `${terminalHeight}px`;
-    xtermViewPortElement.style.width = `${terminalWidth}px`;
+    xtermViewPortElement.style.height = `${terminalHeight}px`
+    xtermViewPortElement.style.width = `${terminalWidth}px`
   }
 
   const login = (websocket: WebSocket) => {
