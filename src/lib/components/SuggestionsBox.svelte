@@ -33,31 +33,19 @@
     }
   }
 
-  export const selectNextSuggestion = () => {
-    if (!isVisible) {
+  export const focusOnNextSuggestion = () => {
+    if (!isVisible || totalAfterFilterSuggestions <= 1) {
       return
     }
-    if (totalAfterFilterSuggestions == 0 || totalAfterFilterSuggestions == 1) {
-      return
-    }
-    focusedSuggestionIndex++
-    if (focusedSuggestionIndex == totalAfterFilterSuggestions) {
-      focusedSuggestionIndex = 0
-    }
+    focusedSuggestionIndex = ++focusedSuggestionIndex % totalAfterFilterSuggestions
     scrollToFocusedSuggestion()
   }
 
-  export const selectPrevSuggestion = () => {
-    if (filteredSuggestions.length < 1) {
+  export const focusOnPrevSuggestion = () => {
+    if (!isVisible || totalAfterFilterSuggestions <= 1) {
       return
     }
-    if (totalAfterFilterSuggestions == 0 || totalAfterFilterSuggestions == 1) {
-      return
-    }
-    focusedSuggestionIndex--
-    if (focusedSuggestionIndex < 0) {
-      focusedSuggestionIndex = totalAfterFilterSuggestions - 1
-    }
+    focusedSuggestionIndex = focusedSuggestionIndex - 1 < 0 ? totalAfterFilterSuggestions - 1 : focusedSuggestionIndex - 1
     scrollToFocusedSuggestion()
   }
 

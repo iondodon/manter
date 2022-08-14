@@ -94,12 +94,12 @@
           }
           // up
           if (data == "\x1b[A") {
-            suggestionsBox.selectPrevSuggestion()
+            suggestionsBox.focusOnPrevSuggestion()
             return
           }
           // down
           if (data == "\x1b[B") {
-            suggestionsBox.selectNextSuggestion()
+            suggestionsBox.focusOnNextSuggestion()
             return
           }
         }
