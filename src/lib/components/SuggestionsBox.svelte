@@ -1,7 +1,7 @@
 <svelte:options accessors={true}/>
 
 <script type="ts">
-  import { IS_WINDOWS } from "../config/config"
+  import { IS_UNIX } from "../config/config"
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/library/commands"
 
@@ -140,7 +140,7 @@
 
     let suggestionMatchFound = null
     for (let suggestionsGroup of candidateGroups[script.length - 1]) {
-      if (!IS_WINDOWS && suggestionsGroup['postProcessor']) {
+      if (IS_UNIX && suggestionsGroup['postProcessor']) {
         suggestionsGroup['values'] = await getDynamicValues(suggestionsGroup, sessionContext)
       }
       

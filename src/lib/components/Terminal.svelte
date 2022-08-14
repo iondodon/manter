@@ -3,7 +3,7 @@
   import { FitAddon }   from "xterm-addon-fit"
   import "xterm/css/xterm.css"
   import SuggestionsBox from "./SuggestionsBox.svelte"
-  import { IS_WINDOWS, PTY_WS_ADDRESS } from "../config/config"
+  import { IS_WINDOWS, IS_UNIX, PTY_WS_ADDRESS } from "../config/config"
   import { ab2str } from "../utils/utils"
 
   let suggestionsBox: SuggestionsBox;
@@ -128,7 +128,7 @@
       terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
 
       terminal.onTitleChange(function(title) {
-        if (!IS_WINDOWS && !sessionContext['isLoggedIn']) {
+        if (IS_UNIX && !sessionContext['isLoggedIn']) {
           terminal.open(document.getElementById('terminal'))
           sessionContext['isLoggedIn'] = true
           adjustTerminalSize(fitAddon)
@@ -146,7 +146,7 @@
         if (evt.data instanceof ArrayBuffer) {
           const data: string = ab2str(evt.data.slice(1))
           terminal.write(data)
-          if (!IS_WINDOWS && !sessionContext['isLoggedIn'] && data.includes("Password:")) {
+          if (IS_UNIX && !sessionContext['isLoggedIn'] && data.includes("Password:")) {
             const loginResultElement = document.getElementById('login-result') as HTMLDivElement
             loginResultElement.innerText = ""
             login(websocket)
@@ -192,7 +192,7 @@
 
 <div id="terminal">
     <SuggestionsBox bind:this={suggestionsBox} />
-    {#if !IS_WINDOWS && !sessionContext['isLoggedIn']}
+    {#if IS_UNIX && !sessionContext['isLoggedIn']}
        <div id="login-form">
         <input 
           type="password" 
