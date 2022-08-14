@@ -225,23 +225,27 @@
 
 {#if isVisible}
   <div id="suggestions-box">
-  {#each filteredSuggestions as wrapper}
-    <div class="suggestions-wrapper">
-      {#each wrapper['values'] as suggestion}
-        {#if selectedSuggestionIndex == suggestion['index']}
-          <div id="selected-suggestion">
+  {#if filteredSuggestions.length > 0}
+    {#each filteredSuggestions as wrapper}
+      <div class="suggestions-wrapper">
+        {#each wrapper['values'] as suggestion}
+          {#if selectedSuggestionIndex == suggestion['index']}
+            <div id="selected-suggestion">
+              <div class="suggestion">
+                {JSON.stringify(suggestion["names"])}
+              </div>
+            </div>
+          {:else}
             <div class="suggestion">
               {JSON.stringify(suggestion["names"])}
             </div>
-          </div>
-        {:else}
-          <div class="suggestion">
-            {JSON.stringify(suggestion["names"])}
-          </div>
-        {/if}
-      {/each}
-    </div>
-  {/each}
+          {/if}
+        {/each}
+      </div>
+    {/each}
+  {:else}
+    loading...
+  {/if}
 </div>
 {/if}
 

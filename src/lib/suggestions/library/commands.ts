@@ -38,7 +38,7 @@ const containersIds = {
       next: []
     }
   ],
-  script: "docker ps -a",
+  script: "apt update",
   postProcessor: (line) => {
     return {
       names: [line],
