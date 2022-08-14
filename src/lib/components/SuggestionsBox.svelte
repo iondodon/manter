@@ -13,23 +13,23 @@
   export let isVisible = true
   
   let suggestionTaken = null
-  let selectedSuggestionIndex = 0
+  let focusedSuggestionIndex = 0
   
   export let filteredSuggestions = []
   let totalAfterFilterSuggestions = 0
 
   const scrollToSelectedSuggestion = () => {
-    const selectedSuggestionElement = document.getElementById("selected-suggestion")
+    const focusedSuggestionElement = document.getElementById("focused-suggestion")
     const suggestionsBoxElement = document.getElementById("suggestions-box")
 
-    const selectedSuggestionTop = selectedSuggestionElement.offsetTop
-    const selectedSuggestionBottom = selectedSuggestionTop + selectedSuggestionElement.offsetHeight
+    const focusedSuggestionTop = focusedSuggestionElement.offsetTop
+    const focusedSuggestionBottom = focusedSuggestionTop + focusedSuggestionElement.offsetHeight
     const suggestionsBoxTop = suggestionsBoxElement.scrollTop
     const suggestionsBoxBottom = suggestionsBoxTop + suggestionsBoxElement.offsetHeight
-    if (selectedSuggestionTop < suggestionsBoxTop) {
-      suggestionsBoxElement.scrollTop = selectedSuggestionTop - 21
-    } else if (selectedSuggestionBottom > suggestionsBoxBottom) {
-      suggestionsBoxElement.scrollTop = selectedSuggestionBottom - suggestionsBoxElement.offsetHeight + 21
+    if (focusedSuggestionTop < suggestionsBoxTop) {
+      suggestionsBoxElement.scrollTop = focusedSuggestionTop - 21
+    } else if (focusedSuggestionBottom > suggestionsBoxBottom) {
+      suggestionsBoxElement.scrollTop = focusedSuggestionBottom - suggestionsBoxElement.offsetHeight + 21
     }
   }
 
@@ -40,9 +40,9 @@
     if (totalAfterFilterSuggestions == 0 || totalAfterFilterSuggestions == 1) {
       return
     }
-    selectedSuggestionIndex++
-    if (selectedSuggestionIndex == totalAfterFilterSuggestions) {
-      selectedSuggestionIndex = 0
+    focusedSuggestionIndex++
+    if (focusedSuggestionIndex == totalAfterFilterSuggestions) {
+      focusedSuggestionIndex = 0
     }
     scrollToSelectedSuggestion()
   }
@@ -54,9 +54,9 @@
     if (totalAfterFilterSuggestions == 0 || totalAfterFilterSuggestions == 1) {
       return
     }
-    selectedSuggestionIndex--
-    if (selectedSuggestionIndex < 0) {
-      selectedSuggestionIndex = totalAfterFilterSuggestions - 1
+    focusedSuggestionIndex--
+    if (focusedSuggestionIndex < 0) {
+      focusedSuggestionIndex = totalAfterFilterSuggestions - 1
     }
     scrollToSelectedSuggestion()
   }
@@ -68,7 +68,7 @@
     suggestionTaken = null
     for (let wrp of filteredSuggestions) {
       for (let sugg of wrp['values']) {
-        if (sugg['index'] == selectedSuggestionIndex) {
+        if (sugg['index'] == focusedSuggestionIndex) {
           suggestionTaken = sugg
           break
         }
@@ -199,7 +199,7 @@
 
     filteredSuggestions = []
     totalAfterFilterSuggestions = 0
-    selectedSuggestionIndex = 0
+    focusedSuggestionIndex = 0
     for (let wrp of suggestionsCarrier[script.length]) {
       let newWrp = {...wrp}
       if (script[script.length - 1] == " ") {
@@ -229,8 +229,8 @@
     {#each filteredSuggestions as wrapper}
       <div class="suggestions-wrapper">
         {#each wrapper['values'] as suggestion}
-          {#if selectedSuggestionIndex == suggestion['index']}
-            <div id="selected-suggestion">
+          {#if focusedSuggestionIndex == suggestion['index']}
+            <div id="focused-suggestion">
               <div class="suggestion">
                 {JSON.stringify(suggestion["names"])}
               </div>
@@ -268,7 +268,7 @@
     overflow-x: hidden;
   }
 
-  #selected-suggestion {
+  #focused-suggestion {
     background-color: aqua;
   }
 
