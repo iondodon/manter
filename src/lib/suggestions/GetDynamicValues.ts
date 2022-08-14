@@ -33,7 +33,7 @@ function executeScript(wrapper, sessionContext, script): Promise<{code: any, res
       console.log(`Command finished with code ${data.code} and signal ${data.signal}`)
       child = null
       if (data.code != 0) {
-        reject({code: data.code, res: res})
+        reject(`Command finished with code ${data.code} and signal ${data.signal}`)
       }
       resolve({code: data.code, res: res})
     })
