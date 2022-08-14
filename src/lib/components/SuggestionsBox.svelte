@@ -18,7 +18,7 @@
   export let filteredSuggestions = []
   let totalAfterFilterSuggestions = 0
 
-  const scrollToSelectedSuggestion = () => {
+  const scrollToFocusedSuggestion = () => {
     const focusedSuggestionElement = document.getElementById("focused-suggestion")
     const suggestionsBoxElement = document.getElementById("suggestions-box")
 
@@ -44,7 +44,7 @@
     if (focusedSuggestionIndex == totalAfterFilterSuggestions) {
       focusedSuggestionIndex = 0
     }
-    scrollToSelectedSuggestion()
+    scrollToFocusedSuggestion()
   }
 
   export const selectPrevSuggestion = () => {
@@ -58,7 +58,7 @@
     if (focusedSuggestionIndex < 0) {
       focusedSuggestionIndex = totalAfterFilterSuggestions - 1
     }
-    scrollToSelectedSuggestion()
+    scrollToFocusedSuggestion()
   }
 
   export const takeSuggestion = () => {
