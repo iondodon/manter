@@ -86,7 +86,7 @@
     alert("matching names not found")
   }
 
-  const isCandidate = (suggestion) => {
+  const matchesLastWord = (suggestion) => {
     if (typeof suggestion['names'] == 'function') {
       suggestion['names'] = suggestion['names']()
     }
@@ -193,7 +193,7 @@
       if (script[script.length - 1] == " ") {
         filteredSuggestions = [...filteredSuggestions, newWrp]
       } else {
-        newWrp['values'] = newWrp['values'].filter(sugg => isCandidate(sugg))
+        newWrp['values'] = newWrp['values'].filter(sugg => matchesLastWord(sugg))
         if (newWrp['values'].length > 0) {
           filteredSuggestions = [...filteredSuggestions, newWrp]
         }
