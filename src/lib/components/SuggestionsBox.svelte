@@ -106,20 +106,20 @@
 
 
   export const bringSuggestionsToCursor = () => {
-    const suggestionsElement = document.getElementById('suggestions-box')
-    if (!suggestionsElement) {
+    const suggestionsBoxElement = document.getElementById('suggestions-box')
+    if (!suggestionsBoxElement) {
       return
     }
     if (script.length == 0) {
-      suggestionsElement.style.display = 'none'
+      suggestionsBoxElement.style.display = 'none'
       return
     }
-    const cursorHtml = document.getElementsByClassName('xterm-helper-textarea')[0]
-    const rect = cursorHtml.getBoundingClientRect()
+    const cursorElement = document.getElementsByClassName('xterm-helper-textarea')[0]
+    const cursorRect = cursorElement.getBoundingClientRect()
 
-    suggestionsElement.style.display = 'block'
-    suggestionsElement.style.top = `${rect.top + 20}px`
-    suggestionsElement.style.left = `${rect.left + 10}px`
+    suggestionsBoxElement.style.display = 'block'
+    suggestionsBoxElement.style.top = `${cursorRect.top + 20}px`
+    suggestionsBoxElement.style.left = `${cursorRect.left + 10}px`
   }
 
 
