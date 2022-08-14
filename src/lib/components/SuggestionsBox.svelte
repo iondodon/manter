@@ -8,7 +8,7 @@
   export let script: string = ''
   export let lastWord = ''
   
-  let suggestionsCarrier = [ [COMMANDS] ]
+  let currentCandidates = [ [COMMANDS] ]
 
   export let isVisibleSuggestionsBox = true
   
@@ -117,9 +117,9 @@
   }
 
 
-  const processSuggestions = async (newCmdInput: string, sessionContext: object) => {
+  const updateCurrentCandidates = async (newCmdInput: string, sessionContext: object) => {
     if (newCmdInput === '\n' || newCmdInput === '\r' || newCmdInput == '\x03') {
-      suggestionsCarrier = [ [COMMANDS] ]
+      currentCandidates = [ [COMMANDS] ]
       script = ''
       return
     }
@@ -138,40 +138,39 @@
       return
     }
 
-    let selectedMatched = null
-    for (let candidatesWrapper of suggestionsCarrier[script.length - 1]) {
+    let suggestionMatchFound = null
+    for (let candidatesWrapper of currentCandidates[script.length - 1]) {
       if (!IS_WINDOWS && candidatesWrapper['postProcessor']) {
         candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, sessionContext)
       }
       
-      let suggestionsCandidates = candidatesWrapper['values']
-      for (const suggestionCandidate of suggestionsCandidates) {
-        if (typeof suggestionCandidate['names'] == 'function') {
-          suggestionCandidate['names'] = (suggestionCandidate['names'] as Function)()
+      for (const suggestionsCandidate of candidatesWrapper['values']) {
+        if (typeof suggestionsCandidate['names'] == 'function') {
+          suggestionsCandidate['names'] = (suggestionsCandidate['names'] as Function)()
         }
 
-        for (const name of suggestionCandidate['names']) {
-          if (!selectedMatched && name == lastWord) {
-            selectedMatched = { ...suggestionCandidate }
+        for (const name of suggestionsCandidate['names']) {
+          if (!suggestionMatchFound && name == lastWord) {
+            suggestionMatchFound = { ...suggestionsCandidate }
             break
           }
         }
-        if (selectedMatched) {
+        if (suggestionMatchFound) {
           break
         }
       }
 
     }
 
-    if (!selectedMatched) {
-      suggestionsCarrier[script.length] = suggestionsCarrier[script.length - 1]
+    if (!suggestionMatchFound) {
+      currentCandidates[script.length] = currentCandidates[script.length - 1]
       return
     }
 
-    if (typeof selectedMatched['next'] == "function") {
-      selectedMatched['next'] = selectedMatched['next']()
+    if (typeof suggestionMatchFound['next'] == "function") {
+      suggestionMatchFound['next'] = suggestionMatchFound['next']()
     }
-    suggestionsCarrier[script.length] = selectedMatched['next']
+    currentCandidates[script.length] = suggestionMatchFound['next']
   }
 
   const getLastScriptWord = (script: string): string => {
@@ -182,12 +181,13 @@
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
     isVisibleSuggestionsBox = true
-    await processSuggestions(newCmdInput, promptContext)
+    await updateCurrentCandidates(newCmdInput, promptContext)
 
     filteredSuggestions = []
     totalAfterFilterSuggestions = 0
     focusedSuggestionIndex = 0
-    for (let wrp of suggestionsCarrier[script.length]) {
+
+    for (let wrp of currentCandidates[script.length]) {
       let newWrp = {...wrp}
       if (script[script.length - 1] == " ") {
         filteredSuggestions = [...filteredSuggestions, newWrp]
@@ -203,7 +203,7 @@
       }
     }
 
-    if (filteredSuggestions.length == 0) {
+    if (totalAfterFilterSuggestions == 0) {
       isVisibleSuggestionsBox = false
     }
   }
