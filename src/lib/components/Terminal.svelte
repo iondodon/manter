@@ -225,6 +225,7 @@
     width: 100%;
 
     background-color: black;
+    overflow: hidden;
   }
 
   #login-form {

@@ -12,6 +12,7 @@
   :root {
     font-family: monospace;
     background-color: black;
+    overflow: hidden;
   }
 
   main {
@@ -21,7 +22,6 @@
     width: 99.8%;
     margin: auto;
 
-    overflow-y: hidden;
-    overflow-x: hidden;
+    overflow: hidden;
   }
 </style>

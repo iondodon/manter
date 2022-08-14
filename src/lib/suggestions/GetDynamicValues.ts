@@ -1,5 +1,4 @@
 import { Child, Command } from "@tauri-apps/api/shell"
-import { IS_MACINTOSH } from "../config/config"
 
 const windows = navigator.userAgent.includes('Windows')
 let cmd = windows ? 'cmd' : 'sh'
