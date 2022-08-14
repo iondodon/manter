@@ -264,7 +264,8 @@
     font-family: monospace;
     border: 1px solid rgb(222, 21, 21);
     display: none;
-    overflow-y: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   #selected-suggestion {
