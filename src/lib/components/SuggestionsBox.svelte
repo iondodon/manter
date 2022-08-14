@@ -18,6 +18,23 @@
   export let filteredSuggestions = []
   let totalAfterFilterSuggestions = 0
 
+  export const bringSuggestionsToCursor = () => {
+    const suggestionsBoxElement = document.getElementById('suggestions-box')
+    if (!suggestionsBoxElement) {
+      return
+    }
+    if (script.length == 0) {
+      suggestionsBoxElement.style.display = 'none'
+      return
+    }
+    const cursorElement = document.getElementsByClassName('xterm-helper-textarea')[0]
+    const cursorRect = cursorElement.getBoundingClientRect()
+
+    suggestionsBoxElement.style.display = 'block'
+    suggestionsBoxElement.style.top = `${cursorRect.top + 20}px`
+    suggestionsBoxElement.style.left = `${cursorRect.left + 10}px`
+  }
+
   const scrollToFocusedSuggestion = () => {
     const focusedSuggestionElement = document.getElementById("focused-suggestion")
     const suggestionsBoxElement = document.getElementById("suggestions-box")
@@ -49,7 +66,7 @@
     scrollToFocusedSuggestion()
   }
 
-  export const takeSuggestion = () => {
+  export const chooseFocusedSuggestion = () => {
     if (!isVisibleSuggestionsBox || filteredSuggestions.length < 1 || totalAfterFilterSuggestions < 1) {
       return
     }
@@ -97,29 +114,6 @@
       }
     }
     return false
-  }
-
-  const getLastScriptWord = (script: string): string => {
-    const words = script.trim().split(' ')
-    return words[words.length - 1].trim()
-  }
-
-
-  export const bringSuggestionsToCursor = () => {
-    const suggestionsBoxElement = document.getElementById('suggestions-box')
-    if (!suggestionsBoxElement) {
-      return
-    }
-    if (script.length == 0) {
-      suggestionsBoxElement.style.display = 'none'
-      return
-    }
-    const cursorElement = document.getElementsByClassName('xterm-helper-textarea')[0]
-    const cursorRect = cursorElement.getBoundingClientRect()
-
-    suggestionsBoxElement.style.display = 'block'
-    suggestionsBoxElement.style.top = `${cursorRect.top + 20}px`
-    suggestionsBoxElement.style.left = `${cursorRect.left + 10}px`
   }
 
 
@@ -178,6 +172,11 @@
       selectedMatched['next'] = selectedMatched['next']()
     }
     suggestionsCarrier[script.length] = selectedMatched['next']
+  }
+
+  const getLastScriptWord = (script: string): string => {
+    const words = script.trim().split(' ')
+    return words[words.length - 1].trim()
   }
 
 
