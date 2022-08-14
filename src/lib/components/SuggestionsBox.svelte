@@ -216,9 +216,9 @@
 {#if isVisibleSuggestionsBox}
   <div id="suggestions-box">
   {#if filteredSuggestions.length > 0}
-    {#each filteredSuggestions as wrapper}
+    {#each filteredSuggestions as suggestionsGroup}
       <div class="suggestions-group">
-        {#each wrapper['values'] as suggestion}
+        {#each suggestionsGroup['values'] as suggestion}
           {#if focusedSuggestionIndex == suggestion['index']}
             <div id="focused-suggestion">
               <div class="suggestion">
