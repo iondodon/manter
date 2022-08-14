@@ -1,8 +1,3 @@
-html, body, #app {
-  width: 100%;
-  height: 100%;
-}
-
 * {
   padding: 0%;
   margin: 0%;
@@ -10,22 +5,23 @@ html, body, #app {
   box-sizing: border-box;
 }
 
-/* width */
-::-webkit-scrollbar {
-  width: 10px;
+html, body, #app {
+  width: 100%;
+  height: 100%;
 }
 
-/* Track */
+::-webkit-scrollbar {
+  width: 0.8rem;
+}
+
 ::-webkit-scrollbar-track {
   background: black;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
   background: #888;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
