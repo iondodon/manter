@@ -8,7 +8,7 @@
   export let script: string = ''
   export let lastWord = ''
   
-  let currentCandidates = [ [COMMANDS] ]
+  let candidateGroups = [ [COMMANDS] ]
 
   export let isVisibleSuggestionsBox = true
   
@@ -117,9 +117,9 @@
   }
 
 
-  const updateCurrentCandidates = async (newCmdInput: string, sessionContext: object) => {
+  const updateCandidateGroups = async (newCmdInput: string, sessionContext: object) => {
     if (newCmdInput === '\n' || newCmdInput === '\r' || newCmdInput == '\x03') {
-      currentCandidates = [ [COMMANDS] ]
+      candidateGroups = [ [COMMANDS] ]
       script = ''
       return
     }
@@ -139,19 +139,19 @@
     }
 
     let suggestionMatchFound = null
-    for (let candidatesWrapper of currentCandidates[script.length - 1]) {
-      if (!IS_WINDOWS && candidatesWrapper['postProcessor']) {
-        candidatesWrapper['values'] = await getDynamicValues(candidatesWrapper, sessionContext)
+    for (let suggestionsGroup of candidateGroups[script.length - 1]) {
+      if (!IS_WINDOWS && suggestionsGroup['postProcessor']) {
+        suggestionsGroup['values'] = await getDynamicValues(suggestionsGroup, sessionContext)
       }
       
-      for (const suggestionsCandidate of candidatesWrapper['values']) {
-        if (typeof suggestionsCandidate['names'] == 'function') {
-          suggestionsCandidate['names'] = (suggestionsCandidate['names'] as Function)()
+      for (const suggestion of suggestionsGroup['values']) {
+        if (typeof suggestion['names'] == 'function') {
+          suggestion['names'] = (suggestion['names'] as Function)()
         }
 
-        for (const name of suggestionsCandidate['names']) {
+        for (const name of suggestion['names']) {
           if (!suggestionMatchFound && name == lastWord) {
-            suggestionMatchFound = { ...suggestionsCandidate }
+            suggestionMatchFound = { ...suggestion }
             break
           }
         }
@@ -163,14 +163,14 @@
     }
 
     if (!suggestionMatchFound) {
-      currentCandidates[script.length] = currentCandidates[script.length - 1]
+      candidateGroups[script.length] = candidateGroups[script.length - 1]
       return
     }
 
     if (typeof suggestionMatchFound['next'] == "function") {
       suggestionMatchFound['next'] = suggestionMatchFound['next']()
     }
-    currentCandidates[script.length] = suggestionMatchFound['next']
+    candidateGroups[script.length] = suggestionMatchFound['next']
   }
 
   const getLastScriptWord = (script: string): string => {
@@ -178,26 +178,21 @@
     return words[words.length - 1].trim()
   }
 
-
-  export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
-    isVisibleSuggestionsBox = true
-    await updateCurrentCandidates(newCmdInput, promptContext)
-
+  const filterSuggestions = () => {
     filteredSuggestions = []
     totalAfterFilterSuggestions = 0
-    focusedSuggestionIndex = 0
 
-    for (let wrp of currentCandidates[script.length]) {
-      let newWrp = {...wrp}
+    for (let suggestionsGroup of candidateGroups[script.length]) {
+      let groupSibling = {...suggestionsGroup}
       if (script[script.length - 1] == " ") {
-        filteredSuggestions = [...filteredSuggestions, newWrp]
+        filteredSuggestions = [...filteredSuggestions, groupSibling]
       } else {
-        newWrp['values'] = newWrp['values'].filter(sugg => matchesLastWord(sugg))
-        if (newWrp['values'].length > 0) {
-          filteredSuggestions = [...filteredSuggestions, newWrp]
+        groupSibling['values'] = groupSibling['values'].filter(sugg => matchesLastWord(sugg))
+        if (groupSibling['values'].length > 0) {
+          filteredSuggestions = [...filteredSuggestions, groupSibling]
         }
       }
-      for (let sugg of newWrp['values']) {
+      for (let sugg of groupSibling['values']) {
         sugg['index'] = totalAfterFilterSuggestions
         totalAfterFilterSuggestions++
       }
@@ -207,6 +202,14 @@
       isVisibleSuggestionsBox = false
     }
   }
+
+
+  export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
+    isVisibleSuggestionsBox = true
+    await updateCandidateGroups(newCmdInput, promptContext)
+    focusedSuggestionIndex = 0
+    filterSuggestions()
+  }
 </script>
 
 
@@ -214,7 +217,7 @@
   <div id="suggestions-box">
   {#if filteredSuggestions.length > 0}
     {#each filteredSuggestions as wrapper}
-      <div class="suggestions-wrapper">
+      <div class="suggestions-group">
         {#each wrapper['values'] as suggestion}
           {#if focusedSuggestionIndex == suggestion['index']}
             <div id="focused-suggestion">
@@ -264,7 +267,7 @@
     margin: 2px;
   }
 
-  .suggestions-wrapper {
+  .suggestions-group {
     border-bottom: 3px solid rgb(7, 115, 3);
     margin: 2px;
   }
