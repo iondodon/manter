@@ -78,7 +78,7 @@
         if (suggestionsBox.isVisibleSuggestionsBox && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
           // if tab or enter
           if (data == "\t") {
-            let nextText = suggestionsBox.chooseFocusedSuggestion()
+            let nextText = suggestionsBox.takeFocusedSuggestion()
             nextText += ' '
             for (let i = 0; i < nextText.length; i++) {
               const encodedData = new TextEncoder().encode("\x00" + nextText[i])

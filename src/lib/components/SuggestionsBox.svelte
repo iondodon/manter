@@ -66,15 +66,15 @@
     scrollToFocusedSuggestion()
   }
 
-  export const chooseFocusedSuggestion = () => {
-    if (!isVisibleSuggestionsBox || filteredSuggestions.length < 1 || totalAfterFilterSuggestions < 1) {
+  export const takeFocusedSuggestion = () => {
+    if (!isVisibleSuggestionsBox || totalAfterFilterSuggestions < 1) {
       return
     }
     suggestionTaken = null
-    for (let wrp of filteredSuggestions) {
-      for (let sugg of wrp['values']) {
-        if (sugg['index'] == focusedSuggestionIndex) {
-          suggestionTaken = sugg
+    for (let suggestionsGroup of filteredSuggestions) {
+      for (let suggestion of suggestionsGroup['values']) {
+        if (suggestion['index'] == focusedSuggestionIndex) {
+          suggestionTaken = suggestion
           break
         }
       }
@@ -84,7 +84,7 @@
     }
 
     if (!suggestionTaken) {
-      alert("Should be a suggestion here")
+      alert("Couldn't take a suggestion")
     }
 
     if (script[script.length - 1] == ' ') {
@@ -100,7 +100,7 @@
       }
     }
 
-    alert("matching names not found")
+    alert("Matching names not found for taken suggestion")
   }
 
   const matchesLastWord = (suggestion) => {
