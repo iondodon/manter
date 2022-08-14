@@ -1,49 +1,27 @@
-import { Command } from "@tauri-apps/api/shell"
+import { Child, Command } from "@tauri-apps/api/shell"
 import { IS_MACINTOSH } from "../config/config"
 
 const windows = navigator.userAgent.includes('Windows')
 let cmd = windows ? 'cmd' : 'sh'
 let args = windows ? ['/C'] : ['-c']
-
-let SUDO_ASKPASS = 'SUDO_ASKPASS=/usr/bin/ssh-askpass'
-if (IS_MACINTOSH) {
-  SUDO_ASKPASS = 'SUDO_ASKPASS=/usr/local/bin/ssh-askpass'
+let env = {
+  // key: val
 }
-let env = `${SUDO_ASKPASS}`
+let child: Child
 
-let child
-
-function getEnv() {
-  return env.split(' ').reduce((env, clause) => {
-    let [key, value] = clause.split('=')
-    return {
-    ...env,
-    [key]: value
-    }
-  }, {})
-}
-
-export function getDynamicValues(wrapper, sessionContext): Promise<any[]> {
+function executeScript(wrapper, sessionContext, script): Promise<{code: any, res: any[]}> {
   const cwd = sessionContext['cwd']
   let res = []
 
   child = null
-
-  let script = wrapper['script']
-  if (script.startsWith('sudo -S')) {
-    script = ' echo "' + sessionContext['password'] + '" | ' + script + '; sudo -K'
-  }
-
-  const command = new Command(cmd, [...args, script], { cwd: cwd || null, env: getEnv() })
+  const command = new Command(cmd, [...args, script], { cwd: cwd || null, env: env })
 
   command.stdout.on('data', line => {
     res.push(wrapper['postProcessor'](line))
   })
   
   command.spawn()
-    .then(c => {
-      child = c
-    })
+    .then(c => child = c)
     .catch(r => console.log(r))
 
   command.stderr.on('data', line => {
@@ -52,15 +30,41 @@ export function getDynamicValues(wrapper, sessionContext): Promise<any[]> {
 
   return new Promise((resolve, reject) => {
     command.on('close', data => {
-      console.log(`command finished with code ${data.code} and signal ${data.signal}`)
+      console.log(`Command finished with code ${data.code} and signal ${data.signal}`)
       child = null
-      resolve(res)
+      if (data.code != 0) {
+        reject({code: data.code, res: res})
+      }
+      resolve({code: data.code, res: res})
     })
 
     command.on('error', error => {
       console.log('error', error)
       reject("error " + error)
     })
+  })
+}
+
+function tryNonSudo(wrapper, sessionContext): Promise<{code: any, res: any[]}> {
+  const script = wrapper['script']
+  return executeScript(wrapper, sessionContext, script)
+}
+
+function trySudo(wrapper, sessionContext): Promise<{code: any, res: any[]}> {
+  const script = ' echo "' + sessionContext['password'] + '" | sudo -S ' + wrapper['script'] + '; sudo -K;'
+  return executeScript(wrapper, sessionContext, script)
+}
+
+export function getDynamicValues(wrapper, sessionContext): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    tryNonSudo(wrapper, sessionContext)
+      .then(responseTryNonSudo => resolve(responseTryNonSudo.res))
+      .catch(errResponseTryNonSudo => {
+        console.log("Try sudo, because of " + JSON.stringify(errResponseTryNonSudo))
+        trySudo(wrapper, sessionContext)
+          .then(responseTrySudo => resolve(responseTrySudo.res))
+          .catch(errResponseTrySudo => reject(errResponseTrySudo))
+      })
   })
 }
 
