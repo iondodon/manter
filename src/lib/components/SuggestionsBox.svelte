@@ -10,7 +10,7 @@
   
   let suggestionsCarrier = [ [COMMANDS] ]
 
-  export let isVisible = true
+  export let isVisibleSuggestionsBox = true
   
   let suggestionTaken = null
   let focusedSuggestionIndex = 0
@@ -34,7 +34,7 @@
   }
 
   export const focusOnNextSuggestion = () => {
-    if (!isVisible || totalAfterFilterSuggestions <= 1) {
+    if (!isVisibleSuggestionsBox || totalAfterFilterSuggestions <= 1) {
       return
     }
     focusedSuggestionIndex = ++focusedSuggestionIndex % totalAfterFilterSuggestions
@@ -42,7 +42,7 @@
   }
 
   export const focusOnPrevSuggestion = () => {
-    if (!isVisible || totalAfterFilterSuggestions <= 1) {
+    if (!isVisibleSuggestionsBox || totalAfterFilterSuggestions <= 1) {
       return
     }
     focusedSuggestionIndex = focusedSuggestionIndex - 1 < 0 ? totalAfterFilterSuggestions - 1 : focusedSuggestionIndex - 1
@@ -50,7 +50,7 @@
   }
 
   export const takeSuggestion = () => {
-    if (!isVisible || filteredSuggestions.length < 1 || totalAfterFilterSuggestions < 1) {
+    if (!isVisibleSuggestionsBox || filteredSuggestions.length < 1 || totalAfterFilterSuggestions < 1) {
       return
     }
     suggestionTaken = null
@@ -182,7 +182,7 @@
 
 
   export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
-    isVisible = true
+    isVisibleSuggestionsBox = true
     await processSuggestions(newCmdInput, promptContext)
 
     filteredSuggestions = []
@@ -205,13 +205,13 @@
     }
 
     if (filteredSuggestions.length == 0) {
-      isVisible = false
+      isVisibleSuggestionsBox = false
     }
   }
 </script>
 
 
-{#if isVisible}
+{#if isVisibleSuggestionsBox}
   <div id="suggestions-box">
   {#if filteredSuggestions.length > 0}
     {#each filteredSuggestions as wrapper}

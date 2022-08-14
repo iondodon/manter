@@ -75,7 +75,7 @@
       })
 
       terminal.onData(async function(data: string) {
-        if (suggestionsBox.isVisible && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
+        if (suggestionsBox.isVisibleSuggestionsBox && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
           // if tab or enter
           if (data == "\t") {
             let nextText = suggestionsBox.takeSuggestion()
@@ -89,7 +89,7 @@
           }
           // if esc
           if (data == "\x1b") {
-            suggestionsBox.isVisible = false
+            suggestionsBox.isVisibleSuggestionsBox = false
             return
           }
           // up
