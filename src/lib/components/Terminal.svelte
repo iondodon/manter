@@ -64,7 +64,7 @@
     }, 1000)
   }
 
-  const loadXterm = () => {
+  const loadTerminalInterface = () => {
     fitAddon = new FitAddon()
     terminalInterface = new Terminal({
       cursorBlink: true,
@@ -206,7 +206,7 @@
     ptyWebSocket.binaryType = "arraybuffer"
 
     ptyWebSocket.onopen = async function(_evt) {
-      loadXterm()
+      loadTerminalInterface()
       handlePtyWsIncomingData()
       handlePtyWsClose()
       handlePtyWsError()
