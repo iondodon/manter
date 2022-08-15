@@ -65,6 +65,9 @@
   }
 
   const termInterfaceHandleResize = () => {
+    addEventListener('resize', (_event) => {
+      adjustTerminalSize()
+    })
     terminalInterface.onResize((evt) => {      
       const resizeValues = {
           cols: evt.cols, 
@@ -149,7 +152,7 @@
     })
   }
 
-  const setupNewTerminalInterface = () => {
+  const createNewTermInterface = () => {
     terminalInterface = new Terminal({
       cursorBlink: true,
       cursorStyle: 'bar',
@@ -157,16 +160,16 @@
     })
     fitAddon = new FitAddon()
     terminalInterface.loadAddon(fitAddon)
+  }
+
+  const setupNewTerminalInterface = () => {
+    createNewTermInterface()
 
     if (IS_WINDOWS) {
       linkTermInterfaceToHtmlElement()
       sendProposedSize()
       adjustTerminalSize()
     }
-
-    addEventListener('resize', (_event) => {
-      adjustTerminalSize()
-    })
 
     termInterfaceHandleResize()
     termInterfaceHandleNewInputData()
