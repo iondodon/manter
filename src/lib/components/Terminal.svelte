@@ -52,111 +52,118 @@
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
+  const loadXterm = () => {
+    fitAddon = new FitAddon()
+    terminal = new Terminal({
+      cursorBlink: true,
+      cursorStyle: 'bar',
+      cursorWidth: 6
+    })
+    terminal.loadAddon(fitAddon)
+
+    if (IS_WINDOWS) {
+      terminal.open(document.getElementById('terminal'))
+      sendProposedSize()
+      adjustTerminalSize()
+    }
+
+    addEventListener('resize', (_event) => {
+      adjustTerminalSize()
+    })
+
+    terminal.onResize(function(evt) {      
+      const resizeData = {
+          cols: evt.cols, 
+          rows: evt.rows, 
+          pixel_width: 0, 
+          pixel_height: 0
+      }
+      websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
+      adjustTerminalSize()
+    })
+
+    terminal.onScroll((_evt) => {
+      
+    })
+
+    terminal.onData(async function(data: string) {
+      if (suggestionsBox.isVisibleSuggestionsBox && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
+        // if tab or enter
+        if (data == "\t") {
+          let nextText = suggestionsBox.takeFocusedSuggestion()
+          nextText += ' '
+          for (let i = 0; i < nextText.length; i++) {
+            const encodedData = new TextEncoder().encode("\x00" + nextText[i])
+            websocket.send(encodedData)
+            await suggestionsBox.updateSuggestions(nextText[i], sessionContext)
+          }
+          return
+        }
+        // if esc
+        if (data == "\x1b") {
+          suggestionsBox.isVisibleSuggestionsBox = false
+          return
+        }
+        // up
+        if (data == "\x1b[A") {
+          suggestionsBox.focusOnPrevSuggestion()
+          return
+        }
+        // down
+        if (data == "\x1b[B") {
+          suggestionsBox.focusOnNextSuggestion()
+          return
+        }
+      }
+
+      const encodedData = new TextEncoder().encode("\x00" + data)
+      websocket.send(encodedData)
+      await suggestionsBox.updateSuggestions(data, sessionContext)
+    })
+
+    terminal.onCursorMove(() => {
+      suggestionsBox.bringSuggestionsToCursor()
+    })
+
+    terminal.onKey(_evt => {
+    
+    })
+
+    terminal.onSelectionChange(() => {
+      
+    })
+
+    terminal.onBell(() => {
+      console.log("bell")
+    })
+
+    terminal.buffer.onBufferChange((buf) => {console.log('buff', buf)})
+
+    terminal.onTitleChange(function(title) {
+      if (IS_UNIX && !sessionContext['isLoggedIn']) {
+        terminal.open(document.getElementById('terminal'))
+        sessionContext['isLoggedIn'] = true
+        adjustTerminalSize()
+      }
+      if (title.includes("[manter]")) {
+          title = title.replace("[manter]", "")
+          let promptUpdatedData = JSON.parse(title)
+          sessionContext = {...sessionContext, ...promptUpdatedData}
+          return
+      }
+      document.title = title
+    })
+  }
+
   const newTerminalSession = async (_evt) => {
+    if (websocket) {
+      websocket.close()
+    }
     websocket = new WebSocket(PTY_WS_ADDRESS)
     websocket.binaryType = "arraybuffer"
 
     websocket.onopen = async function(_evt) {
-      fitAddon = new FitAddon()
-      terminal = new Terminal({
-        cursorBlink: true,
-        cursorStyle: 'bar',
-        cursorWidth: 6
-      })
-      terminal.loadAddon(fitAddon)
-
-      if (IS_WINDOWS) {
-        terminal.open(document.getElementById('terminal'))
-        sendProposedSize()
-        adjustTerminalSize()
-      }
-
-      addEventListener('resize', (_event) => {
-        adjustTerminalSize()
-      })
-
-      terminal.onResize(function(evt) {      
-        const resizeData = {
-            cols: evt.cols, 
-            rows: evt.rows, 
-            pixel_width: 0, 
-            pixel_height: 0
-        }
-        websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
-        adjustTerminalSize()
-      })
-
-      terminal.onScroll((_evt) => {
-        
-      })
-
-      terminal.onData(async function(data: string) {
-        if (suggestionsBox.isVisibleSuggestionsBox && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
-          // if tab or enter
-          if (data == "\t") {
-            let nextText = suggestionsBox.takeFocusedSuggestion()
-            nextText += ' '
-            for (let i = 0; i < nextText.length; i++) {
-              const encodedData = new TextEncoder().encode("\x00" + nextText[i])
-              websocket.send(encodedData)
-              await suggestionsBox.updateSuggestions(nextText[i], sessionContext)
-            }
-            return
-          }
-          // if esc
-          if (data == "\x1b") {
-            suggestionsBox.isVisibleSuggestionsBox = false
-            return
-          }
-          // up
-          if (data == "\x1b[A") {
-            suggestionsBox.focusOnPrevSuggestion()
-            return
-          }
-          // down
-          if (data == "\x1b[B") {
-            suggestionsBox.focusOnNextSuggestion()
-            return
-          }
-        }
-
-        const encodedData = new TextEncoder().encode("\x00" + data)
-        websocket.send(encodedData)
-        await suggestionsBox.updateSuggestions(data, sessionContext)
-      })
-
-      terminal.onCursorMove(() => {
-        suggestionsBox.bringSuggestionsToCursor()
-      })
-
-      terminal.onKey(_evt => {
-      
-      })
-
-      terminal.onSelectionChange(() => {
-        
-      })
-
-      terminal.onBell(() => {
-        console.log("bell")
-      })
-
-      terminal.buffer.onBufferChange((buf) => {console.log('buff', buf)})
-
-      terminal.onTitleChange(function(title) {
-        if (IS_UNIX && !sessionContext['isLoggedIn']) {
-          terminal.open(document.getElementById('terminal'))
-          sessionContext['isLoggedIn'] = true
-          adjustTerminalSize()
-        }
-        if (title.includes("[manter]")) {
-            title = title.replace("[manter]", "")
-            let promptUpdatedData = JSON.parse(title)
-            sessionContext = {...sessionContext, ...promptUpdatedData}
-            return
-        }
-        document.title = title
-      })
+      loadXterm()
 
       websocket.onmessage = async function(evt) {
         if (evt.data instanceof ArrayBuffer) {
