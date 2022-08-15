@@ -3,6 +3,7 @@
   margin: 0%;
   border: 0%;
   box-sizing: border-box;
+  font-family: inherit;
 }
 
 html, body, #app {

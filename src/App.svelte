@@ -18,10 +18,9 @@
   main {
     display: flex;
     flex-direction: column;
-    height: 99.8%;
-    width: 99.8%;
+    height: 100%;
+    width: 100%;
     margin: auto;
-
     overflow: hidden;
   }
 </style>

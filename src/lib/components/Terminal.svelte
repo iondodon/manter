@@ -13,6 +13,17 @@
     password: ""
   }
 
+  const setProposedSize = (fitAddon, websocket) => {
+    const proposedSize = fitAddon.proposeDimensions()
+    const resizeData = {
+        cols: proposedSize.cols, 
+        rows: proposedSize.rows, 
+        pixel_width: 4, 
+        pixel_height: 4
+    }
+    websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
+  }
+
   const adjustTerminalSize = (fitAddon) => {
     fitAddon.fit()
     
@@ -52,6 +63,7 @@
       terminal.loadAddon(fitAddon)
       if (IS_WINDOWS) {
         terminal.open(document.getElementById('terminal'))
+        setProposedSize(fitAddon, websocket)
         adjustTerminalSize(fitAddon)
       }
 
@@ -125,7 +137,7 @@
         console.log("bell")
       })
 
-      terminal.buffer.onBufferChange((buf) => {console.log(buf.type)})
+      terminal.buffer.onBufferChange((buf) => {console.log('buff', buf)})
 
       terminal.onTitleChange(function(title) {
         if (IS_UNIX && !sessionContext['isLoggedIn']) {
@@ -160,7 +172,7 @@
             }, 1000)
           }
         } else {
-          alert(evt.data)
+          alert("unknown data type " + evt.data)
         }
       }
  
