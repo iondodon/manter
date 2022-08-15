@@ -122,7 +122,7 @@
 
   const termInterfaceHandleCursorMove = () => {
     terminalInterface.onCursorMove(() => {
-      
+
     })
   }
 
@@ -134,6 +134,7 @@
 
   const linkTermInterfaceToHtmlElement = () => {
     terminalInterface.open(document.getElementById('terminal'))
+    termInterfaceHandleViewportScroll()
   }
 
   const checkIfLoggedIn = () => {
@@ -160,6 +161,13 @@
           return
       }
       document.title = title
+    })
+  }
+
+  const termInterfaceHandleViewportScroll = () => {
+    const viewport = document.querySelector('.xterm-viewport') as HTMLElement
+    viewport.addEventListener('scroll', (_evt) => {
+      suggestionsBox.isVisibleSuggestionsBox = false
     })
   }
 
