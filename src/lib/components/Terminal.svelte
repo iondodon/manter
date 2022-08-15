@@ -38,11 +38,11 @@
     const xtermElement = document.getElementsByClassName("xterm")[0] as HTMLElement
     const xtermViewPortElement = document.getElementsByClassName("xterm-viewport")[0] as HTMLElement
 
-    xtermElement.style.height = `${terminalHeight}px`
-    xtermElement.style.width = `${terminalWidth}px`
+    xtermElement.style.height = `${terminalHeight}1rem`
+    xtermElement.style.width = `${terminalWidth}1rem`
 
-    xtermViewPortElement.style.height = `${terminalHeight}px`
-    xtermViewPortElement.style.width = `${terminalWidth}px`
+    xtermViewPortElement.style.height = `${terminalHeight}1rem`
+    xtermViewPortElement.style.width = `${terminalWidth}1rem`
   }
 
   const tryLogin = () => {
