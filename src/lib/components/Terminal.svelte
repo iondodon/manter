@@ -167,6 +167,35 @@
     })
   }
 
+  const handlePtyWsIncomingData = () => {
+    websocket.onmessage = async function(evt) {
+      if (!(evt.data instanceof ArrayBuffer)) {
+        alert("unknown data type " + evt.data)
+        return
+      }
+      const dataString: string = arrayBufferToString(evt.data.slice(1))
+      terminal.write(dataString)
+      if (IS_UNIX && !sessionContext['isLoggedIn'] && dataString.includes("Password:")) {
+        tryLogin()
+      }
+    }
+  }
+
+  const handlePtyWsClose = () => {
+    websocket.onclose = function(_evt) {
+      terminal.write("Session terminated")
+      terminal.dispose()
+    }
+  }
+
+  const handlePtyWsError = () => {
+    websocket.onerror = function(evt) {
+      if (typeof console.log == "function") {
+        console.log(evt)
+      }
+    }
+  }
+
   const newTerminalSession = async (_evt) => {
     if (websocket) {
       websocket.close()
@@ -176,30 +205,9 @@
 
     websocket.onopen = async function(_evt) {
       loadXterm()
-
-      websocket.onmessage = async function(evt) {
-        if (!(evt.data instanceof ArrayBuffer)) {
-          alert("unknown data type " + evt.data)
-          return
-        }
-        const dataString: string = arrayBufferToString(evt.data.slice(1))
-        terminal.write(dataString)
-        if (IS_UNIX && !sessionContext['isLoggedIn'] && dataString.includes("Password:")) {
-          tryLogin()
-        }
-      }
- 
-      websocket.onclose = function(_evt) {
-        terminal.write("Session terminated")
-        terminal.dispose()
-      }
-
-      websocket.onerror = function(evt) {
-        if (typeof console.log == "function") {
-          console.log(evt)
-        }
-      }
-
+      handlePtyWsIncomingData()
+      handlePtyWsClose()
+      handlePtyWsError()
     }
   }
 
