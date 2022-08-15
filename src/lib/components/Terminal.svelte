@@ -13,9 +13,9 @@
     password: ""
   }
 
-  let websocket: WebSocket
+  let ptyWebSocket: WebSocket
   let fitAddon: FitAddon
-  let terminal: Terminal
+  let terminalInterface: Terminal
 
   const sendProposedSize = () => {
     const proposedSize = fitAddon.proposeDimensions()
@@ -25,7 +25,7 @@
         pixel_width: 0, 
         pixel_height: 0
     }
-    websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
+    ptyWebSocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
   }
 
   const adjustTerminalSize = () => {
@@ -52,29 +52,29 @@
     const password = (document.getElementById('password') as HTMLInputElement).value
     sessionContext['password'] = password
     const loginData = { password: password}
-    websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
+    ptyWebSocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
 
     setTimeout(() => {
       if (sessionContext['isLoggedIn']) {
         return
       }
       loginResultElement.innerText = "Login failed"
-      websocket.close()
+      ptyWebSocket.close()
       console.log("WS closed because couldn't login")
     }, 1000)
   }
 
   const loadXterm = () => {
     fitAddon = new FitAddon()
-    terminal = new Terminal({
+    terminalInterface = new Terminal({
       cursorBlink: true,
       cursorStyle: 'bar',
       cursorWidth: 6
     })
-    terminal.loadAddon(fitAddon)
+    terminalInterface.loadAddon(fitAddon)
 
     if (IS_WINDOWS) {
-      terminal.open(document.getElementById('terminal'))
+      terminalInterface.open(document.getElementById('terminal'))
       sendProposedSize()
       adjustTerminalSize()
     }
@@ -83,30 +83,32 @@
       adjustTerminalSize()
     })
 
-    terminal.onResize(function(evt) {      
+    terminalInterface.onResize(function(evt) {      
       const resizeData = {
           cols: evt.cols, 
           rows: evt.rows, 
           pixel_width: 0, 
           pixel_height: 0
       }
-      websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
+      ptyWebSocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
       adjustTerminalSize()
     })
 
-    terminal.onScroll((_evt) => {
+    terminalInterface.onScroll((_evt) => {
       
     })
 
-    terminal.onData(async function(data: string) {
-      if (suggestionsBox.isVisibleSuggestionsBox && suggestionsBox.filteredSuggestions.length > 0 && suggestionsBox.script.length > 0) {
+    terminalInterface.onData(async function(data: string) {
+      if (suggestionsBox.isVisibleSuggestionsBox 
+            && suggestionsBox.filteredSuggestions.length > 0 
+            && suggestionsBox.script.length > 0) {
         // if tab or enter
         if (data == "\t") {
           let nextText = suggestionsBox.takeFocusedSuggestion()
           nextText += ' '
           for (let i = 0; i < nextText.length; i++) {
             const encodedData = new TextEncoder().encode("\x00" + nextText[i])
-            websocket.send(encodedData)
+            ptyWebSocket.send(encodedData)
             await suggestionsBox.updateSuggestions(nextText[i], sessionContext)
           }
           return
@@ -129,31 +131,31 @@
       }
 
       const encodedData = new TextEncoder().encode("\x00" + data)
-      websocket.send(encodedData)
+      ptyWebSocket.send(encodedData)
       await suggestionsBox.updateSuggestions(data, sessionContext)
     })
 
-    terminal.onCursorMove(() => {
+    terminalInterface.onCursorMove(() => {
       suggestionsBox.bringSuggestionsToCursor()
     })
 
-    terminal.onKey(_evt => {
+    terminalInterface.onKey(_evt => {
     
     })
 
-    terminal.onSelectionChange(() => {
+    terminalInterface.onSelectionChange(() => {
       
     })
 
-    terminal.onBell(() => {
+    terminalInterface.onBell(() => {
       console.log("bell")
     })
 
-    terminal.buffer.onBufferChange((buf) => {console.log('buff', buf)})
+    terminalInterface.buffer.onBufferChange((buf) => {console.log('buff', buf)})
 
-    terminal.onTitleChange(function(title) {
+    terminalInterface.onTitleChange(function(title) {
       if (IS_UNIX && !sessionContext['isLoggedIn']) {
-        terminal.open(document.getElementById('terminal'))
+        terminalInterface.open(document.getElementById('terminal'))
         sessionContext['isLoggedIn'] = true
         adjustTerminalSize()
       }
@@ -168,13 +170,13 @@
   }
 
   const handlePtyWsIncomingData = () => {
-    websocket.onmessage = async function(evt) {
+    ptyWebSocket.onmessage = async function(evt) {
       if (!(evt.data instanceof ArrayBuffer)) {
         alert("unknown data type " + evt.data)
         return
       }
       const dataString: string = arrayBufferToString(evt.data.slice(1))
-      terminal.write(dataString)
+      terminalInterface.write(dataString)
       if (IS_UNIX && !sessionContext['isLoggedIn'] && dataString.includes("Password:")) {
         tryLogin()
       }
@@ -182,14 +184,14 @@
   }
 
   const handlePtyWsClose = () => {
-    websocket.onclose = function(_evt) {
-      terminal.write("Session terminated")
-      terminal.dispose()
+    ptyWebSocket.onclose = function(_evt) {
+      terminalInterface.write("Session terminated")
+      terminalInterface.dispose()
     }
   }
 
   const handlePtyWsError = () => {
-    websocket.onerror = function(evt) {
+    ptyWebSocket.onerror = function(evt) {
       if (typeof console.log == "function") {
         console.log(evt)
       }
@@ -197,13 +199,13 @@
   }
 
   const newTerminalSession = async (_evt) => {
-    if (websocket) {
-      websocket.close()
+    if (ptyWebSocket) {
+      ptyWebSocket.close()
     }
-    websocket = new WebSocket(PTY_WS_ADDRESS)
-    websocket.binaryType = "arraybuffer"
+    ptyWebSocket = new WebSocket(PTY_WS_ADDRESS)
+    ptyWebSocket.binaryType = "arraybuffer"
 
-    websocket.onopen = async function(_evt) {
+    ptyWebSocket.onopen = async function(_evt) {
       loadXterm()
       handlePtyWsIncomingData()
       handlePtyWsClose()
