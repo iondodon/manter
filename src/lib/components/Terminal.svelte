@@ -13,17 +13,17 @@
     password: ""
   }
 
-  let websocket
-  let fitAddon
-  let terminal
+  let websocket: WebSocket
+  let fitAddon: FitAddon
+  let terminal: Terminal
 
   const sendProposedSize = () => {
     const proposedSize = fitAddon.proposeDimensions()
     const resizeData = {
         cols: proposedSize.cols, 
         rows: proposedSize.rows, 
-        pixel_width: 4, 
-        pixel_height: 4
+        pixel_width: 0, 
+        pixel_height: 0
     }
     websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
   }
@@ -79,8 +79,8 @@
         const resizeData = {
             cols: evt.cols, 
             rows: evt.rows, 
-            pixel_width: 4, 
-            pixel_height: 4
+            pixel_width: 0, 
+            pixel_height: 0
         }
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
         adjustTerminalSize()
