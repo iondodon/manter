@@ -64,40 +64,20 @@
     }, 1000)
   }
 
-  const loadTerminalInterface = () => {
-    fitAddon = new FitAddon()
-    terminalInterface = new Terminal({
-      cursorBlink: true,
-      cursorStyle: 'bar',
-      cursorWidth: 6
-    })
-    terminalInterface.loadAddon(fitAddon)
-
-    if (IS_WINDOWS) {
-      terminalInterface.open(document.getElementById('terminal'))
-      sendProposedSize()
-      adjustTerminalSize()
-    }
-
-    addEventListener('resize', (_event) => {
-      adjustTerminalSize()
-    })
-
+  const termInterfaceHandleResize = () => {
     terminalInterface.onResize(function(evt) {      
-      const resizeData = {
+      const resizeValues = {
           cols: evt.cols, 
           rows: evt.rows, 
           pixel_width: 0, 
           pixel_height: 0
       }
-      ptyWebSocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
+      ptyWebSocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeValues)))
       adjustTerminalSize()
     })
+  }
 
-    terminalInterface.onScroll((_evt) => {
-      
-    })
-
+  const termInterfaceHandleNewInputData = () => {
     terminalInterface.onData(async function(data: string) {
       if (suggestionsBox.isVisibleSuggestionsBox 
             && suggestionsBox.filteredSuggestions.length > 0 
@@ -134,26 +114,22 @@
       ptyWebSocket.send(encodedData)
       await suggestionsBox.updateSuggestions(data, sessionContext)
     })
+  }
 
+  const termInterfaceHandleCursorMove = () => {
     terminalInterface.onCursorMove(() => {
       suggestionsBox.bringSuggestionsToCursor()
     })
+  }
 
-    terminalInterface.onKey(_evt => {
-    
+  const termInterfaceHandleBufferChange = () => {
+    terminalInterface.buffer.onBufferChange((buf) => {
+      console.log('buffchange event', buf)
     })
+  }
 
-    terminalInterface.onSelectionChange(() => {
-      
-    })
-
-    terminalInterface.onBell(() => {
-      console.log("bell")
-    })
-
-    terminalInterface.buffer.onBufferChange((buf) => {console.log('buff', buf)})
-
-    terminalInterface.onTitleChange(function(title) {
+  const termInterfaceHandleTitleChange = () => {
+    terminalInterface.onTitleChange((title) => {
       if (IS_UNIX && !sessionContext['isLoggedIn']) {
         terminalInterface.open(document.getElementById('terminal'))
         sessionContext['isLoggedIn'] = true
@@ -167,6 +143,32 @@
       }
       document.title = title
     })
+  }
+
+  const setupNewTerminalInterface = () => {
+    terminalInterface = new Terminal({
+      cursorBlink: true,
+      cursorStyle: 'bar',
+      cursorWidth: 6
+    })
+    fitAddon = new FitAddon()
+    terminalInterface.loadAddon(fitAddon)
+
+    if (IS_WINDOWS) {
+      terminalInterface.open(document.getElementById('terminal'))
+      sendProposedSize()
+      adjustTerminalSize()
+    }
+
+    addEventListener('resize', (_event) => {
+      adjustTerminalSize()
+    })
+
+    termInterfaceHandleResize()
+    termInterfaceHandleNewInputData()
+    termInterfaceHandleCursorMove()
+    termInterfaceHandleBufferChange()
+    termInterfaceHandleTitleChange()
   }
 
   const handlePtyWsIncomingData = () => {
@@ -206,7 +208,7 @@
     ptyWebSocket.binaryType = "arraybuffer"
 
     ptyWebSocket.onopen = async function(_evt) {
-      loadTerminalInterface()
+      setupNewTerminalInterface()
       handlePtyWsIncomingData()
       handlePtyWsClose()
       handlePtyWsError()
