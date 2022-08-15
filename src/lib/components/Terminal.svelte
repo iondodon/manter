@@ -17,7 +17,7 @@
   let fitAddon: FitAddon
   let terminalInterface: Terminal
 
-  const sendProposedSize = () => {
+  const sendProposedSizeToPty = () => {
     const proposedSize = fitAddon.proposeDimensions()
     const resizeData = {
         cols: proposedSize.cols, 
@@ -135,17 +135,27 @@
     terminalInterface.open(document.getElementById('terminal'))
   }
 
+  const checkIfLoggedIn = () => {
+    if (!sessionContext['isLoggedIn']) {
+      linkTermInterfaceToHtmlElement()
+      sessionContext['isLoggedIn'] = true
+      adjustTerminalSize()
+    }
+  }
+
+  const updateSessionContext = (title) => {
+    title = title.replace("[manter]", "")
+    let promptUpdatedData = JSON.parse(title)
+    sessionContext = {...sessionContext, ...promptUpdatedData}
+  }
+
   const termInterfaceHandleTitleChange = () => {
     terminalInterface.onTitleChange((title) => {
-      if (IS_UNIX && !sessionContext['isLoggedIn']) {
-        linkTermInterfaceToHtmlElement()
-        sessionContext['isLoggedIn'] = true
-        adjustTerminalSize()
+      if (IS_UNIX) {
+        checkIfLoggedIn()
       }
       if (title.includes("[manter]")) {
-          title = title.replace("[manter]", "")
-          let promptUpdatedData = JSON.parse(title)
-          sessionContext = {...sessionContext, ...promptUpdatedData}
+          updateSessionContext(title)
           return
       }
       document.title = title
@@ -167,7 +177,7 @@
 
     if (IS_WINDOWS) {
       linkTermInterfaceToHtmlElement()
-      sendProposedSize()
+      sendProposedSizeToPty()
       adjustTerminalSize()
     }
 
