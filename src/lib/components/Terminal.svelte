@@ -65,7 +65,7 @@
   }
 
   const termInterfaceHandleResize = () => {
-    terminalInterface.onResize(function(evt) {      
+    terminalInterface.onResize((evt) => {      
       const resizeValues = {
           cols: evt.cols, 
           rows: evt.rows, 
@@ -78,7 +78,7 @@
   }
 
   const termInterfaceHandleNewInputData = () => {
-    terminalInterface.onData(async function(data: string) {
+    terminalInterface.onData(async (data: string) => {
       if (suggestionsBox.isVisibleSuggestionsBox 
             && suggestionsBox.filteredSuggestions.length > 0 
             && suggestionsBox.script.length > 0) {
@@ -172,7 +172,7 @@
   }
 
   const handlePtyWsIncomingData = () => {
-    ptyWebSocket.onmessage = async function(evt) {
+    ptyWebSocket.onmessage = async (evt) => {
       if (!(evt.data instanceof ArrayBuffer)) {
         alert("unknown data type " + evt.data)
         return
@@ -186,14 +186,14 @@
   }
 
   const handlePtyWsClose = () => {
-    ptyWebSocket.onclose = function(_evt) {
+    ptyWebSocket.onclose = (_evt) => {
       terminalInterface.write("Session terminated")
       terminalInterface.dispose()
     }
   }
 
   const handlePtyWsError = () => {
-    ptyWebSocket.onerror = function(evt) {
+    ptyWebSocket.onerror = (evt) => {
       if (typeof console.log == "function") {
         console.log(evt)
       }
@@ -207,7 +207,7 @@
     ptyWebSocket = new WebSocket(PTY_WS_ADDRESS)
     ptyWebSocket.binaryType = "arraybuffer"
 
-    ptyWebSocket.onopen = async function(_evt) {
+    ptyWebSocket.onopen = async (_evt) => {
       setupNewTerminalInterface()
       handlePtyWsIncomingData()
       handlePtyWsClose()
