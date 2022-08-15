@@ -128,10 +128,14 @@
     })
   }
 
+  const linkTermInterfaceToHtmlElement = () => {
+    terminalInterface.open(document.getElementById('terminal'))
+  }
+
   const termInterfaceHandleTitleChange = () => {
     terminalInterface.onTitleChange((title) => {
       if (IS_UNIX && !sessionContext['isLoggedIn']) {
-        terminalInterface.open(document.getElementById('terminal'))
+        linkTermInterfaceToHtmlElement()
         sessionContext['isLoggedIn'] = true
         adjustTerminalSize()
       }
@@ -155,7 +159,7 @@
     terminalInterface.loadAddon(fitAddon)
 
     if (IS_WINDOWS) {
-      terminalInterface.open(document.getElementById('terminal'))
+      linkTermInterfaceToHtmlElement()
       sendProposedSize()
       adjustTerminalSize()
     }
