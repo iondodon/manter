@@ -13,7 +13,11 @@
     password: ""
   }
 
-  const setProposedSize = (fitAddon, websocket) => {
+  let websocket
+  let fitAddon
+  let terminal
+
+  const sendProposedSize = () => {
     const proposedSize = fitAddon.proposeDimensions()
     const resizeData = {
         cols: proposedSize.cols, 
@@ -24,7 +28,7 @@
     websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
   }
 
-  const adjustTerminalSize = (fitAddon) => {
+  const adjustTerminalSize = () => {
     fitAddon.fit()
     
     const terminal = document.getElementById("terminal") as HTMLElement
@@ -41,34 +45,34 @@
     xtermViewPortElement.style.width = `${terminalWidth}px`
   }
 
-  const login = (websocket: WebSocket) => {
+  const tryLogin = () => {
     const password = (document.getElementById('password') as HTMLInputElement).value
     sessionContext['password'] = password
     const loginData = { password: password}
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
   }
 
-  const loginToNewTerminal = async (_evt) => {
-    const websocket = new WebSocket(PTY_WS_ADDRESS)
+  const newTerminalSession = async (_evt) => {
+    websocket = new WebSocket(PTY_WS_ADDRESS)
     websocket.binaryType = "arraybuffer"
 
     websocket.onopen = async function(_evt) {
-      const fitAddon: FitAddon = new FitAddon()
-      const terminal: Terminal = new Terminal({
+      fitAddon = new FitAddon()
+      terminal = new Terminal({
         cursorBlink: true,
         cursorStyle: 'bar',
         cursorWidth: 6
       })
-
       terminal.loadAddon(fitAddon)
+
       if (IS_WINDOWS) {
         terminal.open(document.getElementById('terminal'))
-        setProposedSize(fitAddon, websocket)
-        adjustTerminalSize(fitAddon)
+        sendProposedSize()
+        adjustTerminalSize()
       }
 
       addEventListener('resize', (_event) => {
-        adjustTerminalSize(fitAddon)
+        adjustTerminalSize()
       })
 
       terminal.onResize(function(evt) {      
@@ -79,7 +83,7 @@
             pixel_height: 4
         }
         websocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeData)))
-        adjustTerminalSize(fitAddon)
+        adjustTerminalSize()
       })
 
       terminal.onScroll((_evt) => {
@@ -143,7 +147,7 @@
         if (IS_UNIX && !sessionContext['isLoggedIn']) {
           terminal.open(document.getElementById('terminal'))
           sessionContext['isLoggedIn'] = true
-          adjustTerminalSize(fitAddon)
+          adjustTerminalSize()
         }
         if (title.includes("[manter]")) {
             title = title.replace("[manter]", "")
@@ -161,7 +165,7 @@
           if (IS_UNIX && !sessionContext['isLoggedIn'] && data.includes("Password:")) {
             const loginResultElement = document.getElementById('login-result') as HTMLDivElement
             loginResultElement.innerText = ""
-            login(websocket)
+            tryLogin()
             setTimeout(() => {
               if (sessionContext['isLoggedIn']) {
                 return
@@ -191,12 +195,12 @@
   }
 
   if (IS_WINDOWS) {
-    loginToNewTerminal(null)
+    newTerminalSession(null)
   }
 
   const passInputOnKeyPress = (evt) => {
     if (evt.charCode === 13) {
-      loginToNewTerminal(null)
+      newTerminalSession(evt)
     }
   }
 
@@ -218,7 +222,7 @@
           on:keypress={passInputOnKeyPress}
         >
         <br/>
-        <button on:click={loginToNewTerminal} type="button">Login</button>
+        <button on:click={newTerminalSession} type="button">Login</button>
         <br/>
         <span id="login-result"></span>
       </div>
