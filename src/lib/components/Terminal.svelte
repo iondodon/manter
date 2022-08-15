@@ -212,7 +212,7 @@
   const handlePtyWsError = () => {
     ptyWebSocket.onerror = (evt) => {
       if (typeof console.log == "function") {
-        console.log(evt)
+        console.log("ws error", evt)
       }
     }
   }
