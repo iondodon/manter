@@ -1,6 +1,7 @@
 <svelte:options accessors={true}/>
 
 <script type="ts">
+  import { afterUpdate } from 'svelte';
   import { IS_UNIX } from "../config/config"
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/library/commands"
@@ -31,8 +32,21 @@
     const cursorRect = cursorElement.getBoundingClientRect()
 
     suggestionsBoxElement.style.display = 'block'
-    suggestionsBoxElement.style.top = `${cursorRect.top + 20}px`
-    suggestionsBoxElement.style.left = `${cursorRect.left + 10}px`
+    
+    const suggestionsBoxHeight = suggestionsBoxElement.clientHeight
+    const suggestionsBoxWidth = suggestionsBoxElement.clientWidth
+
+    if (cursorRect.bottom + suggestionsBoxHeight > window.innerHeight) {
+      suggestionsBoxElement.style.top = `${cursorRect.top - suggestionsBoxHeight}px`
+    } else {
+      suggestionsBoxElement.style.top = `${cursorRect.bottom}px`
+    }
+
+    if (cursorRect.right + suggestionsBoxWidth > window.innerWidth) {
+      suggestionsBoxElement.style.left = `${cursorRect.left - suggestionsBoxWidth}px`
+    } else {
+      suggestionsBoxElement.style.left = `${cursorRect.right}px`
+    }
   }
 
   const scrollToFocusedSuggestion = () => {
@@ -210,6 +224,10 @@
     focusedSuggestionIndex = 0
     filterSuggestions()
   }
+
+  afterUpdate(() => {
+    bringSuggestionsToCursor()
+  })
 </script>
 
 

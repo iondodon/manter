@@ -67,6 +67,7 @@
   const termInterfaceHandleResize = () => {
     addEventListener('resize', (_event) => {
       adjustTerminalSize()
+      suggestionsBox.bringSuggestionsToCursor()
     })
     terminalInterface.onResize((evt) => {      
       const resizeValues = {
@@ -121,7 +122,7 @@
 
   const termInterfaceHandleCursorMove = () => {
     terminalInterface.onCursorMove(() => {
-      suggestionsBox.bringSuggestionsToCursor()
+      
     })
   }
 
