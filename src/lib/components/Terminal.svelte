@@ -4,7 +4,7 @@
   import "xterm/css/xterm.css"
   import SuggestionsBox from "./SuggestionsBox.svelte"
   import { IS_WINDOWS, IS_UNIX, PTY_WS_ADDRESS } from "../config/config"
-  import { ab2str } from "../utils/utils"
+  import { arrayBufferToString } from "../utils/utils"
 
   let suggestionsBox: SuggestionsBox
   let sessionContext = {
@@ -46,10 +46,22 @@
   }
 
   const tryLogin = () => {
+    const loginResultElement = document.getElementById('login-result') as HTMLDivElement
+    loginResultElement.innerText = ""
+
     const password = (document.getElementById('password') as HTMLInputElement).value
     sessionContext['password'] = password
     const loginData = { password: password}
     websocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
+
+    setTimeout(() => {
+      if (sessionContext['isLoggedIn']) {
+        return
+      }
+      loginResultElement.innerText = "Login failed"
+      websocket.close()
+      console.log("WS closed because couldn't login")
+    }, 1000)
   }
 
   const loadXterm = () => {
@@ -166,24 +178,14 @@
       loadXterm()
 
       websocket.onmessage = async function(evt) {
-        if (evt.data instanceof ArrayBuffer) {
-          const data: string = ab2str(evt.data.slice(1))
-          terminal.write(data)
-          if (IS_UNIX && !sessionContext['isLoggedIn'] && data.includes("Password:")) {
-            const loginResultElement = document.getElementById('login-result') as HTMLDivElement
-            loginResultElement.innerText = ""
-            tryLogin()
-            setTimeout(() => {
-              if (sessionContext['isLoggedIn']) {
-                return
-              }
-              loginResultElement.innerText = "Login failed"
-              websocket.close()
-              console.log('WS closed')
-            }, 1000)
-          }
-        } else {
+        if (!(evt.data instanceof ArrayBuffer)) {
           alert("unknown data type " + evt.data)
+          return
+        }
+        const dataString: string = arrayBufferToString(evt.data.slice(1))
+        terminal.write(dataString)
+        if (IS_UNIX && !sessionContext['isLoggedIn'] && dataString.includes("Password:")) {
+          tryLogin()
         }
       }
  
