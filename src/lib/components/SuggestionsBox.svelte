@@ -229,6 +229,10 @@
   afterUpdate(() => {
     bringSuggestionsToCursor()
   })
+
+  const formatNames = (namesArr) => {
+    return namesArr.join(', ')
+  }
 </script>
 
 
@@ -241,12 +245,12 @@
             {#if focusedSuggestionIndex == suggestion['index']}
               <div id="focused-suggestion">
                 <div class="suggestion">
-                  {JSON.stringify(suggestion["names"])}
+                  {formatNames(suggestion['names'])}
                 </div>
               </div>
             {:else}
               <div class="suggestion">
-                {JSON.stringify(suggestion["names"])}
+                {formatNames(suggestion['names'])}  
               </div>
             {/if}
           {/each}

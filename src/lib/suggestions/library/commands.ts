@@ -1,4 +1,5 @@
 import { IS_WINDOWS } from "../../config/config"
+import { git } from "./git/git"
 
 const files = {
   values: [
@@ -74,6 +75,7 @@ export const COMMANDS = {
       names: ['docker'],
       description: "docker description",
       next: [dockerOptions]
-    }
+    },
+    git
   ]
 }
