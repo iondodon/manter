@@ -35,17 +35,18 @@
     
     const suggestionsBoxHeight = suggestionsBoxElement.clientHeight
     const suggestionsBoxWidth = suggestionsBoxElement.clientWidth
+    const DISTANCE_FROM_CURSOR_PX = 5
 
     if (cursorRect.bottom + suggestionsBoxHeight > window.innerHeight) {
-      suggestionsBoxElement.style.top = `${cursorRect.top - suggestionsBoxHeight}px`
+      suggestionsBoxElement.style.top = `${cursorRect.top - suggestionsBoxHeight - DISTANCE_FROM_CURSOR_PX}px`
     } else {
-      suggestionsBoxElement.style.top = `${cursorRect.bottom}px`
+      suggestionsBoxElement.style.top = `${cursorRect.bottom + DISTANCE_FROM_CURSOR_PX}px`
     }
 
     if (cursorRect.right + suggestionsBoxWidth > window.innerWidth) {
-      suggestionsBoxElement.style.left = `${cursorRect.left - suggestionsBoxWidth}px`
+      suggestionsBoxElement.style.left = `${cursorRect.left - suggestionsBoxWidth - DISTANCE_FROM_CURSOR_PX}px`
     } else {
-      suggestionsBoxElement.style.left = `${cursorRect.right}px`
+      suggestionsBoxElement.style.left = `${cursorRect.right + DISTANCE_FROM_CURSOR_PX}px`
     }
   }
 
@@ -233,28 +234,31 @@
 
 {#if isVisibleSuggestionsBox}
   <div id="suggestions-box">
-  {#if filteredSuggestions.length > 0}
-    {#each filteredSuggestions as suggestionsGroup}
-      <div class="suggestions-group">
-        {#each suggestionsGroup['values'] as suggestion}
-          {#if focusedSuggestionIndex == suggestion['index']}
-            <div id="focused-suggestion">
+    {#if filteredSuggestions.length > 0}
+      {#each filteredSuggestions as suggestionsGroup}
+        <div class="suggestions-group">
+          {#each suggestionsGroup['values'] as suggestion}
+            {#if focusedSuggestionIndex == suggestion['index']}
+              <div id="focused-suggestion">
+                <div class="suggestion">
+                  {JSON.stringify(suggestion["names"])}
+                </div>
+              </div>
+            {:else}
               <div class="suggestion">
                 {JSON.stringify(suggestion["names"])}
               </div>
-            </div>
-          {:else}
-            <div class="suggestion">
-              {JSON.stringify(suggestion["names"])}
-            </div>
-          {/if}
-        {/each}
-      </div>
-    {/each}
-  {:else}
-    loading...
-  {/if}
-</div>
+            {/if}
+          {/each}
+        </div>
+      {/each}
+    {:else}
+      loading...
+    {/if}
+    <div class="suggestion">
+      <kbd>↑</kbd> and <kbd>↓</kbd> to navigate, <kbd>Tab</kbd> to take
+    </div>
+  </div>
 {/if}
 
 

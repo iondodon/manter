@@ -49,7 +49,7 @@
     const loginResultElement = document.getElementById('login-result') as HTMLDivElement
     loginResultElement.innerText = ""
 
-    const password = (document.getElementById('password') as HTMLInputElement).value
+    const password = (document.getElementById('password-input') as HTMLInputElement).value
     sessionContext['password'] = password
     const loginData = { password: password}
     ptyWebSocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
@@ -137,7 +137,7 @@
     termInterfaceHandleViewportScroll()
   }
 
-  const checkIfLoggedIn = () => {
+  const setLoggedIn = () => {
     if (!sessionContext['isLoggedIn']) {
       linkTermInterfaceToHtmlElement()
       sessionContext['isLoggedIn'] = true
@@ -154,7 +154,7 @@
   const termInterfaceHandleTitleChange = () => {
     terminalInterface.onTitleChange((title) => {
       if (IS_UNIX) {
-        checkIfLoggedIn()
+        setLoggedIn()
       }
       if (title.includes("[manter]")) {
           updateSessionContext(title)
@@ -259,13 +259,13 @@
        <div id="login-form">
         <input 
           type="password" 
-          id="password" 
+          id="password-input" 
           name="password" 
           required 
           minlength="4" 
           maxlength="20" 
           size="10"
-          placeholder="password"
+          placeholder="[sudo] password for ion"
           on:keypress={passInputOnKeyPress}
         >
         <br/>
@@ -292,14 +292,33 @@
   }
 
   #login-form {
-    width: 20%;
-    display: inline-block;
+    width: 30%;
+    display: flex;
+    height: 30%;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
     color: hsl(0, 0%, 79%);
+    background-color: hsl(0, 0%, 21%);
+    padding: 2rem;
+    border-radius: 2px;
   }
 
   #login-form button, #login-form input, #login-form span {
-    margin: 0.3em;
     width: 100%;
+  }
+
+  #password-input {
+    border: 1px solid hsl(0, 0%, 79%);
+    border-radius: 2px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1vw;;
+  }
+
+  #login-form button {
+    padding: 0.3rem;
   }
 
   #login-form input {
