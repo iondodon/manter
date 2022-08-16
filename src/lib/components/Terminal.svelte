@@ -71,6 +71,7 @@
 
     setTimeout(() => {
       if (sessionContext['isLoggedIn']) {
+        ptyWebSocket.onmessage = writePtyIncomingToTermInterface
         return
       }
       loginResultElement.innerText = "Login failed"
@@ -96,7 +97,7 @@
     })
   }
 
-  const termInterfaceHandleNewInputData = () => {
+  const termInterfaceHandleUserInputData = () => {
     terminalInterface.onData(async (data: string) => {
       if (suggestionsBox.isVisibleSuggestionsBox 
             && suggestionsBox.filteredSuggestions.length > 0 
@@ -206,24 +207,36 @@
     }
 
     termInterfaceHandleResize()
-    termInterfaceHandleNewInputData()
+    termInterfaceHandleUserInputData()
     termInterfaceHandleCursorMove()
     termInterfaceHandleBufferChange()
     termInterfaceHandleTitleChange()
   }
 
-  const handlePtyWsIncomingData = () => {
-    ptyWebSocket.onmessage = async (evt) => {
-      if (!(evt.data instanceof ArrayBuffer)) {
-        alert("unknown data type " + evt.data)
-        return
-      }
-      const dataString: string = arrayBufferToString(evt.data.slice(1))
-      terminalInterface.write(dataString)
-      if (IS_UNIX && !sessionContext['isLoggedIn'] && dataString.includes("Password:")) {
-        tryLogin()
-      }
+  const writePtyIncomingToTermInterface = (evt) => {
+    if (!(evt.data instanceof ArrayBuffer)) {
+      alert("unknown data type " + evt.data)
+      return
     }
+    const dataString: string = arrayBufferToString(evt.data.slice(1))
+    terminalInterface.write(dataString)
+    return dataString
+  }
+
+  const handlePtyCheckingPassword = async (evt) => {
+    const writenData = writePtyIncomingToTermInterface(evt)
+    console.log('checking pass')
+    if (IS_UNIX && !sessionContext['isLoggedIn'] && writenData.includes("Password:")) {
+      tryLogin()
+    }
+  }
+
+  const handlePtyWsIncomingData = () => {
+    if (IS_UNIX) {
+      ptyWebSocket.onmessage = handlePtyCheckingPassword
+      return
+    }
+    ptyWebSocket.onmessage = writePtyIncomingToTermInterface
   }
 
   const handlePtyWsClose = () => {
