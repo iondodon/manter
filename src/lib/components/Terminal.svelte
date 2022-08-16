@@ -6,7 +6,7 @@
   import { IS_WINDOWS, IS_UNIX, PTY_WS_ADDRESS } from "../config/config"
   import { arrayBufferToString } from "../utils/utils"
   import { invoke } from '@tauri-apps/api/tauri'
-  import { beforeUpdate, onMount, } from 'svelte'
+  import { onMount } from 'svelte'
 
   let suggestionsBox: SuggestionsBox
   let sessionContext = {
@@ -26,8 +26,10 @@
     sessionContext['user'] = settings['default_login_user']
   }
 
-  onMount(async () => {
-    setUser()
+  onMount(() => {
+    if (IS_UNIX) {
+      setUser()
+    }
   })
 
   const sendProposedSizeToPty = () => {
