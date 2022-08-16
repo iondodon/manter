@@ -5,17 +5,30 @@
   import SuggestionsBox from "./SuggestionsBox.svelte"
   import { IS_WINDOWS, IS_UNIX, PTY_WS_ADDRESS } from "../config/config"
   import { arrayBufferToString } from "../utils/utils"
+  import { invoke } from '@tauri-apps/api/tauri'
+  import { beforeUpdate, onMount, } from 'svelte'
 
   let suggestionsBox: SuggestionsBox
   let sessionContext = {
     isLoggedIn: false,
     cwd: "~",
-    password: ""
+    password: "",
+    user: ""
   }
 
   let ptyWebSocket: WebSocket
   let fitAddon: FitAddon
   let terminalInterface: Terminal
+
+  const setUser = async () => {
+    const settingsString = await invoke('get_settings') as string
+    const settings = JSON.parse(settingsString)
+    sessionContext['user'] = settings['default_login_user']
+  }
+
+  onMount(async () => {
+    setUser()
+  })
 
   const sendProposedSizeToPty = () => {
     const proposedSize = fitAddon.proposeDimensions()
@@ -250,7 +263,6 @@
       newTerminalSession(evt)
     }
   }
-
 </script>
 
 <div id="terminal">
@@ -265,7 +277,7 @@
           minlength="4" 
           maxlength="20" 
           size="10"
-          placeholder="[sudo] password for ion"
+          placeholder={`[sudo] password for ${sessionContext['user']}`}
           on:keypress={passInputOnKeyPress}
         >
         <br/>
