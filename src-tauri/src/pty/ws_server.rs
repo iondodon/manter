@@ -113,6 +113,8 @@ async fn feed_pty_from_ws(
               #[cfg(target_os = "macos")]
               pty_writer.write_all(" source ~/.zshenv \n".as_bytes()).unwrap();
 
+              pty_writer.write_all("clear\n".as_bytes()).unwrap();
+
               mt_log!(Level::Info, "Login & Environment initialization finished");
             }
             _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
