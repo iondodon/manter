@@ -256,7 +256,11 @@
       loading...
     {/if}
     <div class="suggestion">
-      <kbd>↑</kbd> and <kbd>↓</kbd> to navigate, <kbd>Tab</kbd> to take
+      <kbd>↑</kbd> and <kbd>↓</kbd> to navigate 
+      <br/>
+      <kbd>Tab</kbd> to take
+      <br/>
+      <kbd>Esc</kbd> to hide
     </div>
   </div>
 {/if}
