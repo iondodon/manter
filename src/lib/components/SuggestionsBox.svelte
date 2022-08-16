@@ -260,33 +260,32 @@
 
 <style type="scss">
   #suggestions-box {
-    z-index: 1000;
+    z-index: 1;
     position: absolute;
     top: 0;
     left: 0;
     width: fit-content;
     max-height: 200px;
-    background-color: rgb(19, 11, 127);
-    color: rgb(218, 17, 17);
     font-size: 1.2em;
     font-family: monospace;
-    border: 1px solid rgb(222, 21, 21);
     display: none;
     overflow-y: auto;
     overflow-x: hidden;
+    background-color: rgb(0, 0, 0);
+    border: 1px solid rgb(77, 77, 77);
   }
 
   #focused-suggestion {
-    background-color: aqua;
+    background-color: hsl(0, 0%, 37%);
   }
 
   .suggestion {
-    border-bottom: 1px solid rgb(0, 0, 0);
+    color: hsl(0, 0%, 67%);
+    border-bottom: 1px solid hsl(0, 0%, 14%);
     margin: 2px;
   }
 
   .suggestions-group {
-    border-bottom: 3px solid rgb(7, 115, 3);
     margin: 2px;
   }
 </style>
