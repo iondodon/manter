@@ -297,6 +297,7 @@
     display: flex;
     flex-direction: column;
     z-index: 4;
+    max-width: 300px;
     position: absolute;
     top: 0;
     left: 0;
@@ -306,7 +307,7 @@
 
   #suggestions-list {
     max-height: 100px;
-    max-width: 300px;
+    width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     background-color: rgb(0, 0, 0);
@@ -314,13 +315,14 @@
   }
 
   .controls {
-    border: 1px solid hsla(109, 98%, 36%, 0.697);
-    max-width: 300px;
+    background-color: hsla(109, 100%, 19%, 0.697);
+    border: 1px solid hsla(109, 100%, 36%, 0.697);
+    width: 100%;
   }
 
   .description {
     border: 1px solid hsla(241, 98%, 36%, 0.697);
-    max-width: 300px;
+    width: 100%;
   }
 
   #focused-suggestion {
@@ -330,5 +332,8 @@
   .suggestion {
     color: hsl(0, 0%, 67%);
     border-bottom: 1px solid hsl(0, 0%, 14%);
+    width: 100%;
+    max-height: 70px;
+    overflow-y: auto;
   }
 </style>
