@@ -274,10 +274,12 @@
       <br/>
       <kbd>Esc</kbd> to hide
     </div>
-    {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
-      {focusedSuggestion['details']['description']}
-    {:else}
-      {focusedSuggestion['names']}
+    {#if focusedSuggestion}
+      {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
+        {focusedSuggestion['details']['description']}
+      {:else}
+        {focusedSuggestion['names']}
+      {/if}
     {/if}
   </div>
 {/if}
