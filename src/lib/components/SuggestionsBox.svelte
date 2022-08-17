@@ -59,10 +59,13 @@
     const focusedSuggestionBottom = focusedSuggestionTop + focusedSuggestionElement.offsetHeight
     const suggestionsListTop = suggestionsListElement.scrollTop
     const suggestionsListBottom = suggestionsListTop + suggestionsListElement.offsetHeight
+
+    const DELTA = 15
+
     if (focusedSuggestionTop < suggestionsListTop) {
-      suggestionsListElement.scrollTop = focusedSuggestionTop - 21
+      suggestionsListElement.scrollTop = focusedSuggestionTop - DELTA
     } else if (focusedSuggestionBottom > suggestionsListBottom) {
-      suggestionsListElement.scrollTop = focusedSuggestionBottom - suggestionsListElement.offsetHeight + 21
+      suggestionsListElement.scrollTop = focusedSuggestionBottom - suggestionsListElement.offsetHeight + DELTA
     }
   }
 
@@ -249,10 +252,12 @@
           <div class="suggestions-group">
             {#each suggestionsGroup['values'] as suggestion}
               {#if focusedSuggestionIndex == suggestion['index']}
-                {setFocusedSuggestion(suggestion)}
                 <div id="focused-suggestion">
                   <div class="suggestion">
-                    {formatNames(suggestion['names'])}
+                    {(() => { 
+                      setFocusedSuggestion(suggestion)
+                      return formatNames(suggestion['names']) 
+                    })()}
                   </div>
                 </div>
               {:else}
@@ -267,43 +272,55 @@
         loading...
       {/if}
     </div>
-    <div class="suggestion">
+    {#if focusedSuggestion}
+      <div class="suggestion description">
+        {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
+          {focusedSuggestion['details']['description']}
+        {:else}
+          {focusedSuggestion['names']}
+        {/if}
+      </div>
+    {/if}
+    <div class="suggestion controls">
       <kbd>↑</kbd> and <kbd>↓</kbd> to navigate 
       <br/>
       <kbd>Tab</kbd> to take
       <br/>
       <kbd>Esc</kbd> to hide
     </div>
-    {#if focusedSuggestion}
-      {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
-        {focusedSuggestion['details']['description']}
-      {:else}
-        {focusedSuggestion['names']}
-      {/if}
-    {/if}
   </div>
 {/if}
 
 
 <style type="scss">
   #suggestions-box {
-    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    z-index: 4;
     position: absolute;
     top: 0;
     left: 0;
-    font-size: 1rem;
     background-color: rgb(160, 32, 32);
-    border: 1px solid rgb(34, 0, 158);
+    border: 1px solid rgb(158, 0, 129);
   }
 
   #suggestions-list {
-    font-size: 1rem;
+    max-height: 100px;
+    max-width: 300px;
     overflow-y: auto;
     overflow-x: hidden;
-    max-height: 100px;
-    max-width: 200px;
     background-color: rgb(0, 0, 0);
-    border: 1px solid rgb(77, 77, 77);
+    border: 2px solid rgb(77, 77, 77);
+  }
+
+  .controls {
+    border: 1px solid hsla(109, 98%, 36%, 0.697);
+    max-width: 300px;
+  }
+
+  .description {
+    border: 1px solid hsla(241, 98%, 36%, 0.697);
+    max-width: 300px;
   }
 
   #focused-suggestion {
@@ -313,10 +330,5 @@
   .suggestion {
     color: hsl(0, 0%, 67%);
     border-bottom: 1px solid hsl(0, 0%, 14%);
-    margin: 2px;
-  }
-
-  .suggestions-group {
-    margin: 2px;
   }
 </style>
