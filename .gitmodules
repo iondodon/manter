@@ -1,0 +1,3 @@
+[submodule "src/lib/suggestions/cmd-library"]
+	path = src/lib/suggestions/cmd-library
+	url = git@github.com:iondodon/cmd-library.git
