@@ -15,6 +15,7 @@
   
   let suggestionTaken = null
   let focusedSuggestionIndex = 0
+  let focusedSuggestion = null
   
   export let filteredSuggestions = []
   let totalAfterFilterSuggestions = 0
@@ -233,6 +234,14 @@
   const formatNames = (namesArr) => {
     return namesArr.join(', ')
   }
+
+  const setFocusedSuggestion = (suggestion) => {
+    if (suggestion['details'] && suggestion['details']['description']) {
+      focusedSuggestion = suggestion
+      return
+    }
+    focusedSuggestion = suggestion
+  }
 </script>
 
 
@@ -244,6 +253,7 @@
           <div class="suggestions-group">
             {#each suggestionsGroup['values'] as suggestion}
               {#if focusedSuggestionIndex == suggestion['index']}
+                {setFocusedSuggestion(suggestion)}
                 <div id="focused-suggestion">
                   <div class="suggestion">
                     {formatNames(suggestion['names'])}
@@ -268,6 +278,9 @@
       <br/>
       <kbd>Esc</kbd> to hide
     </div>
+    {#if focusedSuggestion}
+      {focusedSuggestion['details']['description']}
+    {/if}
   </div>
 {/if}
 
