@@ -4,7 +4,7 @@
   import { afterUpdate } from 'svelte';
   import { IS_UNIX } from "../config/config"
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
-  import { COMMANDS } from "../suggestions/cmd-library/commands"
+  import { COMMANDS } from "../suggestions/cmd-library/src/commands"
 
   export let script: string = ''
   export let lastWord = ''
