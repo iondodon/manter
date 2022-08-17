@@ -236,10 +236,6 @@
   }
 
   const setFocusedSuggestion = (suggestion) => {
-    if (suggestion['details'] && suggestion['details']['description']) {
-      focusedSuggestion = suggestion
-      return
-    }
     focusedSuggestion = suggestion
   }
 </script>
@@ -278,8 +274,10 @@
       <br/>
       <kbd>Esc</kbd> to hide
     </div>
-    {#if focusedSuggestion}
+    {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
       {focusedSuggestion['details']['description']}
+    {:else}
+      {focusedSuggestion['names']}
     {/if}
   </div>
 {/if}
