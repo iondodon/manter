@@ -52,16 +52,16 @@
 
   const scrollToFocusedSuggestion = () => {
     const focusedSuggestionElement = document.getElementById("focused-suggestion")
-    const suggestionsBoxElement = document.getElementById("suggestions-box")
+    const suggestionsListElement = document.getElementById("suggestions-list")
 
     const focusedSuggestionTop = focusedSuggestionElement.offsetTop
     const focusedSuggestionBottom = focusedSuggestionTop + focusedSuggestionElement.offsetHeight
-    const suggestionsBoxTop = suggestionsBoxElement.scrollTop
-    const suggestionsBoxBottom = suggestionsBoxTop + suggestionsBoxElement.offsetHeight
-    if (focusedSuggestionTop < suggestionsBoxTop) {
-      suggestionsBoxElement.scrollTop = focusedSuggestionTop - 21
-    } else if (focusedSuggestionBottom > suggestionsBoxBottom) {
-      suggestionsBoxElement.scrollTop = focusedSuggestionBottom - suggestionsBoxElement.offsetHeight + 21
+    const suggestionsListTop = suggestionsListElement.scrollTop
+    const suggestionsListBottom = suggestionsListTop + suggestionsListElement.offsetHeight
+    if (focusedSuggestionTop < suggestionsListTop) {
+      suggestionsListElement.scrollTop = focusedSuggestionTop - 21
+    } else if (focusedSuggestionBottom > suggestionsListBottom) {
+      suggestionsListElement.scrollTop = focusedSuggestionBottom - suggestionsListElement.offsetHeight + 21
     }
   }
 
@@ -238,27 +238,29 @@
 
 {#if isVisibleSuggestionsBox}
   <div id="suggestions-box">
-    {#if filteredSuggestions.length > 0}
-      {#each filteredSuggestions as suggestionsGroup}
-        <div class="suggestions-group">
-          {#each suggestionsGroup['values'] as suggestion}
-            {#if focusedSuggestionIndex == suggestion['index']}
-              <div id="focused-suggestion">
-                <div class="suggestion">
-                  {formatNames(suggestion['names'])}
+    <div id="suggestions-list">
+      {#if filteredSuggestions.length > 0}
+        {#each filteredSuggestions as suggestionsGroup}
+          <div class="suggestions-group">
+            {#each suggestionsGroup['values'] as suggestion}
+              {#if focusedSuggestionIndex == suggestion['index']}
+                <div id="focused-suggestion">
+                  <div class="suggestion">
+                    {formatNames(suggestion['names'])}
+                  </div>
                 </div>
-              </div>
-            {:else}
-              <div class="suggestion">
-                {formatNames(suggestion['names'])}  
-              </div>
-            {/if}
-          {/each}
-        </div>
-      {/each}
-    {:else}
-      loading...
-    {/if}
+              {:else}
+                <div class="suggestion">
+                  {formatNames(suggestion['names'])}  
+                </div>
+              {/if}
+            {/each}
+          </div>
+        {/each}
+      {:else}
+        loading...
+      {/if}
+    </div>
     <div class="suggestion">
       <kbd>↑</kbd> and <kbd>↓</kbd> to navigate 
       <br/>
@@ -276,13 +278,17 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: fit-content;
-    max-height: 200px;
-    font-size: 1.2em;
-    font-family: monospace;
-    display: none;
+    font-size: 1rem;
+    background-color: rgb(160, 32, 32);
+    border: 1px solid rgb(34, 0, 158);
+  }
+
+  #suggestions-list {
+    font-size: 1rem;
     overflow-y: auto;
     overflow-x: hidden;
+    max-height: 100px;
+    max-width: 200px;
     background-color: rgb(0, 0, 0);
     border: 1px solid rgb(77, 77, 77);
   }
