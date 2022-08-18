@@ -137,6 +137,13 @@
 
 
   const updateCandidateGroups = async (newCmdInput: string, sessionContext: object) => {
+    if (newCmdInput == '\u001b[D' || newCmdInput == '\u001b[C' || newCmdInput == "\u001b[A" || newCmdInput == "\u001b[B") {
+      return
+    }
+    if (newCmdInput == '\u001bOD' || newCmdInput == '\u001bOC' || newCmdInput == "\u001bOA" || newCmdInput == "\u001bOB") {
+      return
+    }
+
     if (newCmdInput === '\n' || newCmdInput === '\r' || newCmdInput == '\x03') {
       candidateGroups = [ [COMMANDS] ]
       script = ''
