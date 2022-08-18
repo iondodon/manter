@@ -60,6 +60,10 @@
     xtermViewPortElement.style.width = `${terminalWidth}px`
   }
 
+  const focusOnTerminal = () => {
+    terminalInterface.focus()
+  }
+
   const tryLogin = () => {
     const loginResultElement = document.getElementById('login-result') as HTMLDivElement
     loginResultElement.innerText = ""
@@ -71,6 +75,7 @@
 
     setTimeout(() => {
       if (sessionContext['isLoggedIn']) {
+        focusOnTerminal()
         ptyWebSocket.onmessage = writePtyIncomingToTermInterface
         return
       }
