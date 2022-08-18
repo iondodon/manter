@@ -20,6 +20,8 @@
   export let filteredSuggestions = []
   let totalAfterFilterSuggestions = 0
 
+  let isBoxReversed = false
+
   export const bringSuggestionsToCursor = () => {
     const suggestionsBoxElement = document.getElementById('suggestions-box')
     if (!suggestionsBoxElement) {
@@ -39,8 +41,10 @@
     const DISTANCE_FROM_CURSOR_PX = 5
 
     if (cursorRect.bottom + suggestionsBoxHeight > window.innerHeight) {
+      isBoxReversed = true
       suggestionsBoxElement.style.top = `${cursorRect.top - suggestionsBoxHeight - DISTANCE_FROM_CURSOR_PX}px`
     } else {
+      isBoxReversed = false
       suggestionsBoxElement.style.top = `${cursorRect.bottom + DISTANCE_FROM_CURSOR_PX}px`
     }
 
@@ -259,6 +263,19 @@
 
 {#if isVisibleSuggestionsBox}
   <div id="suggestions-box">
+
+    {#if isBoxReversed}
+      {#if focusedSuggestion}
+        <div class="suggestion description">
+          {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
+            {focusedSuggestion['details']['description']}
+          {:else}
+            {focusedSuggestion['names']}
+          {/if}
+        </div>
+      {/if}
+    {/if}
+
     <div id="suggestions-list">
       {#if filteredSuggestions.length > 0}
         {#each filteredSuggestions as suggestionsGroup}
@@ -285,15 +302,19 @@
         loading...
       {/if}
     </div>
-    {#if focusedSuggestion}
-      <div class="suggestion description">
-        {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
-          {focusedSuggestion['details']['description']}
-        {:else}
-          {focusedSuggestion['names']}
-        {/if}
-      </div>
+
+    {#if !isBoxReversed}
+      {#if focusedSuggestion}
+        <div class="suggestion description">
+          {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
+            {focusedSuggestion['details']['description']}
+          {:else}
+            {focusedSuggestion['names']}
+          {/if}
+        </div>
+      {/if}
     {/if}
+
     <div class="suggestion controls">
       <kbd>↑</kbd> and <kbd>↓</kbd> to navigate 
       <br/>
@@ -301,6 +322,7 @@
       <br/>
       <kbd>Esc</kbd> to hide
     </div>
+
   </div>
 {/if}
 
@@ -310,7 +332,7 @@
     display: flex;
     flex-direction: column;
     z-index: 4;
-    max-width: 300px;
+    width: 300px;
     position: absolute;
     top: 0;
     left: 0;
