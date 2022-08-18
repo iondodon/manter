@@ -299,7 +299,9 @@
           </div>
         {/each}
       {:else}
-        loading...
+        <div class="loading">
+          loading...
+        </div>
       {/if}
     </div>
 
@@ -358,6 +360,10 @@
   .description {
     border: 1px solid hsla(241, 98%, 36%, 0.697);
     width: 100%;
+  }
+
+  .loading {
+    color: white;
   }
 
   #focused-suggestion {
