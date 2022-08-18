@@ -137,10 +137,17 @@
 
 
   const updateCandidateGroups = async (newCmdInput: string, sessionContext: object) => {
+    console.log("updateCandidateGroups", newCmdInput)
+    // arrows
     if (newCmdInput == '\u001b[D' || newCmdInput == '\u001b[C' || newCmdInput == "\u001b[A" || newCmdInput == "\u001b[B") {
       return
     }
+    // arrows
     if (newCmdInput == '\u001bOD' || newCmdInput == '\u001bOC' || newCmdInput == "\u001bOA" || newCmdInput == "\u001bOB") {
+      return
+    }
+    // esc and ctrl+c
+    if (newCmdInput == '\u001b' || newCmdInput == '\u0003') {
       return
     }
 
