@@ -119,12 +119,12 @@
           return
         }
         // up
-        if (data == "\x1b[A") {
+        if (data == "\x1b[A" || data == "\u001bOA") {
           suggestionsBox.focusOnPrevSuggestion()
           return
         }
         // down
-        if (data == "\x1b[B") {
+        if (data == "\x1b[B" || data == "\u001bOB") {
           suggestionsBox.focusOnNextSuggestion()
           return
         }
