@@ -110,12 +110,20 @@
         // if tab or enter
         if (data == "\t") {
           let nextText = suggestionsBox.takeFocusedSuggestion()
-          nextText += ' '
-          for (let i = 0; i < nextText.length; i++) {
+          for (let i = 0; i < nextText.length - 1; i++) {
             const encodedData = new TextEncoder().encode("\x00" + nextText[i])
             ptyWebSocket.send(encodedData)
-            await suggestionsBox.updateSuggestions(nextText[i], sessionContext)
+            await suggestionsBox.updateSuggestions(nextText[i], sessionContext, true)
           }
+
+          const lastChar = new TextEncoder().encode("\x00" + nextText[nextText.length - 1])
+          ptyWebSocket.send(lastChar)
+          await suggestionsBox.updateSuggestions(nextText[nextText.length - 1], sessionContext, false)
+          
+          const spaceData = new TextEncoder().encode("\x00" + ' ')
+          ptyWebSocket.send(spaceData)
+          await suggestionsBox.updateSuggestions(' ', sessionContext, false)
+
           return
         }
         // if esc
@@ -137,7 +145,7 @@
 
       const encodedData = new TextEncoder().encode("\x00" + data)
       ptyWebSocket.send(encodedData)
-      await suggestionsBox.updateSuggestions(data, sessionContext)
+      await suggestionsBox.updateSuggestions(data, sessionContext, false)
     })
   }
 

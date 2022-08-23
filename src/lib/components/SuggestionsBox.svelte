@@ -140,7 +140,7 @@
   }
 
 
-  const updateCandidateGroups = async (newCmdInput: string, sessionContext: object) => {
+  const updateCandidateGroups = async (newCmdInput: string, sessionContext: object, copyPrevSuggestion) => {
     // arrows
     if (newCmdInput == '\u001b[D' || newCmdInput == '\u001b[C' || newCmdInput == "\u001b[A" || newCmdInput == "\u001b[B") {
       return
@@ -171,6 +171,11 @@
     lastWord = getLastScriptWord(script)
 
     if (script.length == 0) {
+      return
+    }
+
+    if (copyPrevSuggestion) {
+      candidateGroups[script.length] = candidateGroups[script.length - 1]
       return
     }
 
@@ -240,9 +245,9 @@
   }
 
 
-  export const updateSuggestions = async (newCmdInput: string, promptContext: object) => {
+  export const updateSuggestions = async (newCmdInput: string, promptContext: object, copyPrevSuggestion) => {
     isVisibleSuggestionsBox = true
-    await updateCandidateGroups(newCmdInput, promptContext)
+    await updateCandidateGroups(newCmdInput, promptContext, copyPrevSuggestion)
     focusedSuggestionIndex = 0
     filterSuggestions()
   }
