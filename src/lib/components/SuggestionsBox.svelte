@@ -149,12 +149,12 @@
     if (newCmdInput == '\u001bOD' || newCmdInput == '\u001bOC' || newCmdInput == "\u001bOA" || newCmdInput == "\u001bOB") {
       return
     }
-    // esc and ctrl+c
-    if (newCmdInput == '\u001b' || newCmdInput == '\u0003') {
+    // esc
+    if (newCmdInput == '\u001b') {
       return
     }
-
-    if (newCmdInput === '\n' || newCmdInput === '\r' || newCmdInput == '\x03') {
+    // enter or ctrl+c
+    if (newCmdInput === '\n' || newCmdInput === '\r' || newCmdInput == '\u0003') {
       candidateGroups = [ [COMMANDS] ]
       script = ''
       return
