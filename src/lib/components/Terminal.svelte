@@ -19,6 +19,7 @@
   let ptyWebSocket: WebSocket
   let fitAddon: FitAddon
   let terminalInterface: Terminal
+  let bufferType = "normal"
 
   const setUser = async () => {
     const settingsString = await invoke('get_settings') as string
@@ -104,7 +105,8 @@
 
   const termInterfaceHandleUserInputData = () => {
     terminalInterface.onData(async (data: string) => {
-      if (suggestionsBox.isVisibleSuggestionsBox 
+      if (bufferType == "normal"
+            && suggestionsBox.isVisibleSuggestionsBox 
             && suggestionsBox.filteredSuggestions.length > 0 
             && suggestionsBox.script.length > 0) {
         // if tab or enter
@@ -145,7 +147,10 @@
 
       const encodedData = new TextEncoder().encode("\x00" + data)
       ptyWebSocket.send(encodedData)
-      await suggestionsBox.updateSuggestions(data, sessionContext, false)
+
+      if (bufferType == "normal") {
+        await suggestionsBox.updateSuggestions(data, sessionContext, false)
+      }
     })
   }
 
@@ -156,8 +161,8 @@
   }
 
   const termInterfaceHandleBufferChange = () => {
-    terminalInterface.buffer.onBufferChange((buf) => {
-      console.log('buffchange event', buf)
+    terminalInterface.buffer.onBufferChange((buff) => {
+      bufferType = buff.type
     })
   }
 
