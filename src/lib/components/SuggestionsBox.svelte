@@ -271,7 +271,7 @@
 
     {#if isBoxReversed}
       {#if focusedSuggestion}
-        <div class="suggestion description">
+        <div class="suggestion-description">
           {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
             {focusedSuggestion['details']['description']}
           {:else}
@@ -312,7 +312,7 @@
 
     {#if !isBoxReversed}
       {#if focusedSuggestion}
-        <div class="suggestion description">
+        <div class="suggestion-description">
           {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
             {focusedSuggestion['details']['description']}
           {:else}
@@ -322,7 +322,7 @@
       {/if}
     {/if}
 
-    <div class="suggestion controls">
+    <div class="controls-info">
       <kbd>↑</kbd> and <kbd>↓</kbd> to navigate 
       <br/>
       <kbd>Tab</kbd> to take
@@ -344,7 +344,7 @@
     top: 0;
     left: 0;
     background-color: rgb(160, 32, 32);
-    border: 1px solid rgb(158, 0, 129);
+    border: 1px solid rgb(92, 24, 24);
   }
 
   #suggestions-list {
@@ -356,15 +356,22 @@
     border: 2px solid rgb(77, 77, 77);
   }
 
-  .controls {
-    background-color: hsla(109, 100%, 19%, 0.697);
-    border: 1px solid hsla(109, 100%, 36%, 0.697);
+  .controls-info {
+    color: hsl(0, 0%, 67%);
+    max-height: 70px;
+    overflow-y: auto;
+    background-color: hsl(0, 0%, 7%);
+    border: 1px solid hsla(0, 0%, 45%, 0.697);
     width: 100%;
   }
 
-  .description {
-    border: 1px solid hsla(241, 98%, 36%, 0.697);
+  .suggestion-description {
+    color: hsl(0, 0%, 67%);
     width: 100%;
+    max-height: 70px;
+    overflow-y: auto;
+    border: 1px solid hsla(0, 0%, 36%, 0.697);
+    background-color: hsl(0, 0%, 22%);
   }
 
   .loading {
