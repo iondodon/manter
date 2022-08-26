@@ -1,6 +1,18 @@
 <script type="ts">
   import BottomBar from './lib/components/BottomBar.svelte';
   import Terminal from './lib/components/Terminal.svelte'
+  import { onMount } from 'svelte'
+
+  // onMount(() => {
+  //   fetch("http://[ip]/counter/increment")
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     console.log(data)
+  //   }).catch(error => {
+  //     console.log(error)
+  //     return []
+  //   })
+  // })
 </script>
 
 <main>

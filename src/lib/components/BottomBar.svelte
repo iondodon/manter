@@ -3,14 +3,6 @@
 </script>
 
 <div id="bottom-bar">
-
-  <!-- counterAPI library, insert anywhere on the page. -->
-  <script src="https://counterapi.com/c.js" async ></script>
-  <!-- Add the counter instance somewhere to your template... -->
-  <div class="counterapi" noIcon="true" noCss="true"  ></div>
-  <span> global usages</span>
-
-
   <span> | </span>
   <div class="version">
     Manter (alpha)
