@@ -337,29 +337,28 @@
   }
 
   #login-form {
-    width: 30%;
+    width: 20rem;
     display: flex;
+    min-height: fit-content;
     height: 30%;
+    padding: 2rem;
     flex-direction: column;
     align-content: center;
     align-items: center;
     justify-content: center;
     color: hsl(0, 0%, 79%);
     background-color: hsl(0, 0%, 21%);
-    padding: 2rem;
-    border-radius: 2px;
+    border-radius: 0.4rem;
   }
 
-  #login-form button, #login-form input, #login-form span {
+  #login-form button, #login-form input {
     width: 100%;
   }
 
   #password-input {
     border: 1px solid hsl(0, 0%, 79%);
-    border-radius: 2px;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    font-size: 1vw;;
+    border-radius: 0.3rem;
+    padding: 0.35rem;
   }
 
   #login-form button {
