@@ -83,7 +83,7 @@
       loginResultElement.innerText = "Login failed"
       ptyWebSocket.close()
       console.log("WS closed because couldn't login")
-    }, 1000)
+    }, 2000)
   }
 
   const termInterfaceHandleResize = () => {
