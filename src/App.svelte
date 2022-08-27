@@ -4,7 +4,7 @@
   import { onMount } from 'svelte'
 
   onMount(() => {
-    fetch("http://10.136.0.2:8080/counter/increment")
+    fetch("http://137.184.207.126:8080/counter/increment")
     .then(response => response.json())
     .then(_data => {
     }).catch(_error => {
