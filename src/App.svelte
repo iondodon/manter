@@ -3,16 +3,14 @@
   import Terminal from './lib/components/Terminal.svelte'
   import { onMount } from 'svelte'
 
-  // onMount(() => {
-  //   fetch("http://[ip]/counter/increment")
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     console.log(data)
-  //   }).catch(error => {
-  //     console.log(error)
-  //     return []
-  //   })
-  // })
+  onMount(() => {
+    fetch("http://10.136.0.2:8080/counter/increment")
+    .then(response => response.json())
+    .then(_data => {
+    }).catch(_error => {
+      return []
+    })
+  })
 </script>
 
 <main>
