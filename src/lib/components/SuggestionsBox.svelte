@@ -5,6 +5,7 @@
   import { IS_UNIX } from "../config/config"
   import { getDynamicValues } from "../suggestions/GetDynamicValues"
   import { COMMANDS } from "../suggestions/cmd-library/src/commands"
+  import type { NamesGenerator } from '../suggestions/cmd-library/src/contract/contract';
 
   export let script: string = ''
   export let lastWord = ''
@@ -95,7 +96,7 @@
     }
     suggestionTaken = null
     for (let suggestionsGroup of filteredSuggestions) {
-      for (let suggestion of suggestionsGroup['values']) {
+      for (let suggestion of suggestionsGroup['suggestions']) {
         if (suggestion['index'] == focusedSuggestionIndex) {
           suggestionTaken = suggestion
           break
@@ -182,12 +183,12 @@
     let suggestionMatchFound = null
     for (let suggestionsGroup of candidateGroups[script.length - 1]) {
       if (IS_UNIX && suggestionsGroup['postProcessor']) {
-        suggestionsGroup['values'] = await getDynamicValues(suggestionsGroup, sessionContext)
+        suggestionsGroup['suggestions'] = await getDynamicValues(suggestionsGroup, sessionContext)
       }
       
-      for (const suggestion of suggestionsGroup['values']) {
+      for (const suggestion of suggestionsGroup['suggestions']) {
         if (typeof suggestion['names'] == 'function') {
-          suggestion['names'] = (suggestion['names'] as Function)()
+          suggestion['names'] = (suggestion['names'] as NamesGenerator)()
         }
 
         for (const name of suggestion['names']) {
@@ -208,6 +209,10 @@
       return
     }
 
+    if (!suggestionMatchFound['next']) {
+      candidateGroups[script.length] = []
+      return
+    }
     if (typeof suggestionMatchFound['next'] == "function") {
       suggestionMatchFound['next'] = suggestionMatchFound['next']()
     }
@@ -228,12 +233,12 @@
       if (script[script.length - 1] == " ") {
         filteredSuggestions = [...filteredSuggestions, groupSibling]
       } else {
-        groupSibling['values'] = groupSibling['values'].filter(sugg => matchesLastWord(sugg))
-        if (groupSibling['values'].length > 0) {
+        groupSibling['suggestions'] = groupSibling['suggestions'].filter(sugg => matchesLastWord(sugg))
+        if (groupSibling['suggestions'].length > 0) {
           filteredSuggestions = [...filteredSuggestions, groupSibling]
         }
       }
-      for (let sugg of groupSibling['values']) {
+      for (let sugg of groupSibling['suggestions']) {
         sugg['index'] = totalAfterFilterSuggestions
         totalAfterFilterSuggestions++
       }
@@ -285,7 +290,7 @@
       {#if filteredSuggestions.length > 0}
         {#each filteredSuggestions as suggestionsGroup}
           <div class="suggestions-group">
-            {#each suggestionsGroup['values'] as suggestion}
+            {#each suggestionsGroup['suggestions'] as suggestion}
               {#if focusedSuggestionIndex == suggestion['index']}
                 <div id="focused-suggestion">
                   <div class="suggestion">
