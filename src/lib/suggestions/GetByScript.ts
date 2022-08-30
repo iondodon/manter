@@ -59,7 +59,7 @@ export function getByScript(suggestionsGroup, sessionContext): Promise<any[]> {
     tryNonSudoScript(suggestionsGroup, sessionContext)
       .then(responseTryNonSudo => resolve(responseTryNonSudo.res))
       .catch(errResponseTryNonSudo => {
-        console.log("Try sudo, because of " + JSON.stringify(errResponseTryNonSudo))
+        console.log("Trying sudo, because of " + JSON.stringify(errResponseTryNonSudo))
         trySudoScript(suggestionsGroup, sessionContext)
           .then(responseTrySudo => resolve(responseTrySudo.res))
           .catch(errResponseTrySudo => reject(errResponseTrySudo))
