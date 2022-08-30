@@ -54,7 +54,7 @@ function trySudoScript(suggestionsGroup, sessionContext): Promise<{code: any, re
   return executeScript(suggestionsGroup, sessionContext, script)
 }
 
-export function getDynamicValues(suggestionsGroup, sessionContext): Promise<any[]> {
+export function getByScript(suggestionsGroup, sessionContext): Promise<any[]> {
   return new Promise((resolve, reject) => {
     tryNonSudoScript(suggestionsGroup, sessionContext)
       .then(responseTryNonSudo => resolve(responseTryNonSudo.res))

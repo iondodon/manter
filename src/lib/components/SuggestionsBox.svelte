@@ -3,7 +3,7 @@
 <script type="ts">
   import { afterUpdate } from 'svelte';
   import { IS_UNIX } from "../config/config"
-  import { getDynamicValues } from "../suggestions/GetDynamicValues"
+  import { getByScript } from "../suggestions/GetByScript"
   import { COMMANDS } from "../suggestions/cmd-library/src/commands"
   import type { NamesGenerator } from '../suggestions/cmd-library/src/contract/contract';
 
@@ -183,7 +183,7 @@
     let suggestionMatchFound = null
     for (let suggestionsGroup of candidateGroups[script.length - 1]) {
       if (IS_UNIX && suggestionsGroup['postProcessor']) {
-        suggestionsGroup['suggestions'] = await getDynamicValues(suggestionsGroup, sessionContext)
+        suggestionsGroup['suggestions'] = await getByScript(suggestionsGroup, sessionContext)
       }
       
       for (const suggestion of suggestionsGroup['suggestions']) {
