@@ -5,7 +5,7 @@
   import { IS_UNIX } from "../config/config"
   import { getByScript } from "../suggestions/GetByScript"
   import { COMMANDS } from "../suggestions/cmd-library/src/commands"
-  import type { NamesGenerator } from '../suggestions/cmd-library/src/contract/contract';
+  import type { NamesProvider } from '../suggestions/cmd-library/src/contract/contract';
 
   export let script: string = ''
   export let lastWord = ''
@@ -188,7 +188,7 @@
       
       for (const suggestion of suggestionsGroup['suggestions']) {
         if (typeof suggestion['names'] == 'function') {
-          suggestion['names'] = (suggestion['names'] as NamesGenerator)()
+          suggestion['names'] = (suggestion['names'] as NamesProvider)()
         }
 
         for (const name of suggestion['names']) {
