@@ -13,6 +13,17 @@ use mt_logger::*;
 use serde::{Serialize, Deserialize};
 
 
+#[tauri::command]
+#[allow(dead_code)]
+async fn update_usage_counter() {
+  let client = reqwest::Client::new();
+  client.put("http://137.184.207.126:8080/counter/increment")
+    .send()
+    .await
+    .unwrap();
+}
+
+
 #[derive(Deserialize, Debug, Serialize)]
 pub struct Settings {
     pub default_login_user: String
@@ -86,6 +97,7 @@ async fn main() {
   let context = tauri::generate_context!();
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![get_settings])
+    .invoke_handler(tauri::generate_handler![update_usage_counter])
     .menu(tauri::Menu::os_default(&context.package_info().name))
     .run(context)
     .expect("error while running tauri application");

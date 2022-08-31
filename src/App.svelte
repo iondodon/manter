@@ -2,14 +2,10 @@
   import BottomBar from './lib/components/BottomBar.svelte';
   import Terminal from './lib/components/Terminal.svelte'
   import { onMount } from 'svelte'
+  import { invoke } from '@tauri-apps/api/tauri'
 
-  onMount(() => {
-    fetch("http://137.184.207.126:8080/counter/increment", { method: 'PUT' })
-    .then(response => response.json())
-    .then(_data => {
-    }).catch(_error => {
-      return []
-    })
+  onMount(async () => {
+    await invoke('update_usage_counter')
   })
 </script>
 
