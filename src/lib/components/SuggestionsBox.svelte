@@ -181,6 +181,7 @@
     }
 
     let suggestionMatchFound = null
+    let groupMatchFound = null
     for (let suggestionsGroup of candidateGroups[script.length - 1]) {
       if (IS_UNIX && suggestionsGroup['postProcessor']) {
         suggestionsGroup['suggestions'] = await getByScript(suggestionsGroup, sessionContext)
@@ -194,6 +195,7 @@
         for (const name of suggestion['names']) {
           if (!suggestionMatchFound && name == lastWord) {
             suggestionMatchFound = { ...suggestion }
+            groupMatchFound = suggestionsGroup
             break
           }
         }
@@ -209,14 +211,22 @@
       return
     }
 
-    if (!suggestionMatchFound['next']) {
-      candidateGroups[script.length] = []
+    if (suggestionMatchFound['next']) {
+      if (typeof suggestionMatchFound['next'] == "function") {
+        suggestionMatchFound['next'] = suggestionMatchFound['next']()
+      }
+      candidateGroups[script.length] = suggestionMatchFound['next']
       return
     }
-    if (typeof suggestionMatchFound['next'] == "function") {
-      suggestionMatchFound['next'] = suggestionMatchFound['next']()
+    if (groupMatchFound['next']) {
+      if (typeof groupMatchFound['next'] == "function") {
+        groupMatchFound['next'] = groupMatchFound['next']()
+      }
+      candidateGroups[script.length] = groupMatchFound['next']
+      return
     }
-    candidateGroups[script.length] = suggestionMatchFound['next']
+
+    candidateGroups[script.length] = []
   }
 
   const getLastScriptWord = (script: string): string => {
