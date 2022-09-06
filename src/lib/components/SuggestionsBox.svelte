@@ -188,6 +188,9 @@
       }
       
       for (const suggestion of suggestionsGroup['suggestions']) {
+        if (suggestion['isVariable']) {
+          continue
+        }
         if (typeof suggestion['names'] == 'function') {
           suggestion['names'] = (suggestion['names'] as NamesProvider)()
         }
