@@ -111,16 +111,18 @@
       alert("Couldn't take a suggestion")
     }
 
+    const lastChar = suggestionTaken['isVariable'] ? '' : ' '
+
     if (script[script.length - 1] == ' ') {
-      return suggestionTaken['names'][0]
+      return suggestionTaken['names'][0].trim() + lastChar
     }
 
     for (let name of suggestionTaken['names']) {
-      if (name == lastWord) {
+      if (name.trim() == lastWord) {
         return ''
       }
       if (name.startsWith(lastWord)) {
-        return name.substring(lastWord.length)
+        return name.trim().substring(lastWord.length) + lastChar
       }
     }
 
@@ -188,15 +190,12 @@
       }
       
       for (const suggestion of suggestionsGroup['suggestions']) {
-        if (suggestion['isVariable']) {
-          continue
-        }
         if (typeof suggestion['names'] == 'function') {
           suggestion['names'] = (suggestion['names'] as NamesProvider)()
         }
 
         for (const name of suggestion['names']) {
-          if (!suggestionMatchFound && name == lastWord) {
+          if (name == lastWord) {
             suggestionMatchFound = { ...suggestion }
             groupMatchFound = suggestionsGroup
             break

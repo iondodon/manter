@@ -121,10 +121,6 @@
           const encodedData = new TextEncoder().encode("\x00" + nextText[nextText.length - 1])
           ptyWebSocket.send(encodedData)
           await suggestionsBox.updateSuggestions(nextText[nextText.length - 1], sessionContext, false)
-          
-          const spaceData = new TextEncoder().encode("\x00" + ' ')
-          ptyWebSocket.send(spaceData)
-          await suggestionsBox.updateSuggestions(' ', sessionContext, false)
 
           return
         }
