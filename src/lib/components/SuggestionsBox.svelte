@@ -5,7 +5,7 @@
   import { IS_UNIX } from "../config/config"
   import { getByScript } from "../suggestions/GetByScript"
   import { COMMANDS } from "../suggestions/cmd-library/src/commands"
-  import type { NamesProvider } from '../suggestions/cmd-library/src/contract/contract';
+  import type { AliasesProvider } from '../suggestions/cmd-library/src/contract/contract';
 
   export let script: string = ''
   export let lastWord = ''
@@ -114,28 +114,28 @@
     const lastChar = suggestionTaken['isVariable'] ? '' : ' '
 
     if (script[script.length - 1] == ' ') {
-      return suggestionTaken['names'][0].trim() + lastChar
+      return suggestionTaken['aliases'][0].trim() + lastChar
     }
 
-    for (let name of suggestionTaken['names']) {
-      if (name.trim() == lastWord) {
+    for (let alias of suggestionTaken['aliases']) {
+      if (alias.trim() == lastWord) {
         return ''
       }
-      if (name.startsWith(lastWord)) {
-        return name.trim().substring(lastWord.length) + lastChar
+      if (alias.startsWith(lastWord)) {
+        return alias.trim().substring(lastWord.length) + lastChar
       }
     }
 
-    alert("Matching names not found for taken suggestion")
+    alert("Matching aliases not found for taken suggestion")
   }
 
   const matchesLastWord = (suggestion) => {
-    if (typeof suggestion['names'] == 'function') {
-      suggestion['names'] = suggestion['names']()
+    if (typeof suggestion['aliases'] == 'function') {
+      suggestion['aliases'] = suggestion['aliases']()
     }
 
-    for (const name of suggestion["names"]) {
-      if (name == lastWord || name.startsWith(lastWord)) {
+    for (const alias of suggestion['aliases']) {
+      if (alias == lastWord || alias.startsWith(lastWord)) {
         return true
       }
     }
@@ -190,12 +190,12 @@
       }
       
       for (const suggestion of suggestionsGroup['suggestions']) {
-        if (typeof suggestion['names'] == 'function') {
-          suggestion['names'] = (suggestion['names'] as NamesProvider)()
+        if (typeof suggestion['aliases'] == 'function') {
+          suggestion['aliases'] = (suggestion['aliases'] as AliasesProvider)()
         }
 
-        for (const name of suggestion['names']) {
-          if (name == lastWord) {
+        for (const alias of suggestion['aliases']) {
+          if (alias == lastWord) {
             suggestionMatchFound = { ...suggestion }
             groupMatchFound = suggestionsGroup
             break
@@ -273,8 +273,8 @@
     bringSuggestionsToCursor()
   })
 
-  const formatNames = (namesArr) => {
-    return namesArr.join(', ')
+  const formatAliases = (aliasesArr) => {
+    return aliasesArr.join(', ')
   }
 
   const setFocusedSuggestion = (suggestion) => {
@@ -292,7 +292,7 @@
           {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
             {focusedSuggestion['details']['description']}
           {:else}
-            {focusedSuggestion['names']}
+            {focusedSuggestion['aliases']}
           {/if}
         </div>
       {/if}
@@ -308,13 +308,13 @@
                   <div class="suggestion">
                     {(() => { 
                       setFocusedSuggestion(suggestion)
-                      return formatNames(suggestion['names']) 
+                      return formatAliases(suggestion['aliases']) 
                     })()}
                   </div>
                 </div>
               {:else}
                 <div class="suggestion">
-                  {formatNames(suggestion['names'])}  
+                  {formatAliases(suggestion['aliases'])}  
                 </div>
               {/if}
             {/each}
@@ -333,7 +333,7 @@
           {#if focusedSuggestion['details'] && focusedSuggestion['details']['description']}
             {focusedSuggestion['details']['description']}
           {:else}
-            {focusedSuggestion['names']}
+            {focusedSuggestion['aliases']}
           {/if}
         </div>
       {/if}
