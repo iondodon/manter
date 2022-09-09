@@ -96,8 +96,7 @@ async fn main() {
 
   let context = tauri::generate_context!();
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![get_settings])
-    .invoke_handler(tauri::generate_handler![update_usage_counter])
+    .invoke_handler(tauri::generate_handler![get_settings, update_usage_counter])
     .menu(tauri::Menu::os_default(&context.package_info().name))
     .run(context)
     .expect("error while running tauri application");
