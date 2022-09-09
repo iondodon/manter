@@ -1,11 +1,11 @@
 <svelte:options accessors={true}/>
 
 <script type="ts">
-  import { afterUpdate } from 'svelte';
+  import { afterUpdate } from 'svelte'
   import { IS_UNIX } from "../config/config"
   import { getByScript } from "../suggestions/GetByScript"
   import { COMMANDS } from "../suggestions/cmd-library/src/commands"
-  import type { AliasesProvider } from '../suggestions/cmd-library/src/contract/contract';
+  import type { AliasesProvider } from '../suggestions/cmd-library/src/contract/contract'
 
   export let script: string = ''
   export let lastWord = ''
