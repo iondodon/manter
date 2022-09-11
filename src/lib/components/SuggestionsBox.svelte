@@ -10,7 +10,7 @@
   export let script: string = ''
   export let lastWord = ''
   
-  let candidateGroups = [ [COMMANDS] ]
+  let carrier = [{ 'next': [COMMANDS] }]
 
   export let isVisibleSuggestionsBox = true
   
@@ -18,10 +18,11 @@
   let focusedSuggestionIndex = 0
   let focusedSuggestion = null
   
-  export let filteredSuggestions = []
+  export let filteredGroups = []
   let totalAfterFilterSuggestions = 0
 
   let isBoxReversed = false
+
 
   export const bringSuggestionsToCursor = () => {
     const suggestionsBoxElement = document.getElementById('suggestions-box')
@@ -56,6 +57,7 @@
     }
   }
 
+
   const scrollToFocusedSuggestion = () => {
     const focusedSuggestionElement = document.getElementById("focused-suggestion")
     const suggestionsListElement = document.getElementById("suggestions-list")
@@ -74,6 +76,7 @@
     }
   }
 
+
   export const focusOnNextSuggestion = () => {
     if (!isVisibleSuggestionsBox || totalAfterFilterSuggestions <= 1) {
       return
@@ -81,6 +84,7 @@
     focusedSuggestionIndex = ++focusedSuggestionIndex % totalAfterFilterSuggestions
     scrollToFocusedSuggestion()
   }
+
 
   export const focusOnPrevSuggestion = () => {
     if (!isVisibleSuggestionsBox || totalAfterFilterSuggestions <= 1) {
@@ -90,12 +94,13 @@
     scrollToFocusedSuggestion()
   }
 
+
   export const takeFocusedSuggestion = () => {
     if (!isVisibleSuggestionsBox || totalAfterFilterSuggestions < 1) {
       return
     }
     suggestionTaken = null
-    for (let suggestionsGroup of filteredSuggestions) {
+    for (let suggestionsGroup of filteredGroups) {
       for (let suggestion of suggestionsGroup['suggestions']) {
         if (suggestion['index'] == focusedSuggestionIndex) {
           suggestionTaken = suggestion
@@ -129,6 +134,13 @@
     alert("Matching aliases not found for taken suggestion")
   }
 
+
+  const getLastScriptWord = (script: string): string => {
+    const words = script.trim().split(' ')
+    return words[words.length - 1].trim()
+  }
+
+
   const matchesLastWord = (suggestion) => {
     if (typeof suggestion['aliases'] == 'function') {
       suggestion['aliases'] = suggestion['aliases']()
@@ -158,7 +170,7 @@
     }
     // enter or ctrl+c
     if (newCmdInput === '\n' || newCmdInput === '\r' || newCmdInput == '\u0003') {
-      candidateGroups = [ [COMMANDS] ]
+      carrier = [ { 'next': [COMMANDS] } ]
       script = ''
       return
     }
@@ -178,13 +190,13 @@
     }
 
     if (copyPrevSuggestion) {
-      candidateGroups[script.length] = candidateGroups[script.length - 1]
+      carrier[script.length] = carrier[script.length - 1]
       return
     }
 
     let suggestionMatchFound = null
     let groupMatchFound = null
-    for (let suggestionsGroup of candidateGroups[script.length - 1]) {
+    for (let suggestionsGroup of carrier[script.length - 1]['next']) {
       if (IS_UNIX && suggestionsGroup['postProcessor']) {
         suggestionsGroup['suggestions'] = await getByScript(suggestionsGroup, sessionContext)
       }
@@ -209,7 +221,7 @@
     }
 
     if (!suggestionMatchFound) {
-      candidateGroups[script.length] = candidateGroups[script.length - 1]
+      carrier[script.length] = carrier[script.length - 1]
       return
     }
 
@@ -217,40 +229,36 @@
       if (typeof suggestionMatchFound['next'] == "function") {
         suggestionMatchFound['next'] = suggestionMatchFound['next']()
       }
-      candidateGroups[script.length] = suggestionMatchFound['next']
+      carrier[script.length] = { 'next': suggestionMatchFound['next'] }
       return
     }
     if (groupMatchFound['next']) {
       if (typeof groupMatchFound['next'] == "function") {
         groupMatchFound['next'] = groupMatchFound['next']()
       }
-      candidateGroups[script.length] = groupMatchFound['next']
+      carrier[script.length] = { 'next': groupMatchFound['next'] }
       return
     }
 
-    candidateGroups[script.length] = []
+    carrier[script.length] = { 'next': [] }
   }
 
-  const getLastScriptWord = (script: string): string => {
-    const words = script.trim().split(' ')
-    return words[words.length - 1].trim()
-  }
 
   const filterSuggestions = () => {
-    filteredSuggestions = []
+    filteredGroups = []
     totalAfterFilterSuggestions = 0
 
-    for (let suggestionsGroup of candidateGroups[script.length]) {
-      let groupSibling = {...suggestionsGroup}
+    for (let suggestionsGroup of carrier[script.length]['next']) {
+      let groupWithFilteredSuggestions = {...suggestionsGroup}
       if (script[script.length - 1] == " ") {
-        filteredSuggestions = [...filteredSuggestions, groupSibling]
+        filteredGroups = [...filteredGroups, groupWithFilteredSuggestions]
       } else {
-        groupSibling['suggestions'] = groupSibling['suggestions'].filter(sugg => matchesLastWord(sugg))
-        if (groupSibling['suggestions'].length > 0) {
-          filteredSuggestions = [...filteredSuggestions, groupSibling]
+        groupWithFilteredSuggestions['suggestions'] = groupWithFilteredSuggestions['suggestions'].filter(sugg => matchesLastWord(sugg))
+        if (groupWithFilteredSuggestions['suggestions'].length > 0) {
+          filteredGroups = [...filteredGroups, groupWithFilteredSuggestions]
         }
       }
-      for (let sugg of groupSibling['suggestions']) {
+      for (let sugg of groupWithFilteredSuggestions['suggestions']) {
         sugg['index'] = totalAfterFilterSuggestions
         totalAfterFilterSuggestions++
       }
@@ -269,13 +277,16 @@
     filterSuggestions()
   }
 
+
   afterUpdate(() => {
     bringSuggestionsToCursor()
   })
 
+
   const formatAliases = (aliasesArr) => {
     return aliasesArr.join(', ')
   }
+  
 
   const setFocusedSuggestion = (suggestion) => {
     focusedSuggestion = suggestion
@@ -299,8 +310,8 @@
     {/if}
 
     <div id="suggestions-list">
-      {#if filteredSuggestions.length > 0}
-        {#each filteredSuggestions as suggestionsGroup}
+      {#if filteredGroups.length > 0}
+        {#each filteredGroups as suggestionsGroup}
           <div class="suggestions-group">
             {#each suggestionsGroup['suggestions'] as suggestion}
               {#if focusedSuggestionIndex == suggestion['index']}

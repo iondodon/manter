@@ -107,7 +107,7 @@
     terminalInterface.onData(async (data: string) => {
       if (bufferType == "normal"
             && suggestionsBox.isVisibleSuggestionsBox 
-            && suggestionsBox.filteredSuggestions.length > 0 
+            && suggestionsBox.filteredGroups.length > 0 
             && suggestionsBox.script.length > 0) {
         // if tab or enter
         if (data == "\t") {
