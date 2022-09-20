@@ -12,10 +12,8 @@
 <style lang="scss">
   #bottom-bar {
     display: flex;
-    display:-webkit-flex;
-    
     flex-direction: row;
-    justify-content: end;
+    justify-content: flex-end;
 
     bottom: 0em;
     height: 1.2em;
