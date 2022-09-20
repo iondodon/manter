@@ -12,6 +12,8 @@
 <style lang="scss">
   #bottom-bar {
     display: flex;
+    display:-webkit-flex;
+    
     flex-direction: row;
     justify-content: end;
 
