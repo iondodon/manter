@@ -102,27 +102,17 @@
   const termInterfaceHandleCursorMove = () => {
   }
 
-  const setLoggedIn = () => {
-    if (!sessionContext['isLoggedIn']) {
+  const termInterfaceHandleTitleChange = (title) => {
+    if (IS_UNIX && !sessionContext['isLoggedIn']) {
       terminalInterface.open(document.getElementById('terminal'))
       sessionContext['isLoggedIn'] = true
       adjustTerminalSize()
     }
-  }
-
-  const updateSessionContext = (title) => {
-    title = title.replace("[manter]", "")
-    let promptUpdatedData = JSON.parse(title)
-    sessionContext = {...sessionContext, ...promptUpdatedData}
-  }
-
-  const termInterfaceHandleTitleChange = (title) => {
-    if (IS_UNIX) {
-      setLoggedIn()
-    }
     if (title.includes("[manter]")) {
-        updateSessionContext(title)
-        return
+      title = title.replace("[manter]", "")
+      let promptUpdatedData = JSON.parse(title)
+      sessionContext = {...sessionContext, ...promptUpdatedData}
+      return
     }
     document.title = title
   }
