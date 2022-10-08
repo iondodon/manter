@@ -2,13 +2,11 @@
   import { Terminal }  from "xterm"
   import { FitAddon }   from "xterm-addon-fit"
   import "xterm/css/xterm.css"
-  import SuggestionsBox from "./SuggestionsBox.svelte"
   import { IS_WINDOWS, IS_UNIX, PTY_WS_ADDRESS } from "../config/config"
   import { arrayBufferToString } from "../utils/utils"
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
 
-  let suggestionsBox: SuggestionsBox
   let sessionContext = {
     isLoggedIn: false,
     cwd: "~",
@@ -87,10 +85,7 @@
   }
 
   const termInterfaceHandleResize = () => {
-    addEventListener('resize', (_event) => {
-      adjustTerminalSize()
-      suggestionsBox.bringSuggestionsToCursor()
-    })
+    addEventListener('resize', (_event) => adjustTerminalSize())
     terminalInterface.onResize((evt) => {      
       const resizeValues = {
           cols: evt.cols, 
@@ -105,48 +100,8 @@
 
   const termInterfaceHandleUserInputData = () => {
     terminalInterface.onData(async (data: string) => {
-      if (bufferType == "normal"
-            && suggestionsBox.isVisibleSuggestionsBox 
-            && suggestionsBox.filteredGroups.length > 0 
-            && suggestionsBox.script.length > 0) {
-        // if tab or enter
-        if (data == "\t") {
-          let nextText = suggestionsBox.takeFocusedSuggestion()
-          for (let i = 0; i < nextText.length - 1; i++) {
-            const encodedData = new TextEncoder().encode("\x00" + nextText[i])
-            ptyWebSocket.send(encodedData)
-            await suggestionsBox.updateSuggestions(nextText[i], sessionContext, true)
-          }
-
-          const encodedData = new TextEncoder().encode("\x00" + nextText[nextText.length - 1])
-          ptyWebSocket.send(encodedData)
-          await suggestionsBox.updateSuggestions(nextText[nextText.length - 1], sessionContext, false)
-
-          return
-        }
-        // if esc
-        if (data == "\x1b") {
-          suggestionsBox.isVisibleSuggestionsBox = false
-          return
-        }
-        // up
-        if (data == "\x1b[A" || data == "\u001bOA") {
-          suggestionsBox.focusOnPrevSuggestion()
-          return
-        }
-        // down
-        if (data == "\x1b[B" || data == "\u001bOB") {
-          suggestionsBox.focusOnNextSuggestion()
-          return
-        }
-      }
-
       const encodedData = new TextEncoder().encode("\x00" + data)
       ptyWebSocket.send(encodedData)
-
-      if (bufferType == "normal") {
-        await suggestionsBox.updateSuggestions(data, sessionContext, false)
-      }
     })
   }
 
@@ -164,7 +119,6 @@
 
   const linkTermInterfaceToHtmlElement = () => {
     terminalInterface.open(document.getElementById('terminal'))
-    termInterfaceHandleViewportScroll()
   }
 
   const setLoggedIn = () => {
@@ -191,13 +145,6 @@
           return
       }
       document.title = title
-    })
-  }
-
-  const termInterfaceHandleViewportScroll = () => {
-    const viewport = document.querySelector('.xterm-viewport') as HTMLElement
-    viewport.addEventListener('scroll', (_evt) => {
-      suggestionsBox.isVisibleSuggestionsBox = false
     })
   }
 
@@ -295,7 +242,6 @@
 </script>
 
 <div id="terminal">
-    <SuggestionsBox bind:this={suggestionsBox} />
     {#if IS_UNIX && !sessionContext['isLoggedIn']}
        <div id="login-form">
         <input 
