@@ -58,31 +58,6 @@
     xtermViewPortElement.style.width = `${terminalWidth}px`
   }
 
-  const focusOnTerminal = () => {
-    terminalInterface.focus()
-  }
-
-  const tryLogin = () => {
-    const loginResultElement = document.getElementById('login-result') as HTMLDivElement
-    loginResultElement.innerText = ""
-
-    const password = (document.getElementById('password-input') as HTMLInputElement).value
-    sessionContext['password'] = password
-    const loginData = { password: password}
-    ptyWebSocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
-
-    setTimeout(() => {
-      if (sessionContext['isLoggedIn']) {
-        focusOnTerminal()
-        ptyWebSocket.onmessage = writePtyIncomingToTermInterface
-        return
-      }
-      loginResultElement.innerText = "Login failed"
-      ptyWebSocket.close()
-      console.log("WS closed because couldn't login")
-    }, 2000)
-  }
-
   const termInterfaceHandleResize = (evt) => {
     const resizeValues = {
       cols: evt.cols, 
@@ -97,9 +72,6 @@
   const termInterfaceHandleUserInputData = (data: string) => {
     const encodedData = new TextEncoder().encode("\x00" + data)
     ptyWebSocket.send(encodedData)
-  }
-
-  const termInterfaceHandleCursorMove = () => {
   }
 
   const termInterfaceHandleTitleChange = (title) => {
@@ -135,9 +107,17 @@
     addEventListener('resize', (_event) => adjustTerminalSize())
     terminalInterface.onResize((evt) => termInterfaceHandleResize(evt))
     terminalInterface.onData(data => termInterfaceHandleUserInputData(data))
-    terminalInterface.onCursorMove(() => termInterfaceHandleCursorMove())
+    terminalInterface.onCursorMove(() => {})
     terminalInterface.buffer.onBufferChange(_buff => {})
     terminalInterface.onTitleChange(title => termInterfaceHandleTitleChange(title))
+  }
+
+  const handlePtyWsIncomingData = () => {
+    if (IS_UNIX) {
+      ptyWebSocket.onmessage = handlePtyCheckingPassword
+      return
+    }
+    ptyWebSocket.onmessage = writePtyIncomingToTermInterface
   }
 
   const writePtyIncomingToTermInterface = (evt) => {
@@ -158,12 +138,25 @@
     }
   }
 
-  const handlePtyWsIncomingData = () => {
-    if (IS_UNIX) {
-      ptyWebSocket.onmessage = handlePtyCheckingPassword
-      return
-    }
-    ptyWebSocket.onmessage = writePtyIncomingToTermInterface
+  const tryLogin = () => {
+    const loginResultElement = document.getElementById('login-result') as HTMLDivElement
+    loginResultElement.innerText = ""
+
+    const password = (document.getElementById('password-input') as HTMLInputElement).value
+    sessionContext['password'] = password
+    const loginData = { password: password}
+    ptyWebSocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
+
+    setTimeout(() => {
+      if (sessionContext['isLoggedIn']) {
+        terminalInterface.focus()
+        ptyWebSocket.onmessage = writePtyIncomingToTermInterface
+        return
+      }
+      loginResultElement.innerText = "Login failed"
+      ptyWebSocket.close()
+      console.log("WS closed because couldn't login")
+    }, 2000)
   }
 
   const handlePtyWsClose = (_evt) => {
