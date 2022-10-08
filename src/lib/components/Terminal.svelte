@@ -166,18 +166,14 @@
     ptyWebSocket.onmessage = writePtyIncomingToTermInterface
   }
 
-  const handlePtyWsClose = () => {
-    ptyWebSocket.onclose = (_evt) => {
-      terminalInterface.write("Session terminated")
-      terminalInterface.dispose()
-    }
+  const handlePtyWsClose = (_evt) => {
+    terminalInterface.write("Session terminated")
+    terminalInterface.dispose()
   }
 
-  const handlePtyWsError = () => {
-    ptyWebSocket.onerror = (evt) => {
-      if (typeof console.log == "function") {
-        console.log("ws error", evt)
-      }
+  const handlePtyWsError = (evt) => {
+    if (typeof console.log == "function") {
+      console.log("ws error", evt)
     }
   }
 
@@ -191,8 +187,8 @@
     ptyWebSocket.onopen = async (_evt) => {
       setupNewTerminalInterface()
       handlePtyWsIncomingData()
-      handlePtyWsClose()
-      handlePtyWsError()
+      ptyWebSocket.onclose = (evt) => handlePtyWsClose(evt)
+      ptyWebSocket.onerror = (evt) => handlePtyWsError(evt)
     }
   }
 
