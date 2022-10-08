@@ -10,7 +10,6 @@
   let sessionContext = {
     isLoggedIn: false,
     cwd: "~",
-    password: "",
     user: ""
   }
 
@@ -133,7 +132,7 @@
   const handlePtyCheckingPassword = async (evt) => {
     const writenData = writePtyIncomingToTermInterface(evt)
     console.log('checking pass')
-    if (IS_UNIX && !sessionContext['isLoggedIn'] && writenData.includes("Password:")) {
+    if (IS_UNIX && writenData.includes("Password:")) {
       tryLogin()
     }
   }
@@ -143,7 +142,6 @@
     loginResultElement.innerText = ""
 
     const password = (document.getElementById('password-input') as HTMLInputElement).value
-    sessionContext['password'] = password
     const loginData = { password: password}
     ptyWebSocket.send(new TextEncoder().encode("\x02" + JSON.stringify(loginData)))
 
