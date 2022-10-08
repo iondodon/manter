@@ -17,7 +17,6 @@
   let ptyWebSocket: WebSocket
   let fitAddon: FitAddon
   let terminalInterface: Terminal
-  let bufferType = "normal"
 
   const setUser = async () => {
     const settingsString = await invoke('get_settings') as string
@@ -84,46 +83,28 @@
     }, 2000)
   }
 
-  const termInterfaceHandleResize = () => {
-    addEventListener('resize', (_event) => adjustTerminalSize())
-    terminalInterface.onResize((evt) => {      
-      const resizeValues = {
-          cols: evt.cols, 
-          rows: evt.rows, 
-          pixel_width: 0, 
-          pixel_height: 0
-      }
-      ptyWebSocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeValues)))
-      adjustTerminalSize()
-    })
+  const termInterfaceHandleResize = (evt) => {
+    const resizeValues = {
+      cols: evt.cols, 
+      rows: evt.rows, 
+      pixel_width: 0, 
+      pixel_height: 0
+    }
+    ptyWebSocket.send(new TextEncoder().encode("\x01" + JSON.stringify(resizeValues)))
+    adjustTerminalSize()
   }
 
-  const termInterfaceHandleUserInputData = () => {
-    terminalInterface.onData(async (data: string) => {
-      const encodedData = new TextEncoder().encode("\x00" + data)
-      ptyWebSocket.send(encodedData)
-    })
+  const termInterfaceHandleUserInputData = (data: string) => {
+    const encodedData = new TextEncoder().encode("\x00" + data)
+    ptyWebSocket.send(encodedData)
   }
 
   const termInterfaceHandleCursorMove = () => {
-    terminalInterface.onCursorMove(() => {
-
-    })
-  }
-
-  const termInterfaceHandleBufferChange = () => {
-    terminalInterface.buffer.onBufferChange((buff) => {
-      bufferType = buff.type
-    })
-  }
-
-  const linkTermInterfaceToHtmlElement = () => {
-    terminalInterface.open(document.getElementById('terminal'))
   }
 
   const setLoggedIn = () => {
     if (!sessionContext['isLoggedIn']) {
-      linkTermInterfaceToHtmlElement()
+      terminalInterface.open(document.getElementById('terminal'))
       sessionContext['isLoggedIn'] = true
       adjustTerminalSize()
     }
@@ -135,20 +116,18 @@
     sessionContext = {...sessionContext, ...promptUpdatedData}
   }
 
-  const termInterfaceHandleTitleChange = () => {
-    terminalInterface.onTitleChange((title) => {
-      if (IS_UNIX) {
-        setLoggedIn()
-      }
-      if (title.includes("[manter]")) {
-          updateSessionContext(title)
-          return
-      }
-      document.title = title
-    })
+  const termInterfaceHandleTitleChange = (title) => {
+    if (IS_UNIX) {
+      setLoggedIn()
+    }
+    if (title.includes("[manter]")) {
+        updateSessionContext(title)
+        return
+    }
+    document.title = title
   }
 
-  const createNewTermInterface = () => {
+  const setupNewTerminalInterface = () => {
     terminalInterface = new Terminal({
       cursorBlink: true,
       cursorStyle: 'bar',
@@ -156,22 +135,19 @@
     })
     fitAddon = new FitAddon()
     terminalInterface.loadAddon(fitAddon)
-  }
-
-  const setupNewTerminalInterface = () => {
-    createNewTermInterface()
 
     if (IS_WINDOWS) {
-      linkTermInterfaceToHtmlElement()
+      terminalInterface.open(document.getElementById('terminal'))
       sendProposedSizeToPty()
       adjustTerminalSize()
     }
 
-    termInterfaceHandleResize()
-    termInterfaceHandleUserInputData()
-    termInterfaceHandleCursorMove()
-    termInterfaceHandleBufferChange()
-    termInterfaceHandleTitleChange()
+    addEventListener('resize', (_event) => adjustTerminalSize())
+    terminalInterface.onResize((evt) => termInterfaceHandleResize(evt))
+    terminalInterface.onData(data => termInterfaceHandleUserInputData(data))
+    terminalInterface.onCursorMove(() => termInterfaceHandleCursorMove())
+    terminalInterface.buffer.onBufferChange(_buff => {})
+    terminalInterface.onTitleChange(title => termInterfaceHandleTitleChange(title))
   }
 
   const writePtyIncomingToTermInterface = (evt) => {
