@@ -7,15 +7,23 @@
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
 
-  let sessionContext = {
+  export let sessionContext = {
     isLoggedIn: false,
     cwd: "~",
     user: ""
   }
+  export let terminalInterface: Terminal
+  export let ptyWebSocket: WebSocket
+  export let fitAddon: FitAddon
 
-  let ptyWebSocket: WebSocket
-  let fitAddon: FitAddon
-  let terminalInterface: Terminal
+  $: connected = ptyWebSocket != null
+
+  const openTerminalInterface = () => {
+    if (!terminalInterface) {
+      return
+    }
+    terminalInterface.open(document.getElementById('terminal'))
+  }
 
   const setUser = async () => {
     const settingsString = await invoke('get_settings') as string
@@ -24,7 +32,7 @@
   }
 
   onMount(() => {
-    if (IS_UNIX) {
+    if (IS_UNIX && !connected) {
       setUser()
     }
   })
@@ -75,7 +83,7 @@
 
   const termInterfaceHandleTitleChange = (title) => {
     if (IS_UNIX && !sessionContext['isLoggedIn']) {
-      terminalInterface.open(document.getElementById('terminal'))
+      openTerminalInterface()
       sessionContext['isLoggedIn'] = true
       adjustTerminalSize()
     }
@@ -98,7 +106,7 @@
     terminalInterface.loadAddon(fitAddon)
 
     if (IS_WINDOWS) {
-      terminalInterface.open(document.getElementById('terminal'))
+      openTerminalInterface()
       sendProposedSizeToPty()
       adjustTerminalSize()
     }
@@ -169,9 +177,6 @@
   }
 
   const newTerminalSession = async (_evt) => {
-    if (ptyWebSocket) {
-      ptyWebSocket.close()
-    }
     ptyWebSocket = new WebSocket(PTY_WS_ADDRESS)
     ptyWebSocket.binaryType = "arraybuffer"
 
@@ -183,12 +188,12 @@
     }
   }
 
-  if (IS_WINDOWS) {
+  if (IS_WINDOWS && !connected) {
     newTerminalSession(null)
   }
 
   const passInputOnKeyPress = (evt) => {
-    if (evt.charCode === 13) {
+    if (evt.charCode === 13 && !connected) {
       newTerminalSession(evt)
     }
   }

@@ -1,8 +1,18 @@
 <script type="ts">
-  import BottomBar from './lib/components/BottomBar.svelte';
+  import BottomBar from './lib/components/BottomBar.svelte'
   import Terminal from './lib/components/Terminal.svelte'
+  import Tabs from './lib/components/Tabs.svelte';
   import { onMount } from 'svelte'
   import { invoke } from '@tauri-apps/api/tauri'
+  import { TerminalsStore } from './lib/stores/stores'
+  import { CurrentActiveStore } from './lib/stores/stores'
+
+
+  let terminals
+  TerminalsStore.subscribe(value => terminals = value)
+  let currentActive
+  CurrentActiveStore.subscribe(value => currentActive = value)
+
 
   onMount(async () => {
     await invoke('update_usage_counter')
@@ -10,8 +20,20 @@
 </script>
 
 <main>
-    <Terminal/>
-    <BottomBar/>
+  <Tabs/>
+  
+  {#each terminals as terminal}
+    {#if terminal.id == currentActive}
+      <Terminal
+        bind:sessionContext={terminal['sessionContext']}
+        bind:terminalInterface={terminal['terminalInterface']} 
+        bind:ptyWebSocket={terminal['ptyWebSocket']}
+        bind:fitAddon={terminal['fitAddon']}
+      />
+    {/if}
+  {/each}
+
+  <BottomBar/>
 </main>
 
 <style type="scss">
