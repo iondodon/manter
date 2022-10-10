@@ -7,23 +7,16 @@
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
 
-  export let sessionContext = {
-    isLoggedIn: false,
-    cwd: "~",
-    user: ""
-  }
+  export let sessionContext
   export let terminalInterface: Terminal
   export let ptyWebSocket: WebSocket
   export let fitAddon: FitAddon
 
-  $: connected = ptyWebSocket != null
-
-  const openTerminalInterface = () => {
-    if (!terminalInterface) {
-      return
+  onMount(() => {
+    if (IS_UNIX) {
+      setUser()
     }
-    terminalInterface.open(document.getElementById('terminal'))
-  }
+  })
 
   const setUser = async () => {
     const settingsString = await invoke('get_settings') as string
@@ -31,11 +24,12 @@
     sessionContext['user'] = settings['default_login_user']
   }
 
-  onMount(() => {
-    if (IS_UNIX && !connected) {
-      setUser()
+  const openTerminalInterface = () => {
+    if (!terminalInterface) {
+      return
     }
-  })
+    terminalInterface.open(document.getElementById('terminal'))
+  }
 
   const sendProposedSizeToPty = () => {
     const proposedSize = fitAddon.proposeDimensions()
@@ -188,12 +182,12 @@
     }
   }
 
-  if (IS_WINDOWS && !connected) {
+  if (IS_WINDOWS && ptyWebSocket == null) {
     newTerminalSession(null)
   }
 
   const passInputOnKeyPress = (evt) => {
-    if (evt.charCode === 13 && !connected) {
+    if (evt.charCode === 13 && ptyWebSocket == null) {
       newTerminalSession(evt)
     }
   }

@@ -5,14 +5,12 @@
   import { onMount } from 'svelte'
   import { invoke } from '@tauri-apps/api/tauri'
   import { TerminalsStore } from './lib/stores/stores'
-  import { CurrentActiveStore } from './lib/stores/stores'
-
+  import { CurrentActiveStoreTermId } from './lib/stores/stores'
 
   let terminals
   TerminalsStore.subscribe(value => terminals = value)
-  let currentActive
-  CurrentActiveStore.subscribe(value => currentActive = value)
-
+  let currentActiveId
+  CurrentActiveStoreTermId.subscribe(value => currentActiveId = value)
 
   onMount(async () => {
     await invoke('update_usage_counter')
@@ -21,9 +19,8 @@
 
 <main>
   <Tabs/>
-  
   {#each terminals as terminal}
-    {#if terminal.id == currentActive}
+    {#if terminal.id == currentActiveId}
       <Terminal
         bind:sessionContext={terminal['sessionContext']}
         bind:terminalInterface={terminal['terminalInterface']} 
@@ -32,7 +29,6 @@
       />
     {/if}
   {/each}
-
   <BottomBar/>
 </main>
 
