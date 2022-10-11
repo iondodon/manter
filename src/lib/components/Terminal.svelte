@@ -12,7 +12,15 @@
   export let ptyWebSocket: WebSocket
   export let fitAddon: FitAddon
 
+  const openTerminalInterface = () => {
+    if (!terminalInterface) {
+      return
+    }
+    terminalInterface.open(document.getElementById('terminal'))
+  }
+
   onMount(() => {
+    openTerminalInterface()
     if (IS_UNIX) {
       setUser()
     }
@@ -22,13 +30,6 @@
     const settingsString = await invoke('get_settings') as string
     const settings = JSON.parse(settingsString)
     sessionContext['user'] = settings['default_login_user']
-  }
-
-  const openTerminalInterface = () => {
-    if (!terminalInterface) {
-      return
-    }
-    terminalInterface.open(document.getElementById('terminal'))
   }
 
   const sendProposedSizeToPty = () => {

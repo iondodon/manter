@@ -14,4 +14,4 @@ export const TerminalsStore = writable([
   }
 ])
 
-export const CurrentActiveStoreTermId = writable(0)
+export const ActiveTermIdStore = writable(0)

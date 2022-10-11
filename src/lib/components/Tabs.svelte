@@ -1,11 +1,12 @@
 <script lang="ts">
   import { TerminalsStore } from '../stores/stores'
-  import { CurrentActiveStoreTermId } from '../stores/stores'
+  import { ActiveTermIdStore } from '../stores/stores'
 
-  let terminals
-  TerminalsStore.subscribe(value => terminals = value)
-  let currentActiveId;
-  CurrentActiveStoreTermId.subscribe(value => currentActiveId = value)
+  let terminals = []
+  let activeTermId = 0
+  
+  TerminalsStore.subscribe(updatedTerminals => terminals = updatedTerminals)
+  ActiveTermIdStore.subscribe(updatedActiveTerminalId => activeTermId = updatedActiveTerminalId)
 
   const addNewTerminal= () => {
     TerminalsStore.update(terminals => {
@@ -26,26 +27,14 @@
     setActive(terminals.length - 1)
   }
 
-  const setActive = (termId) => {
-    const terminalInterface = terminals[termId]['terminalInterface']
-    if (terminalInterface) {
-      const terminal = document.getElementById('terminal')
-      while (terminal.firstChild) {
-        terminal.removeChild(terminal.firstChild)
-      }
-      terminalInterface.open(document.getElementById('terminal'))
-    }
-
-    CurrentActiveStoreTermId.update(oldActive => {
-      return termId
-    })
-  }
+  const setActive = (newActiveTermId) => ActiveTermIdStore.update(_prevActiveTermId => newActiveTermId)
+  
 </script>
 
 <ol id="tabs">
   {#each terminals as terminal}
     <li class="tab" on:click={() => setActive(terminal.id)}>
-      {#if terminal.id == currentActiveId}
+      {#if terminal.id == activeTermId}
         <div id="selected-tab">
           <span class="tab-text">Terminal {terminal.id}</span>
         </div>
