@@ -1,17 +1,20 @@
 <script lang="ts">
   import { TerminalsStore } from '../stores/stores'
-  import { ActiveTermIdStore } from '../stores/stores'
+  import { ActiveTermUUIDStore } from '../stores/stores'
+  import { v4 as uuidv4 } from 'uuid'
+  import { NIL as NIL_UUID } from 'uuid'
 
   let terminals = []
-  let activeTermId = 0
+  let activeTermUUID = NIL_UUID
   
   TerminalsStore.subscribe(updatedTerminals => terminals = updatedTerminals)
-  ActiveTermIdStore.subscribe(updatedActiveTerminalId => activeTermId = updatedActiveTerminalId)
+  ActiveTermUUIDStore.subscribe(updatedActiveTerminalUUID => activeTermUUID = updatedActiveTerminalUUID)
 
   const addNewTerminal= () => {
+    const NEW_TERM_UUID = uuidv4()
     TerminalsStore.update(terminals => {
       terminals.push({
-        id: terminals.length, 
+        uuid: NEW_TERM_UUID, 
         sessionContext: {
           isLoggedIn: false,
           cwd: "~",
@@ -24,22 +27,28 @@
       return terminals
     })
 
-    setActive(terminals.length - 1)
+    setActive(NEW_TERM_UUID)
   }
 
-  const setActive = (newActiveTermId) => ActiveTermIdStore.update(_prevActiveTermId => newActiveTermId)
+  const setActive = (newActiveTermUUID) => ActiveTermUUIDStore.update(_prevActiveTermUUID => newActiveTermUUID)
   
+  const closeTerminal = (termUUID) => {
+    TerminalsStore.update(terminals => terminals.filter(term => term['uuid'] != termUUID))
+    ActiveTermUUIDStore.update(_prevActiveTermUUID => terminals[0]['uuid'])
+  }
 </script>
 
 <ol id="tabs">
-  {#each terminals as terminal}
-    <li class="tab" on:click={() => setActive(terminal.id)}>
-      {#if terminal.id == activeTermId}
+  {#each terminals as terminal, index}
+    <li class="tab" on:click={() => setActive(terminal['uuid'])}>
+      {#if terminal['uuid'] == activeTermUUID}
         <div id="selected-tab">
-          <span class="tab-text">Terminal {terminal.id}</span>
+          <span class="tab-text">Terminal {index}</span>
+          <span class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])} >X</span>
         </div>
       {:else}
-        <span class="tab-text">Terminal {terminal.id}</span>
+        <span class="tab-text">Terminal {index}</span>
+        <span class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])} >X</span>
       {/if}
     </li>
   {/each}
@@ -55,6 +64,10 @@
     padding: 0;
     overflow: hidden;
     background-color: #333;
+  }
+
+  .close-tab-button {
+    background-color: hsl(270, 54%, 32%);
   }
 
   #selected-tab {

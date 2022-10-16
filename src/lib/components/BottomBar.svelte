@@ -3,7 +3,6 @@
 </script>
 
 <div id="bottom-bar">
-  <span> | </span>
   <div class="version">
     Manter (alpha)
   </div>

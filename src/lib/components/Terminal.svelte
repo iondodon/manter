@@ -17,6 +17,9 @@
       return
     }
     terminalInterface.open(document.getElementById('terminal'))
+    sendProposedSizeToPty()
+    adjustTerminalSize()
+    terminalInterface.focus()
   }
 
   onMount(() => {
@@ -195,25 +198,25 @@
 </script>
 
 <div id="terminal">
-    {#if IS_UNIX && !sessionContext['isLoggedIn']}
-       <div id="login-form">
-        <input 
-          type="password" 
-          id="password-input" 
-          name="password" 
-          required 
-          minlength="4" 
-          maxlength="20" 
-          size="10"
-          placeholder={`[sudo] password for ${sessionContext['user']}`}
-          on:keypress={passInputOnKeyPress}
-        >
-        <br/>
-        <button on:click={newTerminalSession} type="button">Login</button>
-        <br/>
-        <span id="login-result"></span>
-      </div>
-    {/if}
+  {#if IS_UNIX && !sessionContext['isLoggedIn']}
+    <div id="login-form">
+      <input 
+        type="password" 
+        id="password-input" 
+        name="password" 
+        required 
+        minlength="4" 
+        maxlength="20" 
+        size="10"
+        placeholder={`[sudo] password for ${sessionContext['user']}`}
+        on:keypress={passInputOnKeyPress}
+      >
+      <br/>
+      <button on:click={newTerminalSession} type="button">Login</button>
+      <br/>
+      <span id="login-result"></span>
+    </div>
+  {/if}
 </div>
 
 <style lang="scss">

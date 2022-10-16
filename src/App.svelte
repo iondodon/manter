@@ -5,17 +5,14 @@
   import { onMount } from 'svelte'
   import { invoke } from '@tauri-apps/api/tauri'
   import { TerminalsStore } from './lib/stores/stores'
-  import { ActiveTermIdStore } from './lib/stores/stores'
+  import { ActiveTermUUIDStore } from './lib/stores/stores'
+  import { NIL as NIL_UUID } from 'uuid'
 
   let terminals = []
-  let activeTerminalId = 0
-  let activeTerminal = terminals[0]
+  let activeTerminalUUID = NIL_UUID
 
   TerminalsStore.subscribe(updatedTerminals => terminals = updatedTerminals)
-  ActiveTermIdStore.subscribe(updatedTerminalId => {
-    activeTerminalId = updatedTerminalId
-    activeTerminal = terminals[updatedTerminalId]
-  })
+  ActiveTermUUIDStore.subscribe(updatedTerminalUUID => activeTerminalUUID = updatedTerminalUUID)
 
   onMount(async () => {
     await invoke('update_usage_counter')
@@ -25,12 +22,12 @@
 <main>
   <Tabs/>
   {#each terminals as terminal}
-    {#if terminal.id == activeTerminalId}
+    {#if terminal['uuid'] == activeTerminalUUID}
       <Terminal
-        bind:sessionContext={activeTerminal['sessionContext']}
-        bind:terminalInterface={activeTerminal['terminalInterface']} 
-        bind:ptyWebSocket={activeTerminal['ptyWebSocket']}
-        bind:fitAddon={activeTerminal['fitAddon']}
+        bind:sessionContext={terminal['sessionContext']}
+        bind:terminalInterface={terminal['terminalInterface']} 
+        bind:ptyWebSocket={terminal['ptyWebSocket']}
+        bind:fitAddon={terminal['fitAddon']}
       />
     {/if}
   {/each}
