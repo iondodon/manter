@@ -1,8 +1,14 @@
 <script lang="ts">
+  import { SessionContextStore } from "../stores/stores";
 
+  let sessionContext = {}
+  SessionContextStore.subscribe(updatesSessionContext => sessionContext = updatesSessionContext)
 </script>
 
 <div id="bottom-bar">
+  <div id="context-status">
+    {JSON.stringify(sessionContext)}
+  </div>
   <div class="version">
     Manter (alpha)
   </div>
@@ -12,7 +18,7 @@
   #bottom-bar {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: space-between;
 
     bottom: 0em;
     height: 1.2em;

@@ -17,4 +17,5 @@ export const TerminalsStore = writable([
   }
 ])
 
+export const SessionContextStore = writable({})
 export const ActiveTermUUIDStore = writable(FIRST_TERM_UUID)

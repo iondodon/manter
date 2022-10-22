@@ -88,7 +88,16 @@ async fn feed_pty_from_ws(
 
               let mut load_env_var_script = String::from(" export ");
 
-              let prompt_commnd = r#"PROMPT_COMMAND='echo -en "\033]0; [manter] {\"cwd\": \"$(pwd)\"} \a"' "#;
+              let prompt_commnd = r#"
+                PROMPT_COMMAND='echo -en "\033]0; [manter] 
+                  {
+                    \"cwd\": \"$(pwd)\",
+                    \"git\": {
+                      \"currentBranch\" : \"$(git rev-parse --abbrev-ref HEAD 2> /dev/null )\"
+                    }
+                  }
+                \a" '
+              "#;
               load_env_var_script.push_str(prompt_commnd);
 
               let term_var = "TERM=xterm-256color ";

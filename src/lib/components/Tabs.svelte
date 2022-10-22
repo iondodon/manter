@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { TerminalsStore } from '../stores/stores'
-  import { ActiveTermUUIDStore } from '../stores/stores'
+  import { TerminalsStore,ActiveTermUUIDStore } from '../stores/stores'
   import { v4 as uuidv4 } from 'uuid'
   import { NIL as NIL_UUID } from 'uuid'
 

@@ -6,6 +6,7 @@
   import { arrayBufferToString } from "../utils/utils"
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
+  import { SessionContextStore } from "../stores/stores"
 
   export let sessionContext
   export let terminalInterface: Terminal
@@ -89,6 +90,7 @@
       title = title.replace("[manter]", "")
       let promptUpdatedData = JSON.parse(title)
       sessionContext = {...sessionContext, ...promptUpdatedData}
+      SessionContextStore.update(() => sessionContext)
       return
     }
     document.title = title
