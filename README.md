@@ -29,3 +29,6 @@ Build the installer with ```npm run tauri build```.
 
 The installer that has been built will be for the operating system that you are using. The terminal can be built for Linux, MacOS and Windows.
 
+## Community
+
+[https://discord.gg/k4FFFPK3ZR](Discord server)
