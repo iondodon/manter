@@ -31,4 +31,4 @@ The installer that has been built will be for the operating system that you are 
 
 ## Community
 
-[https://discord.gg/k4FFFPK3ZR](Discord server)
+[Discord server](https://discord.gg/k4FFFPK3ZR)
