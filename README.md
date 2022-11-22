@@ -10,6 +10,9 @@ A good analogy to understand the purpose of this project is the following - trad
 
 Anyone is welcome to contribute to this project with and ideas. Imagine the terminal you would like to use. Feel free to open any issue with suggestions and bugs.
 
+## Community
+
+[Discord server](https://discord.gg/k4FFFPK3ZR)
 
 ## Setup local development environment
 
@@ -30,7 +33,3 @@ You can keep the application running in the dev environment and the changes in c
 Build the installer with ```npm run tauri build```.
 
 The installer that has been built will be for the operating system that you are using. The terminal can be built for Linux, MacOS and Windows.
-
-## Community
-
-[Discord server](https://discord.gg/k4FFFPK3ZR)
