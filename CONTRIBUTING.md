@@ -1,3 +1,6 @@
+First of all you have to contact us on out [Discord server](https://discord.gg/k4FFFPK3ZR) and send you github username or email and we will add you
+to the contributor list.
+
 For the moment, a workflow will be considered as simplified as possible because the project is at the beginning 
 of the road and it should be as easy as possible for those willing to contribute. Along the way, the contribution
 rules will be adjusted to meet the requirements.
