@@ -14,6 +14,10 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 [Discord server](https://discord.gg/k4FFFPK3ZR)
 
+## Contribution
+
+[Contribution guide](https://github.com/iondodon/manter/blob/main/CONTRIBUTING.md)
+
 ## Setup local development environment
 
 *First off, thank you for considering contributing to Manter. It’s people like you that can make Manter a great tool.*
