@@ -11,6 +11,12 @@ This project aims to create a terminal with functionalities that improve the exp
 
 A good analogy to understand the purpose of this project is the following - traditional terminals are like simple code editors while this terminal is like an IDE.
 
+### The following animation represents an example of what can be achieved with this project. But this is just a tiny part of what can be done. This demo was done with the actual project but the autocompletion part was removed for a better implementation.
+
+<p align="center">
+  <img src="usage-demo.gif" />
+</p>
+
 Anyone is welcome to contribute to this project with and ideas. Imagine the terminal you would like to use. Feel free to open any issue with suggestions and bugs.
 
 ## Community
