@@ -10,7 +10,7 @@
     {JSON.stringify(sessionContext)}
   </div>
   <div class="version">
-    Manter (alpha)
+    v.0.0.1
   </div>
 </div>
 

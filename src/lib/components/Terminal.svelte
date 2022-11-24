@@ -7,6 +7,7 @@
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
   import { SessionContextStore } from '../stores/stores'
+  import { BANNER } from '../../banner'
 
   export let sessionContext: any
   export let terminalInterface: Terminal
@@ -99,6 +100,14 @@
     document.title = title
   }
 
+  const displayWelcomePage = () => {
+    terminalInterface.write(BANNER)
+    terminalInterface.write("    v. 0.0.1 \r\n\n")
+    if (IS_UNIX) {
+      terminalInterface.write("User: " + sessionContext['user'] + "\r\n")
+    }
+  }
+
   const setupNewTerminalInterface = () => {
     terminalInterface = new Terminal({
       cursorBlink: true,
@@ -118,6 +127,8 @@
     terminalInterface.onTitleChange((title) =>
       termInterfaceHandleTitleChange(title)
     )
+
+    displayWelcomePage()
   }
 
   const writePtyIncomingToTermInterface = (evt) => {
