@@ -25,10 +25,6 @@ struct WindowSize {
     pub pixel_height: u16,
 }
 
-#[derive(Deserialize, Debug)]
-struct LoginData {
-    pub password: String,
-}
 
 async fn feed_client_from_pty(
     mut pty_reader: Box<dyn Read + Send>,
