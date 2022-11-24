@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SessionContextStore } from "../stores/stores";
+  import { SessionContextStore } from "../stores/stores"
 
   let sessionContext = {}
   SessionContextStore.subscribe(updatesSessionContext => sessionContext = updatesSessionContext)
