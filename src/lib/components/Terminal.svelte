@@ -2,7 +2,7 @@
   import { Terminal } from 'xterm'
   import { FitAddon } from 'xterm-addon-fit'
   import 'xterm/css/xterm.css'
-  import { IS_WINDOWS, IS_UNIX, PTY_WS_ADDRESS } from '../config/config'
+  import { IS_UNIX, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString } from '../utils/utils'
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
