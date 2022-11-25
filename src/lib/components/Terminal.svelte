@@ -33,7 +33,7 @@
     }
     terminalInterface.open(document.getElementById('terminal'))
     sendProposedSizeToPty()
-    adjustTerminalSize()
+    adjustDomTerminalElementSize()
     terminalInterface.focus()
   }
 
@@ -50,7 +50,7 @@
     )
   }
 
-  const adjustTerminalSize = () => {
+  const adjustDomTerminalElementSize = () => {
     fitAddon.fit()
 
     const terminal = document.getElementById('terminal') as HTMLElement
@@ -81,7 +81,7 @@
     ptyWebSocket.send(
       new TextEncoder().encode('\x01' + JSON.stringify(resizeValues))
     )
-    adjustTerminalSize()
+    adjustDomTerminalElementSize()
   }
 
   const termInterfaceHandleUserInputData = (data: string) => {
@@ -108,6 +108,25 @@
       terminalInterface.write("User: " + sessionContext['user'] + "\r\n")
     }
   }
+  
+  const termInterfaceHandleKeyEvents = (evt) => {
+    console.log("xterm intercepted key", evt)
+
+    if (evt.ctrlKey && evt.key === '=') {
+      terminalInterface.options.fontSize += 1
+      sendProposedSizeToPty()
+      fitAddon.fit()
+      return false
+    }
+    if (evt.ctrlKey && evt.key === '-') {
+      terminalInterface.options.fontSize -= 1
+      sendProposedSizeToPty()
+      fitAddon.fit()
+      return false
+    }
+    
+    return true
+  }
 
   const setupNewTerminalInterface = () => {
     terminalInterface = new Terminal({
@@ -118,9 +137,11 @@
     fitAddon = new FitAddon()
     terminalInterface.loadAddon(fitAddon)
 
+    terminalInterface.attachCustomKeyEventHandler((evt) => termInterfaceHandleKeyEvents(evt))
+
     openDomTerminalInterface()
 
-    addEventListener('resize', (_event) => adjustTerminalSize())
+    addEventListener('resize', (_event) => adjustDomTerminalElementSize())
     terminalInterface.onResize((evt) => termInterfaceHandleResize(evt))
     terminalInterface.onData((data) => termInterfaceHandleUserInputData(data))
     terminalInterface.onCursorMove(() => {})
