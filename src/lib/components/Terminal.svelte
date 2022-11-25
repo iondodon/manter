@@ -101,14 +101,11 @@
   }
 
   const displayWelcomePage = () => {
-    terminalInterface.write(BANNER)
-    terminalInterface.write("    v. 0.1.0 \r\n")
-    terminalInterface.write("    GNU GENERAL PUBLIC LICENSED \r\n\n")
     if (IS_UNIX) {
+      terminalInterface.write(BANNER)
+      terminalInterface.write("    v. 0.1.0 \r\n")
+      terminalInterface.write("    Licensed under GPL v.3 \r\n\n")
       terminalInterface.write("User: " + sessionContext['user'] + "\r\n")
-    }
-    if (IS_WINDOWS) {
-      ptyWebSocket.send(new TextEncoder().encode('\x00' + BANNER))
     }
   }
 
