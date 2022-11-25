@@ -9,9 +9,6 @@
   <div id="context-status">
     {JSON.stringify(sessionContext)}
   </div>
-  <div class="version">
-    v.0.0.1
-  </div>
 </div>
 
 <style lang="scss">

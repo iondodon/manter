@@ -2,7 +2,7 @@
   import { Terminal } from 'xterm'
   import { FitAddon } from 'xterm-addon-fit'
   import 'xterm/css/xterm.css'
-  import { IS_UNIX, PTY_WS_ADDRESS } from '../config/config'
+  import { IS_UNIX, IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString } from '../utils/utils'
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
@@ -102,9 +102,13 @@
 
   const displayWelcomePage = () => {
     terminalInterface.write(BANNER)
-    terminalInterface.write("    v. 0.0.1 \r\n\n")
+    terminalInterface.write("    v. 0.1.0 \r\n")
+    terminalInterface.write("    GNU GENERAL PUBLIC LICENSED \r\n\n")
     if (IS_UNIX) {
       terminalInterface.write("User: " + sessionContext['user'] + "\r\n")
+    }
+    if (IS_WINDOWS) {
+      ptyWebSocket.send(new TextEncoder().encode('\x00' + BANNER))
     }
   }
 

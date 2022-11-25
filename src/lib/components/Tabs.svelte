@@ -15,7 +15,6 @@
       terminals.push({
         uuid: NEW_TERM_UUID, 
         sessionContext: {
-          isLoggedIn: false,
           cwd: "~",
           user: ""
         },
