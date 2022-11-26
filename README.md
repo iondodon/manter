@@ -17,6 +17,8 @@ A good analogy to understand the purpose of this project is the following - trad
 
 Anyone is welcome to contribute to this project with and ideas. Imagine the terminal you would like to use. Feel free to open any issue with suggestions and bugs.
 
+# Read the about the implementation details in the project's WIKI .
+
 ## Community
 
 [Discord server](https://discord.gg/k4FFFPK3ZR)
