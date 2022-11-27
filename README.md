@@ -48,3 +48,7 @@ You can keep the application running in the dev environment and the changes in c
 Build the installer with `npm run tauri build`.
 
 The installer that has been built will be for the operating system that you are using. The terminal can be built for Linux, MacOS and Windows.
+
+## License
+
+Greasy Fork is licensed under the [GPLv3](https://github.com/iondodon/manter/blob/main/LICENCE.txt).
