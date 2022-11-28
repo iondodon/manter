@@ -51,4 +51,4 @@ The installer that has been built will be for the operating system that you are 
 
 ## License
 
-Greasy Fork is licensed under the [GPLv3](https://github.com/iondodon/manter/blob/main/LICENCE.txt).
+Manter is licensed under the [GPLv3](https://github.com/iondodon/manter/blob/main/LICENCE.txt).
