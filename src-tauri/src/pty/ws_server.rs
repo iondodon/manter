@@ -28,21 +28,34 @@ struct WindowSize {
 
 async fn feed_client_from_pty(
     mut pty_reader: Box<dyn Read + Send>,
-    mut ws_sender: SplitSink<WebSocketStream<TcpStream>, Message>,
+    mut ws_sender: SplitSink<WebSocketStream<TcpStream>, Message>
 ) {
     let mut buffer = BytesMut::with_capacity(1024);
     buffer.resize(1024, 0u8);
     loop {
         buffer[0] = 0u8;
         let mut tail = &mut buffer[1..];
-        let n = pty_reader.read(&mut tail).unwrap();
-        if n == 0 {
-            break;
+
+        match pty_reader.read(&mut tail) {
+            Ok(0) => {
+                // EOF
+                break;
+            }
+            Ok(n) => {
+                if n == 0 {
+                    break;
+                }
+                let mut data_to_send = Vec::with_capacity(n + 1);
+                data_to_send.extend_from_slice(&buffer[..n + 1]);
+                let message = Message::Binary(data_to_send);
+                ws_sender.send(message).await.unwrap();
+            }
+            Err(e) => {
+                mt_log!(Level::Error, "Error reading from pty: {}", e);
+                mt_log!(Level::Error, "PTY child process may be closed: {}", e);
+                break;
+            }
         }
-        let mut data_to_send = Vec::with_capacity(n + 1);
-        data_to_send.extend_from_slice(&buffer[..n + 1]);
-        let message = Message::Binary(data_to_send);
-        ws_sender.send(message).await.unwrap();
     }
 }
 
