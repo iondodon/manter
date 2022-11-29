@@ -32,7 +32,7 @@ async fn feed_client_from_pty(
 ) {
     let mut buffer = BytesMut::with_capacity(1024);
     buffer.resize(1024, 0u8);
-    loop {
+    loop { // TODO: make sure that this loop ends when the PTY child process was killed
         buffer[0] = 0u8;
         let mut tail = &mut buffer[1..];
 
