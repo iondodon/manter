@@ -2,7 +2,7 @@ use bytes::BytesMut;
 use futures::stream::{SplitSink, SplitStream};
 use futures::{SinkExt, StreamExt};
 use mt_logger::*;
-use portable_pty::{native_pty_system, CommandBuilder, PtyPair, PtySize};
+use portable_pty::{native_pty_system, CommandBuilder, PtyPair, PtySize, Child};
 use serde::Deserialize;
 use std::io::{Read, Write};
 use tokio::net::{TcpListener, TcpStream};
@@ -50,10 +50,10 @@ async fn feed_pty_from_ws(
     mut ws_receiver: SplitStream<WebSocketStream<TcpStream>>,
     mut pty_writer: Box<dyn Write + Send>,
     pty_pair: PtyPair,
+    mut pty_child_process: Box<dyn Child + Send + Sync>
 ) {
-    loop {
-        let message = ws_receiver.next().await.unwrap().unwrap();
-
+    while let Some(message) = ws_receiver.next().await {
+        let message = message.unwrap();
         match message {
             Message::Binary(msg) => {
                 let msg_bytes = msg.as_slice();
@@ -76,6 +76,15 @@ async fn feed_pty_from_ws(
                     }
                     _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
                 }
+            }
+            Message::Close(_) => {
+                mt_log!(Level::Info, "Closing the websocket connection");
+
+                mt_log!(Level::Info, "Killing PTY child process");
+                pty_child_process.kill().unwrap();
+
+                mt_log!(Level::Info, "Breakes the loop. This will terminate the ws socket thread and the ws will close");
+                break;
             }
             _ => mt_log!(Level::Error, "Unknown received data type"),
         }
@@ -110,7 +119,7 @@ async fn accept_connection(stream: TcpStream) {
         cmd
     };
 
-    let _child = pty_pair.slave.spawn_command(cmd).unwrap();
+    let pty_child_process = pty_pair.slave.spawn_command(cmd).unwrap();
 
     let pty_reader = pty_pair.master.try_clone_reader().unwrap();
     let pty_writer = pty_pair.master.try_clone_writer().unwrap();
@@ -122,7 +131,7 @@ async fn accept_connection(stream: TcpStream) {
         })
     });
 
-    feed_pty_from_ws(ws_receiver, pty_writer, pty_pair).await;
+    feed_pty_from_ws(ws_receiver, pty_writer, pty_pair, pty_child_process).await;
 }
 
 pub async fn pty_serve() {

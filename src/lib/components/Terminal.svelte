@@ -164,8 +164,9 @@
   }
 
   const handlePtyWsClose = (_evt) => {
-    terminalInterface.write('Session terminated')
+    terminalInterface.write('Terminal session terminated')
     terminalInterface.dispose()
+    console.log('Terminal session terminated')
   }
 
   const handlePtyWsError = (evt) => {

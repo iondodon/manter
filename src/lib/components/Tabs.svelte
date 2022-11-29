@@ -30,7 +30,18 @@
 
   const setActive = (newActiveTermUUID) => ActiveTermUUIDStore.update(_prevActiveTermUUID => newActiveTermUUID)
   
+  const getTerminalByUuid = (termUuid) => {
+    for (const term of terminals) {
+      if (term['uuid'] == termUuid) {
+        return term
+      }
+    }
+    throw `Terminal with UUID=${termUuid} not found`
+  }
+
   const closeTerminal = (termUUID) => {
+    let termToClose  = getTerminalByUuid(termUUID)
+    termToClose['ptyWebSocket'].close()
     TerminalsStore.update(terminals => terminals.filter(term => term['uuid'] != termUUID))
     ActiveTermUUIDStore.update(_prevActiveTermUUID => terminals[0]['uuid'])
   }
