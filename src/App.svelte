@@ -3,7 +3,6 @@
   import Terminal from './lib/components/Terminal.svelte'
   import Tabs from './lib/components/Tabs.svelte';
   import { onMount } from 'svelte'
-  import { invoke } from '@tauri-apps/api/tauri'
   import { TerminalsStore } from './lib/stores/stores'
   import { ActiveTermUUIDStore } from './lib/stores/stores'
   import { NIL as NIL_UUID } from 'uuid'
@@ -15,7 +14,7 @@
   ActiveTermUUIDStore.subscribe(updatedTerminalUUID => activeTerminalUUID = updatedTerminalUUID)
 
   onMount(async () => {
-    await invoke('update_usage_counter')
+    
   })
 </script>
 

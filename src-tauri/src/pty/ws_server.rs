@@ -32,7 +32,7 @@ async fn feed_client_from_pty(
 ) {
     let mut buffer = BytesMut::with_capacity(1024);
     buffer.resize(1024, 0u8);
-    loop { // TODO: make sure that this loop ends when the PTY child process was killed
+    loop {
         buffer[0] = 0u8;
         let mut tail = &mut buffer[1..];
 
@@ -42,7 +42,7 @@ async fn feed_client_from_pty(
                 break;
             }
             Ok(n) => {
-                if n == 0 {
+                if n == 0 { // make sure that this is the case of Ok(0)
                     break;
                 }
                 let mut data_to_send = Vec::with_capacity(n + 1);
@@ -52,11 +52,13 @@ async fn feed_client_from_pty(
             }
             Err(e) => {
                 mt_log!(Level::Error, "Error reading from pty: {}", e);
-                mt_log!(Level::Error, "PTY child process may be closed: {}", e);
+                mt_log!(Level::Error, "PTY child process may be closed.");
                 break;
             }
         }
     }
+
+    mt_log!(Level::Info, "PTY child process killed.");
 }
 
 async fn feed_pty_from_ws(
@@ -91,9 +93,9 @@ async fn feed_pty_from_ws(
                 }
             }
             Message::Close(_) => {
-                mt_log!(Level::Info, "Closing the websocket connection");
+                mt_log!(Level::Info, "Closing the websocket connection...");
 
-                mt_log!(Level::Info, "Killing PTY child process");
+                mt_log!(Level::Info, "Killing PTY child process...");
                 pty_child_process.kill().unwrap();
 
                 mt_log!(Level::Info, "Breakes the loop. This will terminate the ws socket thread and the ws will close");
@@ -102,6 +104,8 @@ async fn feed_pty_from_ws(
             _ => mt_log!(Level::Error, "Unknown received data type"),
         }
     }
+
+    mt_log!(Level::Info, "The Websocket was closed and the thread for WS listening will end soon.");
 }
 
 async fn accept_connection(stream: TcpStream) {
