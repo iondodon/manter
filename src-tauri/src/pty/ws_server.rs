@@ -129,7 +129,11 @@ async fn accept_connection(stream: TcpStream) {
     .unwrap();
 
   let cmd = if cfg!(target_os = "windows") {
-    CommandBuilder::new("powershell")
+    // CommandBuilder::new(r"powershell")
+    // CommandBuilder::new(r"C:\Program Files\Git\bin\bash.exe")
+    // CommandBuilder::new(r"ubuntu.exe") // if WSL is active
+    // on UI the user should have the option to choose
+    CommandBuilder::new(r"cmd")
   } else {
     let user = crate::get_setting("default_login_user");
     let mut cmd = CommandBuilder::new("su");
