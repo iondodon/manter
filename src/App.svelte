@@ -2,10 +2,9 @@
   import BottomBar from './lib/components/BottomBar.svelte'
   import Terminal from './lib/components/Terminal.svelte'
   import Tabs from './lib/components/Tabs.svelte';
-  import { onMount } from 'svelte'
-  import { TerminalsStore } from './lib/stores/stores'
-  import { ActiveTermUUIDStore } from './lib/stores/stores'
-  import { NIL as NIL_UUID } from 'uuid'
+  import {onMount} from 'svelte'
+  import {ActiveTermUUIDStore, TerminalsStore} from './lib/stores/stores'
+  import {NIL as NIL_UUID} from 'uuid'
 
   let terminals = []
   let activeTerminalUUID = NIL_UUID
@@ -14,17 +13,17 @@
   ActiveTermUUIDStore.subscribe(updatedTerminalUUID => activeTerminalUUID = updatedTerminalUUID)
 
   onMount(async () => {
-    
+
   })
 </script>
 
 <main>
   <Tabs/>
   {#each terminals as terminal}
-    {#if terminal['uuid'] == activeTerminalUUID}
+    {#if terminal['uuid'] === activeTerminalUUID}
       <Terminal
         bind:sessionContext={terminal['sessionContext']}
-        bind:terminalInterface={terminal['terminalInterface']} 
+        bind:terminalInterface={terminal['terminalInterface']}
         bind:ptyWebSocket={terminal['ptyWebSocket']}
         bind:fitAddon={terminal['fitAddon']}
       />
