@@ -32,7 +32,7 @@
   <BottomBar/>
 </main>
 
-<style type="scss">
+<style lang="scss">
   :root {
     font-family: monospace;
     background-color: black;
