@@ -1,27 +1,11 @@
-## Envirnoment variables
-
-### Common Unix
-
-```bash
-
-PROMPT_COMMAND='echo -en "\033]0; [manter]
-                  {
-                    \"cwd\": \"$(pwd)\",
-                    \"git\": {
-                      \"currentBranch\" : \"$(git rev-parse --abbrev-ref HEAD 2> /dev/null )\"
-                    }
-                  }
-                \a" '
-
-TERM=xterm-256color
-
-```
-
-```bash
-source ~/.bashrc
-```
-
 ### MacOS
+
+On MacOS the following commands should be executed in the terminal before starting the application.
+These two are required to runt the COMMAND_PROMPT script each time the prompt appears in the terminal.
+The COMMAND_PROMPT script by default provides useful information about the current git branch, the current user the current directory.
+The script can be modified in the sourcecode. In the future will make an option for the user to defined the script.
+
+Add the following two command in ~/.profile or ~/.zshenv (or both - not sure). The run source them.
 
 ```bash
 
