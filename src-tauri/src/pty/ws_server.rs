@@ -11,6 +11,18 @@ use tokio_tungstenite::{accept_async, WebSocketStream};
 use tokio_tungstenite::tungstenite::Message;
 
 const PTY_SERVER_ADDRESS: &str = "127.0.0.1:7703";
+const PROMPT_COMMAND: &str = r#"
+  echo -en "\033]0; [manter] 
+    {
+      \"cwd\": \"$(pwd)\",
+      \"git\": {
+        \"currentBranch\" : \"$(git rev-parse --abbrev-ref HEAD 2> /dev/null )\"
+      }
+    }
+  \a"
+"#;
+const TERM: &str = "xterm-256color";
+
 
 #[derive(Deserialize, Debug)]
 struct WindowSize {
@@ -137,6 +149,8 @@ async fn accept_connection(stream: TcpStream) {
   } else {
     let user = crate::get_setting("default_login_user");
     let mut cmd = CommandBuilder::new("su");
+    cmd.env("PROMPT_COMMAND", PROMPT_COMMAND);
+    cmd.env("TERM", TERM);
     cmd.args(["-m", user.as_str()]);
     cmd
   };
