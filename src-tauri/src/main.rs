@@ -1,21 +1,22 @@
 #![cfg_attr(
-  all(not(debug_assertions), target_os = "windows"),
-  windows_subsystem = "windows"
+all(not(debug_assertions), target_os = "windows"),
+windows_subsystem = "windows"
 )]
-
-mod pty;
 
 extern crate serde_json;
 
-use std::{fs::{OpenOptions, self}, io::Write, path::Path};
-use pty::ws_server::{pty_serve};
-use mt_logger::*;
-use serde::{Serialize, Deserialize};
+use std::{fs::{self, OpenOptions}, io::Write, path::Path};
 
+use mt_logger::*;
+use serde::{Deserialize, Serialize};
+
+use pty::ws_server::pty_serve;
+
+mod pty;
 
 #[derive(Deserialize, Debug, Serialize)]
 pub struct Settings {
-    pub default_login_user: String
+  pub default_login_user: String,
 }
 
 #[tauri::command]
@@ -38,7 +39,7 @@ pub fn get_setting(setting_name: &str) -> String {
   let settings: Settings = serde_json::from_str(&settings_file_string).unwrap();
 
   mt_log!(Level::Info, "Get setting {:?}", setting_name);
-  
+
   match setting_name {
     "default_login_user" => settings.default_login_user,
     _ => panic!("Unknown setting")
@@ -53,9 +54,9 @@ fn check_settings_file() {
   let settings_file_path = Path::new(&settings_file);
 
   if settings_file_path.exists() {
-    return ;
+    return;
   }
-  
+
   mt_log!(Level::Info, "Create new settings file {:?}", settings_file_path);
 
   let settings_file = OpenOptions::new()

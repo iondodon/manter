@@ -1,19 +1,18 @@
 <script lang="ts">
-  import { TerminalsStore,ActiveTermUUIDStore } from '../stores/stores'
-  import { v4 as uuidv4 } from 'uuid'
-  import { NIL as NIL_UUID } from 'uuid'
+  import {ActiveTermUUIDStore, TerminalsStore} from '../stores/stores'
+  import {NIL as NIL_UUID, v4 as uuidv4} from 'uuid'
 
   let terminals = []
   let activeTermUUID = NIL_UUID
-  
+
   TerminalsStore.subscribe(updatedTerminals => terminals = updatedTerminals)
   ActiveTermUUIDStore.subscribe(updatedActiveTerminalUUID => activeTermUUID = updatedActiveTerminalUUID)
 
-  const addNewTerminal= () => {
+  const addNewTerminal = () => {
     const NEW_TERM_UUID = uuidv4()
     TerminalsStore.update(terminals => {
       terminals.push({
-        uuid: NEW_TERM_UUID, 
+        uuid: NEW_TERM_UUID,
         sessionContext: {
           cwd: "~",
           user: ""
@@ -29,7 +28,7 @@
   }
 
   const setActive = (newActiveTermUUID) => ActiveTermUUIDStore.update(_prevActiveTermUUID => newActiveTermUUID)
-  
+
   const getTerminalByUuid = (termUuid) => {
     for (const term of terminals) {
       if (term['uuid'] == termUuid) {
@@ -40,7 +39,7 @@
   }
 
   const closeTerminal = (termUUID) => {
-    let termToClose  = getTerminalByUuid(termUUID)
+    let termToClose = getTerminalByUuid(termUUID)
     termToClose['ptyWebSocket'].close()
     TerminalsStore.update(terminals => terminals.filter(term => term['uuid'] != termUUID))
     ActiveTermUUIDStore.update(_prevActiveTermUUID => terminals[0]['uuid'])
@@ -50,14 +49,14 @@
 <ol id="tabs">
   {#each terminals as terminal, index}
     <li class="tab" on:click={() => setActive(terminal['uuid'])}>
-      {#if terminal['uuid'] == activeTermUUID}
+      {#if terminal['uuid'] === activeTermUUID}
         <div id="selected-tab">
           <span class="tab-text">Terminal {index}</span>
-          <span class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])} >X</span>
+          <span class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])}>X</span>
         </div>
       {:else}
         <span class="tab-text">Terminal {index}</span>
-        <span class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])} >X</span>
+        <span class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])}>X</span>
       {/if}
     </li>
   {/each}
@@ -85,7 +84,6 @@
 
   .tab {
     float: left;
-    border: none;
     outline: none;
     cursor: pointer;
     transition: 0.3s;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SessionContextStore } from "../stores/stores"
+  import {SessionContextStore} from "../stores/stores"
 
   let sessionContext = {}
   SessionContextStore.subscribe(updatesSessionContext => sessionContext = updatesSessionContext)
@@ -17,7 +17,7 @@
     flex-direction: row;
     justify-content: space-between;
 
-    bottom: 0em;
+    bottom: 0;
     height: 1.2em;
     width: 100%;
     background-color: rgb(29, 29, 29);
