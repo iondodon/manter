@@ -38,7 +38,11 @@
     throw `Terminal with UUID=${termUuid} not found`
   }
 
-  const closeTerminal = (termUUID) => {
+  const closeTerminal = async (termUUID) => {
+    const isSure = await confirm("Are you sure you want to close this terminal?")
+    if(!isSure) {
+      return
+    } 
     let termToClose = getTerminalByUuid(termUUID)
     termToClose['ptyWebSocket'].close()
     TerminalsStore.update(terminals => terminals.filter(term => term['uuid'] != termUUID))
@@ -76,6 +80,12 @@
 
   .close-tab-button {
     background-color: hsl(270, 54%, 32%);
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+  }
+
+  .close-tab-button:hover {
+    background-color: rgb(71, 71, 237);
   }
 
   #selected-tab {
@@ -87,7 +97,7 @@
     outline: none;
     cursor: pointer;
     transition: 0.3s;
-    font-size: 17px;
+    font-size: 2em;
     border: 1px solid rgb(136, 16, 16);
     text-align: center;
   }

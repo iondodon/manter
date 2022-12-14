@@ -198,11 +198,11 @@
   #terminal {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items:flex-start;
 
     top: 0em;
     right: 0em;
-    height: calc(100% - 1.2em);
+    height: calc(100% - 4em);
     width: 100%;
 
     background-color: black;

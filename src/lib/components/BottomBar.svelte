@@ -18,10 +18,14 @@
     justify-content: space-between;
 
     bottom: 0;
-    height: 1.2em;
+    height: 2em;
     width: 100%;
     background-color: rgb(29, 29, 29);
     color: rgb(156, 156, 156);
+
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
   }
 
   #bottom-bar * {
