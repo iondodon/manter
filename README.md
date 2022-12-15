@@ -47,9 +47,7 @@ _First off, thank you for considering contributing to Manter. It’s people like
 
 4. install the dependencies `npm install`
 
-5. follow the instruction from [SETUP.md](https://github.com/iondodon/manter/blob/main/SETUP.md) for more setup instructions
-
-6. run the application in dev environment `npm run tauri dev`
+5. run the application in dev environment `npm run tauri dev`
 
 You can keep the application running in the dev environment and the changes in code will be reflected in the application running application. If the back-end code changes, then the application restarts to reflect the changes.
 
