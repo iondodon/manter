@@ -52,10 +52,11 @@ async fn feed_client_from_pty(
     match pty_reader.read(&mut tail) {
       Ok(0) => {
         // EOF
+        mt_log!(Level::Info, "0 bytes read from pty. EOF.");
         break;
       }
       Ok(n) => {
-        if n == 0 { // make sure that this is the case of Ok(0)
+        if n == 0 { // this may be redundant because of Ok(0), but not sure
           break;
         }
         let mut data_to_send = Vec::with_capacity(n + 1);

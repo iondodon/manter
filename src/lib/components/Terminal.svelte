@@ -166,7 +166,7 @@
   const handlePtyWsClose = (_evt) => {
     terminalInterface.write('Terminal session terminated')
     terminalInterface.dispose()
-    console.log('Terminal session terminated')
+    console.log('websocket closes from backend side')
   }
 
   const handlePtyWsError = (evt) => {
