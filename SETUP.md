@@ -20,3 +20,4 @@ precmd_functions=(prmptcmd)
 source ~/.profile
 source ~/.zshenv
 ```
+
