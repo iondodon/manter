@@ -5,7 +5,6 @@
   import {onMount} from 'svelte'
   import {ActiveTermUUIDStore, TerminalsStore} from './lib/stores/stores'
   import {NIL as NIL_UUID} from 'uuid'
-  import { IS_MACINTOSH } from './lib/config/config'
 
   let terminals = []
   let activeTerminalUUID = NIL_UUID
@@ -14,9 +13,7 @@
   ActiveTermUUIDStore.subscribe(updatedTerminalUUID => activeTerminalUUID = updatedTerminalUUID)
 
   onMount(async () => {
-    if (IS_MACINTOSH) {
-      alert("Run this two commands after the terminal is open: \n prmptcmd() { eval '$PROMPT_COMMAND' } \nprecmd_functions=(prmptcmd)")
-    }
+
   })
 </script>
 

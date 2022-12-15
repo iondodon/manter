@@ -2,7 +2,7 @@
   import { Terminal } from 'xterm'
   import { FitAddon } from 'xterm-addon-fit'
   import 'xterm/css/xterm.css'
-  import { IS_UNIX, IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
+  import { IS_MACINTOSH, IS_UNIX, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString } from '../utils/utils'
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
@@ -105,6 +105,14 @@
       terminalInterface.write(BANNER)
       terminalInterface.write("    v. 0.1.0 \r\n")
       terminalInterface.write("    Licensed under GPL v.3 \r\n\n")
+
+      if (IS_MACINTOSH) {
+        terminalInterface.write("Run these two commands in the terminal after login: \r\n\n")
+        terminalInterface.write("$ prmptcmd() { eval \"$PROMPT_COMMAND\" }  \r\n")
+        terminalInterface.write("$ precmd_functions=(prmptcmd)  \r\n\n")
+        terminalInterface.write("They are needed to run the script that shows at the bottom information such as the current directory, the git branch, the user, etc. \r\n\n")
+      }
+
       terminalInterface.write("User: " + sessionContext['user'] + "\r\n")
     }
   }
