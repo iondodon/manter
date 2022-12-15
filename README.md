@@ -49,7 +49,7 @@ _First off, thank you for considering contributing to Manter. It’s people like
 
 5. run the application in dev environment `npm run tauri dev`
 
-You can keep the application running in the dev environment and the changes in code will be reflected in the application running application. If the back-end code changes, then the application restarts to reflect the changes.
+You can keep the application running in the dev environment and the changes in code will be reflected in the running application. If the back-end code changes, then the application restarts to reflect the changes.
 
 Build the installer with `npm run tauri build`.
 
