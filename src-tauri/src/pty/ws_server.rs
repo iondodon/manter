@@ -10,6 +10,8 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::{accept_async, WebSocketStream};
 use tokio_tungstenite::tungstenite::Message;
 
+use crate::settings::settings::get_setting;
+
 const PTY_SERVER_ADDRESS: &str = "127.0.0.1:7703";
 const PROMPT_COMMAND: &str = r#"
   echo -en "\033]0; [manter] 
@@ -148,7 +150,7 @@ async fn accept_connection(stream: TcpStream) {
     // on UI the user should have the option to choose
     CommandBuilder::new(r"cmd")
   } else {
-    let user = crate::get_setting("default_login_user");
+    let user = get_setting("default_login_user");
     let mut cmd = CommandBuilder::new("su");
     cmd.env("PROMPT_COMMAND", PROMPT_COMMAND);
     cmd.env("TERM", TERM);
