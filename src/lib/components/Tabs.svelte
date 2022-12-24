@@ -97,7 +97,6 @@
     outline: none;
     cursor: pointer;
     transition: 0.3s;
-    font-size: 2em;
     border: 1px solid rgb(136, 16, 16);
     text-align: center;
   }

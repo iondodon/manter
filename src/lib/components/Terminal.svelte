@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Terminal } from 'xterm'
+  import { IBufferLine, Terminal } from 'xterm'
   import { FitAddon } from 'xterm-addon-fit'
   import 'xterm/css/xterm.css'
   import { IS_MACINTOSH, IS_UNIX, PTY_WS_ADDRESS } from '../config/config'
@@ -116,10 +116,16 @@
       terminalInterface.write("User: " + sessionContext['user'] + "\r\n")
     }
   }
+
+  const getTextOnCursorLine = () => {
+    const scrolledRows = terminalInterface.buffer.active._buffer.ydisp
+    const lineIndex = terminalInterface.buffer.active.cursorY + scrolledRows
+    const currentLine = terminalInterface.buffer.active.getLine(lineIndex)
+    const currentLineText = currentLine.translateToString(true)
+    return currentLineText
+  }
   
   const termInterfaceHandleKeyEvents = (evt) => {
-    console.log("xterm intercepted key", evt)
-
     if (evt.ctrlKey && evt.key === '=') {
       terminalInterface.options.fontSize += 1
       sendProposedSizeToPty()
@@ -132,6 +138,9 @@
       fitAddon.fit()
       return false
     }
+
+    const currentLineText = getTextOnCursorLine()
+    console.log('currentLineText', currentLineText)
     
     return true
   }
@@ -146,6 +155,7 @@
     terminalInterface.loadAddon(fitAddon)
 
     terminalInterface.attachCustomKeyEventHandler((evt) => termInterfaceHandleKeyEvents(evt))
+    terminalInterface.onKey((evt) => {})
 
     openDomTerminalInterface()
 
@@ -210,7 +220,7 @@
 
     top: 0em;
     right: 0em;
-    height: calc(100% - 4em);
+    height: calc(100% - 2em);
     width: 100%;
 
     background-color: black;
