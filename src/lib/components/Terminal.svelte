@@ -139,8 +139,8 @@
       return false
     }
 
-    const currentLineText = getTextOnCursorLine()
-    console.log('currentLineText', currentLineText)
+    // TODO: to be use for suggesions
+    const _currentLineText = getTextOnCursorLine()
     
     return true
   }
