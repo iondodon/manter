@@ -7,7 +7,6 @@ export const TerminalsStore = writable([
   {
     uuid: FIRST_TERM_UUID,
     sessionContext: {
-      cwd: "~",
       user: "",
     },
     terminalInterface: null,
