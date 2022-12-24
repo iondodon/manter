@@ -10,19 +10,9 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::{accept_async, WebSocketStream};
 use tokio_tungstenite::tungstenite::Message;
 
-use crate::settings::settings::get_setting;
+use crate::settings::settings::get_settings;
 
 const PTY_SERVER_ADDRESS: &str = "127.0.0.1:7703";
-const PROMPT_COMMAND: &str = r#"
-  echo -en "\033]0; [manter] 
-    {
-      \"cwd\": \"$(pwd)\",
-      \"git\": {
-        \"currentBranch\" : \"$(git rev-parse --abbrev-ref HEAD 2> /dev/null )\"
-      }
-    }
-  \a"
-"#;
 const TERM: &str = "xterm-256color";
 
 
@@ -150,11 +140,24 @@ async fn accept_connection(stream: TcpStream) {
     // on UI the user should have the option to choose
     CommandBuilder::new(r"cmd")
   } else {
-    let user = get_setting("default_login_user");
+    let settings = get_settings();
+    let user = settings.get("default_login_user").unwrap();
+    let user = user.as_str().unwrap();
+
+    // if there is a 'script' in the settings
+    let prompt_command_scripts = if settings.contains_key("prompt_command_script") {
+      let script = settings.get("prompt_command_script").unwrap();
+      let script = script.to_string();
+      script
+    } else {String::new()};
+    let prompt_command_scripts = format!(r#"echo -en "\033]0; [manter] {} \a""#, prompt_command_scripts);
+
+    mt_log!(Level::Info, "prompt_command_scripts= {}", prompt_command_scripts);
+
     let mut cmd = CommandBuilder::new("su");
-    cmd.env("PROMPT_COMMAND", PROMPT_COMMAND);
+    cmd.env("PROMPT_COMMAND", prompt_command_scripts);
     cmd.env("TERM", TERM);
-    cmd.args(["-m", user.as_str()]);
+    cmd.args(["-m", user]);
     cmd
   };
 

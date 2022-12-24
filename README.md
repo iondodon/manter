@@ -55,6 +55,23 @@ Build the installer with `npm run tauri build`.
 
 The installer that has been built will be for the operating system that you are using. The terminal can be built for Linux, MacOS and Windows.
 
+## PROMPT_COMMAND script
+
+This script is run every time the prompt appears and is used to display information in the bottom bar.
+
+The script should be placed in the `~/.manter.json` file with the `prompt_command_script` key. On Windows, the file is located in `C:\Users\{username}\.manter.json`.
+
+```json
+{
+  "default_login_user": "ion",
+  "prompt_command_script": "{ \"cwd\": \"$(pwd)\", \"git\": { \"currentBranch\" : \"$(git rev-parse --abbrev-ref HEAD 2> /dev/null )\" } }"
+}
+```
+
 ## License
 
 Manter is licensed under the [GPLv3](https://github.com/iondodon/manter/blob/main/LICENCE.txt).
+
+```
+
+```

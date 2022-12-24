@@ -1,15 +1,11 @@
 use std::{path::Path, fs::{self, OpenOptions}, io::Write};
 
 use mt_logger::{mt_log, Level};
-use serde::{Deserialize, Serialize};
+use serde_json::{Value, Map};
 
-#[derive(Deserialize, Debug, Serialize)]
-pub struct Settings {
-  pub default_login_user: String
-}
 
 #[tauri::command]
-pub fn get_settings() -> String {
+pub fn get_settings() -> Map<String, Value> {
   let home_dir = dirs::home_dir().unwrap();
   let home_dir = home_dir.to_str().unwrap();
   let settings_file = format!("{}/.manter.json", home_dir);
@@ -19,20 +15,11 @@ pub fn get_settings() -> String {
     panic!("Settings file not found");
   }
 
-  fs::read_to_string(settings_file_path).unwrap()
-}
+  let settings_file_string = fs::read_to_string(settings_file_path).unwrap();
 
+  let settings: Map<String, Value> = serde_json::from_str(&settings_file_string).unwrap();
 
-pub fn get_setting(setting_name: &str) -> String {
-  let settings_file_string = get_settings();
-  let settings: Settings = serde_json::from_str(&settings_file_string).unwrap();
-
-  mt_log!(Level::Info, "Get setting {:?}", setting_name);
-
-  match setting_name {
-    "default_login_user" => settings.default_login_user,
-    _ => panic!("Unknown setting")
-  }
+  settings
 }
 
 
@@ -55,9 +42,9 @@ pub fn check_settings_file() {
     .open(settings_file_path);
 
   let default_user = whoami::username();
-  let settings_json_object = serde_json::to_string(&Settings {
-    default_login_user: default_user
-  }).unwrap();
+  let mut settings_json_object = Map::new();
+  settings_json_object.insert("default_login_user".to_string(), Value::String(default_user));
+  let settings_json_object = serde_json::to_string(&settings_json_object).unwrap();
   
   settings_file.unwrap().write_all(settings_json_object.as_bytes()).unwrap();
 }

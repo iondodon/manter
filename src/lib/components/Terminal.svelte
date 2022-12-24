@@ -22,8 +22,7 @@
   })
 
   const setUser = async () => {
-    const settingsString = (await invoke('get_settings')) as string
-    const settings = JSON.parse(settingsString)
+    const settings = (await invoke('get_settings')) as string
     sessionContext['user'] = settings['default_login_user']
   }
 
