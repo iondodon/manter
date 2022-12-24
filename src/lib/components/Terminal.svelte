@@ -139,7 +139,7 @@
       return false
     }
 
-    // TODO: to be use for suggesions
+    // TODO: to be used for suggesions
     const _currentLineText = getTextOnCursorLine()
     
     return true
