@@ -61,6 +61,8 @@ This script is run every time the prompt appears and is used to display informat
 
 The script should be placed in the `~/.manter.json` file with the `prompt_command_script` key. On Windows, the file is located in `C:\Users\{username}\.manter.json`.
 
+All scripts should be in a json format as presented in the example below.
+
 ```json
 {
   "default_login_user": "ion",

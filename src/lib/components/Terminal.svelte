@@ -91,7 +91,13 @@
   const termInterfaceHandleTitleChange = (title) => {
     if (title.includes('[manter]')) {
       title = title.replace('[manter]', '')
-      let promptUpdatedData = JSON.parse(title)
+      let promptUpdatedData = {}
+      try {
+        promptUpdatedData = JSON.parse(title)
+      } catch (e) {
+        alert('Error parsing JSON from prompt_command_script\n' + e.message)
+        return
+      }
       sessionContext = { ...sessionContext, ...promptUpdatedData }
       SessionContextStore.update(() => sessionContext)
       return
