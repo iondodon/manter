@@ -118,6 +118,7 @@
   }
 
   const getTextOnCursorLine = () => {
+    // @ts-ignore
     const scrolledRows = terminalInterface.buffer.active._buffer.ydisp
     const lineIndex = terminalInterface.buffer.active.cursorY + scrolledRows
     const currentLine = terminalInterface.buffer.active.getLine(lineIndex)
