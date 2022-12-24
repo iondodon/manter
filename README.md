@@ -59,7 +59,7 @@ The installer that has been built will be for the operating system that you are 
 
 This script is run every time the prompt appears and is used to display information in the bottom bar.
 
-The script should be placed in the `~/.manter.json` file with the `prompt_command_script` key. On Windows, the file is located in `C:\Users\{username}\.manter.json`.
+The script should be placed in the `~/.manter.json` file with the `prompt_command_script` key. On Windows, the file is located in `C:\Users\{username}\.manter.json`. On MacOS, the file is located in `/Users/{username}/.manter.json`. On Linux, the file is located in `/home/{username}/.manter.json`.
 
 All scripts should be in a json format as presented in the example below.
 
