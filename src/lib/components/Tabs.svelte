@@ -14,7 +14,6 @@
       terminals.push({
         uuid: NEW_TERM_UUID,
         sessionContext: {
-          cwd: "~",
           user: ""
         },
         terminalInterface: null,
@@ -52,56 +51,77 @@
 
 <ol id="tabs">
   {#each terminals as terminal, index}
-    <li class="tab" on:click={() => setActive(terminal['uuid'])}>
-      {#if terminal['uuid'] === activeTermUUID}
-        <div id="selected-tab">
-          <span class="tab-text">Terminal {index}</span>
-          <span class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])}>X</span>
-        </div>
-      {:else}
-        <span class="tab-text">Terminal {index}</span>
-        <span class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])}>X</span>
-      {/if}
+    <li class="tab" id="{terminal['uuid'] === activeTermUUID? 'selected-tab' : ''}" on:click={() => setActive(terminal['uuid'])}>
+      <div class="tab-text">Terminal {index}</div>
+      <div class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])}>X</div>
     </li>
   {/each}
   <li class="tab" on:click={addNewTerminal}><span>+</span></li>
 </ol>
 
 <style lang="scss">
+  
   #tabs {
     display: flex;
-    flex-direction: row;
-    list-style-type: none;
+    list-style: none;
     margin: 0;
     padding: 0;
-    overflow: hidden;
     background-color: #333;
-  }
-
-  .close-tab-button {
-    background-color: hsl(270, 54%, 32%);
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-  }
-
-  .close-tab-button:hover {
-    background-color: rgb(71, 71, 237);
-  }
-
-  #selected-tab {
-    background-color: rebeccapurple;
+    color: #fff;
   }
 
   .tab {
-    float: left;
-    outline: none;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 20px;
+    border-right: 1px solid #444;
     cursor: pointer;
-    transition: 0.3s;
-    border: 1px solid rgb(136, 16, 16);
-    text-align: center;
   }
 
   .tab:hover {
-    background-color: #ddd;
+    background: linear-gradient(to top, #000, #444);
+    color: #fff;
   }
+
+  .tab#selected-tab {
+    background: linear-gradient(to top, #000, #333);
+    color: #fff;
+  }
+
+  .tab-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 40px;
+  }
+
+  .close-tab-button {
+    margin-left: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    outline: none;
+    padding: 0 10px;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .close-tab-button:hover {
+    background-color: #333;
+    color: #ff000060;
+  }
+
+  .close-tab-button:active {
+    background-color: #333;
+  }
+
+  .tab span {
+    font-size: 24px;
+    line-height: 40px;
+  }
+
+
 </style>

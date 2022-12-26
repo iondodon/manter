@@ -155,7 +155,8 @@
     terminalInterface = new Terminal({
       cursorBlink: true,
       cursorStyle: 'bar',
-      cursorWidth: 6
+      fontSize: 18,
+      cursorWidth: 10,
     })
     fitAddon = new FitAddon()
     terminalInterface.loadAddon(fitAddon)
@@ -178,6 +179,7 @@
   }
 
   const writePtyIncomingToTermInterface = (evt) => {
+    console.log(evt)
     if (!(evt.data instanceof ArrayBuffer)) {
       alert('unknown data type ' + evt.data)
       return
@@ -220,14 +222,9 @@
 
 <style lang="scss">
   #terminal {
-    display: flex;
-    justify-content: center;
-    align-items:flex-start;
-
-    top: 0em;
-    right: 0em;
-    height: calc(100% - 2em);
     width: 100%;
+
+    height: calc(100vh - 80px);
 
     background-color: black;
     overflow: hidden;

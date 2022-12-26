@@ -14,20 +14,16 @@
 <style lang="scss">
   #bottom-bar {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    bottom: 0;
-    width: 100%;
-    background-color: rgb(29, 29, 29);
-    color: rgb(156, 156, 156);
-
-    display: flex;
     align-items: center;
+    height: 40px;
+    background: linear-gradient(to bottom, #000, #333);
+    color: #fff;
   }
 
-  #bottom-bar * {
-    margin-left: 0.2rem;
-    margin-right: 0.2rem;
+  #context-status {
+    flex: 1;
+    font-size: 14px;
+    line-height: 40px;
+    padding: 0 20px;
   }
 </style>
