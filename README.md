@@ -3,9 +3,13 @@
 
 # Manter
 
+### Demo on Linux
+
 <p align="center">
   <img src="demo-linux.gif" />
 </p>
+
+### Demo on MacOS
 
 <p align="center">
   <img src="demo-macos.gif" />
