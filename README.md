@@ -3,6 +3,10 @@
 
 # Manter
 
+<p align="center">
+  <img src="example.png" />
+</p>
+
 ### Demo on Linux
 
 <p align="center">
