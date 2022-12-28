@@ -35,7 +35,7 @@
 <style lang="scss">
   :root {
     font-family: monospace;
-    background-color: rgb(221, 0, 0);
+    background-color: black;
   }
 
   main {
