@@ -29,11 +29,11 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 ## Download the installer
 
-[For Linux](https://drive.google.com/file/d/1qneJYlAmYFBPsH_bxNOOh7Er7DMGcoOM/view?usp=share_link)
+[For Linux](https://drive.google.com/file/d/15ioVeRl7rusbwGspZmknpBjkA3-QhE6i/view?usp=share_link)
 
-[For MacOS](https://drive.google.com/file/d/18lpHzOuwMHbOsRSGoZGR7DLD40PsqKTB/view?usp=share_link)
+[For MacOS](https://drive.google.com/file/d/1PAUuK0akVBCv6oUNGmGmt8cDXMoTFnyD/view?usp=share_link)
 
-[For Windows](https://drive.google.com/file/d/17bRX98aD565eKrBIdrB1hiddaEiQixvL/view?usp=share_link)
+[For Windows](https://drive.google.com/file/d/1qKjm0TdSJzXKa0TEGRWemNHgUKqzD9dm/view?usp=share_link)
 
 ## Community
 
