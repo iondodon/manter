@@ -35,14 +35,11 @@
 <style lang="scss">
   :root {
     font-family: monospace;
-    background-color: black;
-    overflow: hidden;
+    background-color: rgb(221, 0, 0);
   }
 
   main {
     height: 100%;
     width: 100%;
-    margin: auto;
-    overflow: hidden;
   }
 </style>

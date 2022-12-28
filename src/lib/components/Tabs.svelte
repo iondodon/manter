@@ -53,7 +53,7 @@
   {#each terminals as terminal, index}
     <li class="tab" id="{terminal['uuid'] === activeTermUUID? 'selected-tab' : ''}" on:click={() => setActive(terminal['uuid'])}>
       <div class="tab-text">Terminal {index}</div>
-      <div class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])}>X</div>
+      <div class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])}>x</div>
     </li>
   {/each}
   <li class="tab" on:click={addNewTerminal}><span>+</span></li>
@@ -68,6 +68,7 @@
     padding: 0;
     background-color: #333;
     color: #fff;
+    background: linear-gradient(to top, #000, #444);
   }
 
   .tab {
@@ -75,17 +76,17 @@
     align-items: center;
     height: 40px;
     padding: 0 20px;
-    border-right: 1px solid #444;
     cursor: pointer;
+    transition: all 1s;
   }
 
   .tab:hover {
-    background: linear-gradient(to top, #000, #444);
+    background: linear-gradient(to top, #000, rgb(18, 76, 103));
     color: #fff;
   }
 
   .tab#selected-tab {
-    background: linear-gradient(to top, #000, #333);
+    background: linear-gradient(to top, #000, rgb(23, 101, 137));
     color: #fff;
   }
 
@@ -107,6 +108,11 @@
     padding: 0 10px;
     border-radius: 4px;
     transition: all 0.2s ease-in-out;
+    visibility: hidden;
+  }
+
+  .tab:hover .close-tab-button {
+    visibility: visible;
   }
 
   .close-tab-button:hover {
