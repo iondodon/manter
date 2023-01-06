@@ -33,7 +33,7 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 [For MacOS](https://drive.google.com/file/d/1AhjXcjD26ZQD9rr9SXyXJiPDKjJszNsU/view?usp=share_link)
 
-[For Windows](https://drive.google.com/file/d/1qKjm0TdSJzXKa0TEGRWemNHgUKqzD9dm/view?usp=share_link)
+[For Windows](https://drive.google.com/file/d/1c8ql1tjq3NnibvRkNBawbfzo49zKs8M6/view?usp=share_link)
 
 ## Community
 
