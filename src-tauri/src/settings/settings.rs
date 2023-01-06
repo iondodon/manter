@@ -41,12 +41,19 @@ pub fn check_settings_file() {
     .create(true)
     .open(settings_file_path);
 
-  let prompt_command_script = r#"{ "cwd": "$(pwd)", "git": { "currentBranch" : "$(git rev-parse --abbrev-ref HEAD 2> /dev/null )" } }"#;
 
   let default_user = whoami::username();
   let mut settings_json_object = Map::new();
   settings_json_object.insert("default_login_user".to_string(), Value::String(default_user));
-  settings_json_object.insert("prompt_command_script".to_string(), Value::String(prompt_command_script.to_string()));
+
+  if cfg!(target_os = "linux") {
+    let prompt_command_script = r#"{ "cwd": "$(pwd)", "git": { "currentBranch" : "$(git rev-parse --abbrev-ref HEAD 2> /dev/null )" } }"#;
+    settings_json_object.insert("prompt_command_script".to_string(), Value::String(prompt_command_script.to_string()));
+  } else if cfg!(target_os = "macos") {
+    let prompt_command_script = r#"{ "cwd": "$(pwd)" }"#;
+    settings_json_object.insert("prompt_command_script".to_string(), Value::String(prompt_command_script.to_string()));
+  }
+  
   let settings_json_object = serde_json::to_string(&settings_json_object).unwrap();
   
   settings_file.unwrap().write_all(settings_json_object.as_bytes()).unwrap();
