@@ -78,6 +78,10 @@ All scripts should be in a json format as presented in the example below.
 }
 ```
 
+## Support
+
+Support this project [on Patreon](patreon.com/user?u=16335094).
+
 ## License
 
 Manter is licensed under the [GPLv3](https://github.com/iondodon/manter/blob/main/LICENCE.txt).
