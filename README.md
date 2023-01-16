@@ -80,7 +80,7 @@ All scripts should be in a json format as presented in the example below.
 
 ## Support
 
-Support this project [on Patreon](https://patreon.com/user?u=16335094).
+You can support this project [on Patreon](https://patreon.com/user?u=16335094).
 
 ## License
 
