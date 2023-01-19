@@ -146,7 +146,10 @@
     }
 
     // TODO: to be used for suggesions
-    const _currentLineText = getTextOnCursorLine()
+    const currentLineText = getTextOnCursorLine()
+    const lineData = {'line': currentLineText}
+    sessionContext = { ...sessionContext, ...lineData }
+    SessionContextStore.update(() => sessionContext)
     
     return true
   }

@@ -38,7 +38,7 @@
   }
 
   const closeTerminal = async (termUUID) => {
-    const isSure = await confirm("Are you sure you want to close this terminal?")
+    const isSure = await confirm("Are you sure you want to close this tab?")
     if(!isSure) {
       return
     } 

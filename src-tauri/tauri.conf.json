@@ -8,7 +8,7 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "manter",
+    "productName": "Manter",
     "version": "0.1.0"
   },
   "tauri": {
@@ -78,7 +78,7 @@
         "height": 600,
         "resizable": true,
         "title": "Manter",
-        "width": 800
+        "width": 1000
       }
     ]
   }
