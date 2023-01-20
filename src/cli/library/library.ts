@@ -1,6 +1,6 @@
 const filesOrFolders = [
     {
-        name: 'file',
+        name: 'file or foler',
         regex: /^.*$/,
         next: () => [...filesOrFolders]
     }
@@ -8,12 +8,12 @@ const filesOrFolders = [
 
 const lsOptions = [
     {
-        name: 'all',
+        name: '-a',
         regex: /^-a$/,
         next: () => [...lsOptions, ...filesOrFolders]
     },
     {
-        name: 'long',
+        name: '-l',
         regex: /^-l$/,
         next: () => [...lsOptions, ...filesOrFolders]
     }

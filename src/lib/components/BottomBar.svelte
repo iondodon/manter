@@ -22,7 +22,7 @@
 
   #context-status {
     flex: 1;
-    font-size: 14px;
+    font-size: 8px;
     line-height: 40px;
     padding: 0 20px;
   }

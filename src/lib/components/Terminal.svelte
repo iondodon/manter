@@ -132,7 +132,7 @@
     return currentLineText
   }
 
-  const suggestNextOptions = (input) => {
+  const getSuggestions = (input) => {
     let suggestions = [...clis];
     let inputArr = input.trim().split(" ");
     let matchedTokens = [];
@@ -177,8 +177,14 @@
     sessionContext = { ...sessionContext, ...lineData }
     SessionContextStore.update(() => sessionContext)
 
-    const suggestions = suggestNextOptions(lineWithoutPrompt)
-    console.log(suggestions)
+    const suggestions = getSuggestions(lineWithoutPrompt)
+
+    // convert suggestions to string
+    let suggestionsStr = suggestions.map((suggestion) => suggestion.name).join(", ")
+    
+    const suggestionsData = {'suggestions': suggestionsStr}
+    sessionContext = { ...sessionContext, ...suggestionsData }
+    SessionContextStore.update(() => sessionContext)
 
     return true
   }
