@@ -146,12 +146,9 @@
                 break;
             }
         }
-        // if (!foundToken) {
-        //     return [];
-        // }
     }
     return suggestions;
-}
+  }
   
   const termInterfaceHandleKeyEvents = (evt) => {
     if (evt.ctrlKey && evt.key === '=') {
@@ -175,7 +172,7 @@
     SessionContextStore.update(() => sessionContext)
 
     const suggestions = getSuggestions(currentLineText)
-  
+
     // convert suggestions to string
     let suggestionsStr = suggestions.map((suggestion) => suggestion.name).join(", ")
     
