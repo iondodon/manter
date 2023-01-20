@@ -8,6 +8,7 @@
   import { onMount } from 'svelte'
   import { SessionContextStore } from '../stores/stores'
   import { BANNER } from '../../banner'
+  import clis  from '../../cli/library/library'
 
   export let sessionContext: any
   export let terminalInterface: Terminal
@@ -130,6 +131,27 @@
     const currentLineText = currentLine.translateToString(true)
     return currentLineText
   }
+
+  const suggestNextOptions = (input) => {
+    let suggestions = [...clis];
+    let inputArr = input.trim().split(" ");
+    let matchedTokens = [];
+    for (let i = 0; i < inputArr.length; i++) {
+        let foundToken = false;
+        for (const option of suggestions) {
+            if (option.regex.test(inputArr[i])) {
+                matchedTokens.push(option.name);
+                suggestions = option.next();
+                foundToken = true;
+                break;
+            }
+        }
+        if (!foundToken) {
+            return [];
+        }
+    }
+    return suggestions;
+}
   
   const termInterfaceHandleKeyEvents = (evt) => {
     if (evt.ctrlKey && evt.key === '=') {
@@ -147,10 +169,17 @@
 
     // TODO: to be used for suggesions
     const currentLineText = getTextOnCursorLine()
-    const lineData = {'line': currentLineText}
+
+    // remove 'ion@acer:~$' from the line
+    const lineWithoutPrompt = currentLineText.replace(/ion@acer:~\$ /g, '')
+
+    const lineData = {'line': lineWithoutPrompt}
     sessionContext = { ...sessionContext, ...lineData }
     SessionContextStore.update(() => sessionContext)
-    
+
+    const suggestions = suggestNextOptions(lineWithoutPrompt)
+    console.log(suggestions)
+
     return true
   }
 
@@ -182,7 +211,6 @@
   }
 
   const writePtyIncomingToTermInterface = (evt) => {
-    console.log(evt)
     if (!(evt.data instanceof ArrayBuffer)) {
       alert('unknown data type ' + evt.data)
       return
