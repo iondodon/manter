@@ -146,9 +146,9 @@
                 break;
             }
         }
-        if (!foundToken) {
-            return [];
-        }
+        // if (!foundToken) {
+        //     return [];
+        // }
     }
     return suggestions;
 }
@@ -170,15 +170,12 @@
     // TODO: to be used for suggesions
     const currentLineText = getTextOnCursorLine()
 
-    // remove 'ion@acer:~$' from the line
-    const lineWithoutPrompt = currentLineText.replace(/ion@acer:~\$ /g, '')
-
-    const lineData = {'line': lineWithoutPrompt}
+    const lineData = {'line': currentLineText}
     sessionContext = { ...sessionContext, ...lineData }
     SessionContextStore.update(() => sessionContext)
 
-    const suggestions = getSuggestions(lineWithoutPrompt)
-
+    const suggestions = getSuggestions(currentLineText)
+  
     // convert suggestions to string
     let suggestionsStr = suggestions.map((suggestion) => suggestion.name).join(", ")
     
