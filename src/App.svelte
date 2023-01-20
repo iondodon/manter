@@ -5,6 +5,7 @@
   import {onMount} from 'svelte'
   import {ActiveTermUUIDStore, TerminalsStore} from './lib/stores/stores'
   import {NIL as NIL_UUID} from 'uuid'
+  import SuggestionsContainer from './lib/components/SuggestionsContainer.svelte';
 
   let terminals = []
   let activeTerminalUUID = NIL_UUID
@@ -27,6 +28,7 @@
         bind:ptyWebSocket={terminal['ptyWebSocket']}
         bind:fitAddon={terminal['fitAddon']}
       />
+      <SuggestionsContainer suggestions={terminal['sessionContext']['suggestions']} />
     {/if}
   {/each}
   <BottomBar/>

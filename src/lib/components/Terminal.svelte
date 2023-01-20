@@ -172,11 +172,8 @@
     SessionContextStore.update(() => sessionContext)
 
     const suggestions = getSuggestions(currentLineText)
-
-    // convert suggestions to string
-    let suggestionsStr = suggestions.map((suggestion) => suggestion.name).join(", ")
     
-    const suggestionsData = {'suggestions': suggestionsStr}
+    const suggestionsData = {'suggestions': suggestions}
     sessionContext = { ...sessionContext, ...suggestionsData }
     SessionContextStore.update(() => sessionContext)
 

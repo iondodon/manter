@@ -8,10 +8,11 @@ export const TerminalsStore = writable([
     uuid: FIRST_TERM_UUID,
     sessionContext: {
       user: "",
+      suggestions: []
     },
     terminalInterface: null,
     ptyWebSocket: null,
-    fitAddon: null,
+    fitAddon: null
   },
 ]);
 
