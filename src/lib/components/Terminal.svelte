@@ -8,7 +8,7 @@
   import { onMount } from 'svelte'
   import { SessionContextStore } from '../stores/stores'
   import { BANNER } from '../../banner'
-  import clis  from '../../cli/library/library'
+  import getSuggestions from '../../suggestions/suggestions';
 
   export let sessionContext: any
   export let terminalInterface: Terminal
@@ -130,52 +130,6 @@
     const currentLine = terminalInterface.buffer.active.getLine(lineIndex)
     const currentLineText = currentLine.translateToString(true)
     return currentLineText
-  }
-
-  const getSuggestions = (input) => {
-    let next: any = [clis];
-    let words = input.trim().split(" ");
-    
-    for (const word of words) {
-
-      let found = false
-      for (const item of next) {
-
-        if (item.suggestions) {
-          // in a group
-          for (const suggestion of item.suggestions) {
-            if (suggestion.regex.test(word)) {
-              if (suggestion.next)
-                next = suggestion.next()
-              else if(item.next) 
-                next = item.next()
-              else next = []
-              found = true
-              break
-            }
-          }
-        } else if (item.regex) {
-          // single suggestion
-          const suggestion = item
-          if (suggestion.regex.test(word)) {
-            if (suggestion.next)
-              next = suggestion.next()
-            else next = []
-            found = true
-            break
-          }
-        } else {
-          console.log("yoklmn")
-        }
-
-        if (found) {
-          break
-        }
-      }
-
-    }
-
-    return next;
   }
   
   const termInterfaceHandleKeyEvents = (evt) => {
