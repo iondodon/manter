@@ -142,17 +142,25 @@
       for (const item of next) {
 
         if (item.suggestions) {
+          // in a group
           for (const suggestion of item.suggestions) {
             if (suggestion.regex.test(word)) {
-              next = suggestion.next()
+              if (suggestion.next)
+                next = suggestion.next()
+              else if(item.next) 
+                next = item.next()
+              else next = []
               found = true
               break
             }
           }
         } else if (item.regex) {
+          // single suggestion
           const suggestion = item
           if (suggestion.regex.test(word)) {
-            next = suggestion.next()
+            if (suggestion.next)
+              next = suggestion.next()
+            else next = []
             found = true
             break
           }

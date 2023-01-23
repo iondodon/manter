@@ -1,4 +1,4 @@
-import type { Suggestion } from "./contract"
+import type { Group, Suggestion } from "./contract"
 
 const filesOrFolders: Suggestion = {
   name: 'file or foler',
@@ -7,22 +7,21 @@ const filesOrFolders: Suggestion = {
 }
 
 
-const lsOptions = {
+const lsOptions: Group = {
   suggestions: [
     {
       name: '-a',
-      regex: /^-a$/,
-      next: () => [lsOptions, filesOrFolders]
+      regex: /^-a$/
     },
     {
       name: '-l',
-      regex: /^-l$/,
-      next: () => [lsOptions, filesOrFolders]
+      regex: /^-l$/
     }
-  ]
+  ],
+  next: () => [lsOptions, filesOrFolders]
 }
 
-const clis = {
+const clis: Group = {
   suggestions: [
     {
       name: 'ls',
