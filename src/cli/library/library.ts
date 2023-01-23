@@ -1,30 +1,35 @@
-const filesOrFolders = [
-    {
-        name: 'file or foler',
-        regex: /^.*$/,
-        next: () => [...filesOrFolders]
-    }
-]
+import type { Suggestion } from "./contract"
 
-const lsOptions = [
+const filesOrFolders: Suggestion = {
+  name: 'file or foler',
+  regex: /^.*$/,
+  next: () => [filesOrFolders]
+}
+
+
+const lsOptions = {
+  suggestions: [
     {
-        name: '-a',
-        regex: /^-a$/,
-        next: () => [...lsOptions, ...filesOrFolders]
+      name: '-a',
+      regex: /^-a$/,
+      next: () => [lsOptions, filesOrFolders]
     },
     {
-        name: '-l',
-        regex: /^-l$/,
-        next: () => [...lsOptions, ...filesOrFolders]
+      name: '-l',
+      regex: /^-l$/,
+      next: () => [lsOptions, filesOrFolders]
     }
-]
+  ]
+}
 
-const clis = [
+const clis = {
+  suggestions: [
     {
-        name: 'ls',
-        regex: /^ls$/,
-        next: () => [...lsOptions, ...filesOrFolders]
+      name: 'ls',
+      regex: /^ls$/,
+      next: () => [lsOptions, filesOrFolders]
     }
-]
+  ]
+}
 
 export default clis

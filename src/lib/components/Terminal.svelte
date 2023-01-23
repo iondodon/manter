@@ -133,21 +133,41 @@
   }
 
   const getSuggestions = (input) => {
-    let suggestions = [...clis];
-    let inputArr = input.trim().split(" ");
-    let matchedTokens = [];
-    for (let i = 0; i < inputArr.length; i++) {
-        let foundToken = false;
-        for (const option of suggestions) {
-            if (option.regex.test(inputArr[i])) {
-                matchedTokens.push(option.name);
-                suggestions = option.next();
-                foundToken = true;
-                break;
+    let next: any = [clis];
+    let words = input.trim().split(" ");
+    
+    for (const word of words) {
+
+      let found = false
+      for (const item of next) {
+
+        if (item.suggestions) {
+          for (const suggestion of item.suggestions) {
+            if (suggestion.regex.test(word)) {
+              next = suggestion.next()
+              found = true
+              break
             }
+          }
+        } else if (item.regex) {
+          const suggestion = item
+          if (suggestion.regex.test(word)) {
+            next = suggestion.next()
+            found = true
+            break
+          }
+        } else {
+          console.log("yoklmn")
         }
+
+        if (found) {
+          break
+        }
+      }
+
     }
-    return suggestions;
+
+    return next;
   }
   
   const termInterfaceHandleKeyEvents = (evt) => {

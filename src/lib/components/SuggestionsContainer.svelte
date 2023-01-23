@@ -4,7 +4,7 @@
 
 <ol id="suggestions-container">
     {#each suggestions as suggestion}
-        <li>{suggestion['name']}</li>
+        <li>{JSON.stringify(suggestion)}</li>
     {/each}
 </ol>
 

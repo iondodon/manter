@@ -14,7 +14,8 @@
       terminals.push({
         uuid: NEW_TERM_UUID,
         sessionContext: {
-          user: ""
+          user: "",
+          suggestions: []
         },
         terminalInterface: null,
         ptyWebSocket: null,
