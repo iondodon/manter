@@ -1,12 +1,14 @@
 <script lang="ts">
-  import {ActiveTermUUIDStore, TerminalsStore} from '../stores/stores'
+  import {ActiveTermUUIDStore, SessionContextStore, TerminalsStore} from '../stores/stores'
   import {NIL as NIL_UUID, v4 as uuidv4} from 'uuid'
 
   let terminals = []
   let activeTermUUID = NIL_UUID
+  let sessionContext = {}
 
   TerminalsStore.subscribe(updatedTerminals => terminals = updatedTerminals)
   ActiveTermUUIDStore.subscribe(updatedActiveTerminalUUID => activeTermUUID = updatedActiveTerminalUUID)
+  SessionContextStore.subscribe(newSessionContext => sessionContext = newSessionContext)
 
   const addNewTerminal = () => {
     const NEW_TERM_UUID = uuidv4()
@@ -28,7 +30,12 @@
     setActive(NEW_TERM_UUID)
   }
 
-  const setActive = (newActiveTermUUID) => ActiveTermUUIDStore.update(_prevActiveTermUUID => newActiveTermUUID)
+  const setActive = (newActiveTermUUID) => {
+    ActiveTermUUIDStore.update(_prevActiveTermUUID => newActiveTermUUID)
+
+    const newActiveTerm = getTerminalByUuid(newActiveTermUUID)
+    SessionContextStore.update(_prevSessionContext => newActiveTerm['sessionContext'])
+  }
 
   const getTerminalByUuid = (termUuid) => {
     for (const term of terminals) {
