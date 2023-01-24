@@ -15,7 +15,8 @@
         uuid: NEW_TERM_UUID,
         sessionContext: {
           user: "",
-          suggestions: []
+          suggestions: [],
+          scriptResult: {}
         },
         terminalInterface: null,
         ptyWebSocket: null,

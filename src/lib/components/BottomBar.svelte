@@ -7,7 +7,7 @@
 
 <div id="bottom-bar">
   <div id="context-status">
-    {JSON.stringify(sessionContext)}
+    {JSON.stringify(sessionContext['scriptResult'])}
   </div>
 </div>
 
