@@ -9,11 +9,12 @@ export const TerminalsStore = writable([
     sessionContext: {
       user: "",
       suggestions: [],
-      scriptResult: {}
+      scriptResult: {},
+      suggestionsContainer: null,
     },
     terminalInterface: null,
     ptyWebSocket: null,
-    fitAddon: null
+    fitAddon: null,
   },
 ]);
 

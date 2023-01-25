@@ -9,8 +9,9 @@
   import { SessionContextStore } from '../stores/stores'
   import { BANNER } from '../../banner'
   import getSuggestions from '../../suggestions/suggestions';
+  import SuggestionsContainer from './SuggestionsContainer.svelte';
 
-  export let sessionContext: any
+  export let sessionContext: object
   export let terminalInterface: Terminal
   export let ptyWebSocket: WebSocket
   export let fitAddon: FitAddon
@@ -146,20 +147,17 @@
       return false
     }
 
-    // TODO: to be used for suggesions
     const currentLineText = getTextOnCursorLine()
-
-    const lineData = {'line': currentLineText}
-    sessionContext = { ...sessionContext, ...lineData }
-    SessionContextStore.update(() => sessionContext)
-
     const suggestions = getSuggestions(currentLineText)
-    
-    const suggestionsData = {'suggestions': suggestions}
-    sessionContext = { ...sessionContext, ...suggestionsData }
+    sessionContext['suggestions'] = suggestions
     SessionContextStore.update(() => sessionContext)
 
     return true
+  }
+
+  const termInterfaceHandleCursorMove = () => {
+    console.log(sessionContext['suggestionsContainer'])
+    sessionContext['suggestionsContainer'].update()
   }
 
   const setupNewTerminalInterface = () => {
@@ -180,7 +178,7 @@
     addEventListener('resize', (_event) => adjustDomTerminalElementSize())
     terminalInterface.onResize((evt) => termInterfaceHandleResize(evt))
     terminalInterface.onData((data) => termInterfaceHandleUserInputData(data))
-    terminalInterface.onCursorMove(() => {})
+    terminalInterface.onCursorMove(() => termInterfaceHandleCursorMove())
     terminalInterface.buffer.onBufferChange((_buff) => {})
     terminalInterface.onTitleChange((title) =>
       termInterfaceHandleTitleChange(title)
@@ -229,6 +227,10 @@
 </script>
 
 <div id="terminal" />
+<SuggestionsContainer
+  bind:this={sessionContext['suggestionsContainer']} 
+  suggestions={sessionContext['suggestions']} 
+/>
 
 <style lang="scss">
   #terminal {

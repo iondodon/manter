@@ -18,7 +18,8 @@
         sessionContext: {
           user: "",
           suggestions: [],
-          scriptResult: {}
+          scriptResult: {},
+          suggestionsContainer: null
         },
         terminalInterface: null,
         ptyWebSocket: null,
