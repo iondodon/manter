@@ -20,7 +20,7 @@
     openDomTerminalInterface()
 
     if (sessionContext && sessionContext['suggestionsContainer']) {
-      sessionContext['suggestionsContainer'].update()
+      sessionContext['suggestionsContainer'].init()
     }
 
     if (IS_UNIX) {
