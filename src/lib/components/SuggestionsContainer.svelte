@@ -1,7 +1,14 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   export let suggestions: object[]  = [];
 
   const DISTANCE_FROM_CURSOR_PX = 5
+
+  export const init = () => {
+    const suggestionsContainerElement = document.getElementById('suggestions-container')
+    suggestionsContainerElement.style.display = 'none'
+  }
 
   export const update = () => {
     const suggestionsContainerElement = document.getElementById('suggestions-container')

@@ -18,6 +18,11 @@
 
   onMount(() => {
     openDomTerminalInterface()
+
+    if (sessionContext && sessionContext['suggestionsContainer']) {
+      sessionContext['suggestionsContainer'].update()
+    }
+
     if (IS_UNIX) {
       setUser()
     }
