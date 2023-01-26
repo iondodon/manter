@@ -156,7 +156,6 @@
   }
 
   const termInterfaceHandleCursorMove = () => {
-    console.log(sessionContext['suggestionsContainer'])
     sessionContext['suggestionsContainer'].update()
   }
 
