@@ -138,7 +138,15 @@ async fn accept_connection(stream: TcpStream) {
     // CommandBuilder::new(r"C:\Program Files\Git\bin\bash.exe")
     // CommandBuilder::new(r"ubuntu.exe") // if WSL is active
     // on UI the user should have the option to choose
-    CommandBuilder::new(r"cmd")
+
+    let mut cmd  = CommandBuilder::new(r"cmd");
+
+    // this is needed only for cmd.exe
+    // because the prompt does not have an empty space at the end
+    // the prompt should be sepratared from the command being typed, for command parsing
+    cmd.env("PROMPT", "$P$G ");
+
+    cmd
   } else {
     let settings = get_settings();
     let user = settings.get("default_login_user").unwrap();

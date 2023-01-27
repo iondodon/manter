@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { IBufferLine, Terminal } from 'xterm'
+  import { Terminal } from 'xterm'
   import { FitAddon } from 'xterm-addon-fit'
   import 'xterm/css/xterm.css'
-  import { IS_MACINTOSH, IS_UNIX, PTY_WS_ADDRESS } from '../config/config'
+  import { IS_MACINTOSH, IS_UNIX, IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString } from '../utils/utils'
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
@@ -18,10 +18,6 @@
 
   onMount(() => {
     openDomTerminalInterface()
-
-    if (sessionContext && sessionContext['suggestionsContainer']) {
-      sessionContext['suggestionsContainer'].init()
-    }
 
     if (IS_UNIX) {
       setUser()
@@ -184,9 +180,11 @@
     terminalInterface.onData((data) => termInterfaceHandleUserInputData(data))
     terminalInterface.onCursorMove(() => termInterfaceHandleCursorMove())
     terminalInterface.buffer.onBufferChange((_buff) => {})
-    terminalInterface.onTitleChange((title) =>
-      termInterfaceHandleTitleChange(title)
-    )
+    terminalInterface.onTitleChange((title) =>termInterfaceHandleTitleChange(title))
+
+    if (IS_WINDOWS) {
+      terminalInterface.options.windowsMode = true
+    }
 
     displayWelcomePage()
   }

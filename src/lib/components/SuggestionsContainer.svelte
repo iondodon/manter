@@ -5,11 +5,6 @@
 
   const DISTANCE_FROM_CURSOR_PX = 5
 
-  export const init = () => {
-    const suggestionsContainerElement = document.getElementById('suggestions-container')
-    suggestionsContainerElement.style.display = 'none'
-  }
-
   export const update = () => {
     const suggestionsContainerElement = document.getElementById('suggestions-container')
     
@@ -48,8 +43,7 @@
 <style lang="scss">
   #suggestions-container {
     position: absolute;
-    top: 0;
-    right: 0;
+    display: none;
     width: 300px;
     background-color: rgb(160, 32, 32);
     border: 1px solid rgb(92, 24, 24);
