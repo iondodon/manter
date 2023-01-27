@@ -153,11 +153,13 @@
     sessionContext['suggestions'] = suggestions
     SessionContextStore.update(() => sessionContext)
 
+    sessionContext['suggestionsContainer'].update()
+
     return true
   }
 
   const termInterfaceHandleCursorMove = () => {
-    sessionContext['suggestionsContainer'].update()
+    
   }
 
   const setupNewTerminalInterface = () => {

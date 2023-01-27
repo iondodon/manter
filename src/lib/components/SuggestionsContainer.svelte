@@ -24,13 +24,13 @@
     const suggestionsContainerHeight = suggestionsContainerElement.clientHeight
     const suggestionsContainerWidth = suggestionsContainerElement.clientWidth
 
-    if (cursorRect.bottom + suggestionsContainerHeight + 20 > window.innerHeight) {
+    if (cursorRect.bottom + suggestionsContainerHeight > window.innerHeight) {
       suggestionsContainerElement.style.top = `${cursorRect.top - suggestionsContainerHeight - DISTANCE_FROM_CURSOR_PX}px`
     } else {
       suggestionsContainerElement.style.top = `${cursorRect.bottom + DISTANCE_FROM_CURSOR_PX}px`
     }
     
-    if (cursorRect.right + suggestionsContainerWidth + 20 > window.innerWidth) {
+    if (cursorRect.right + suggestionsContainerWidth > window.innerWidth) {
       suggestionsContainerElement.style.left = `${cursorRect.left - suggestionsContainerWidth - DISTANCE_FROM_CURSOR_PX}px`
     } else {
       suggestionsContainerElement.style.left = `${cursorRect.right + DISTANCE_FROM_CURSOR_PX}px`
