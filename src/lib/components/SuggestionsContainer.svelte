@@ -1,8 +1,7 @@
 <script lang="ts">
-  import type { Group, Suggestion } from 'src/cli/library/contract';
   import clis from '../../cli/library/library'
 
-  export let suggestions: (Group | Suggestion)[] = []
+  export let suggestions = []
 
   const DISTANCE_FROM_CURSOR_PX = 5
 
@@ -25,13 +24,13 @@
     const suggestionsContainerHeight = suggestionsContainerElement.clientHeight
     const suggestionsContainerWidth = suggestionsContainerElement.clientWidth
 
-    if (cursorRect.bottom + suggestionsContainerHeight > window.innerHeight) {
+    if (cursorRect.bottom + suggestionsContainerHeight + 20 > window.innerHeight) {
       suggestionsContainerElement.style.top = `${cursorRect.top - suggestionsContainerHeight - DISTANCE_FROM_CURSOR_PX}px`
     } else {
       suggestionsContainerElement.style.top = `${cursorRect.bottom + DISTANCE_FROM_CURSOR_PX}px`
     }
     
-    if (cursorRect.right + suggestionsContainerWidth > window.innerWidth) {
+    if (cursorRect.right + suggestionsContainerWidth + 20 > window.innerWidth) {
       suggestionsContainerElement.style.left = `${cursorRect.left - suggestionsContainerWidth - DISTANCE_FROM_CURSOR_PX}px`
     } else {
       suggestionsContainerElement.style.left = `${cursorRect.right + DISTANCE_FROM_CURSOR_PX}px`
@@ -42,7 +41,21 @@
 {#if suggestions.length > 0 && suggestions[0] !== clis}
   <ol id="suggestions-container">
     {#each suggestions as suggestion}
-      <li>{JSON.stringify(suggestion)}</li>
+      {#if suggestion.suggestions}
+        <li>
+          <ol class="suggestions-group">
+            {#each suggestion.suggestions as subSuggestion}
+              <li class="suggestion">
+                <span>{subSuggestion.name}</span>
+              </li>
+            {/each}
+          </ol>
+        </li>
+      {:else}
+        <li class="suggestion">
+          <span>{suggestion.name}</span>
+        </li>
+      {/if}
     {/each}
   </ol>
 {/if}
@@ -51,9 +64,19 @@
   #suggestions-container {
     position: absolute;
     display: none;
-    width: 300px;
+    max-width: 300px;
     background-color: rgb(160, 32, 32);
     border: 1px solid rgb(92, 24, 24);
     list-style: none;
+  }
+
+  .suggestions-group {
+    list-style: none;
+    color: aqua;
+  }
+
+  .suggestion {
+    cursor: pointer;
+    border: 1px solid rgb(92, 24, 24);
   }
 </style>

@@ -1,7 +1,7 @@
 import type { Group, Suggestion } from "./contract"
 
 const filesOrFolders: Suggestion = {
-  name: 'file or foler',
+  name: 'file or folder',
   regex: /^.*$/,
   next: () => [filesOrFolders]
 }
