@@ -1,12 +1,17 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import type { Group, Suggestion } from 'src/cli/library/contract';
+  import clis from '../../cli/library/library'
 
-  export let suggestions: object[]  = [];
+  export let suggestions: (Group | Suggestion)[] = []
 
   const DISTANCE_FROM_CURSOR_PX = 5
 
   export const update = () => {
     const suggestionsContainerElement = document.getElementById('suggestions-container')
+
+    if (!suggestionsContainerElement) {
+      return
+    }
     
     if (false) { // TODO: special cases
       suggestionsContainerElement.style.display = 'none'
@@ -34,11 +39,13 @@
   }
 </script>
 
-<ol id="suggestions-container">
-  {#each suggestions as suggestion}
-    <li>{JSON.stringify(suggestion)}</li>
-  {/each}
-</ol>
+{#if suggestions.length > 0 && suggestions[0] !== clis}
+  <ol id="suggestions-container">
+    {#each suggestions as suggestion}
+      <li>{JSON.stringify(suggestion)}</li>
+    {/each}
+  </ol>
+{/if}
 
 <style lang="scss">
   #suggestions-container {
