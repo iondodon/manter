@@ -152,10 +152,10 @@
       return false
     }
 
-    const currentLineText = getTextOnCursorLine()
-    const suggestions = getSuggestions(currentLineText)
+    const lineText = getTextOnCursorLine()
+    const suggestions = getSuggestions(lineText)
     sessionContext['suggestions'] = suggestions
-    sessionContext['currentLineText'] = currentLineText
+    sessionContext['lineText'] = lineText
     SessionContextStore.update((_prevSessionContext) => sessionContext)
 
     return true
@@ -237,7 +237,7 @@
 <SuggestionsContainer
   bind:this={sessionContext['suggestionsContainer']} 
   suggestions={sessionContext['suggestions']}
-  currentLineText={sessionContext['currentLineText']}
+  lineText={sessionContext['lineText']}
 />
 
 <style lang="scss">
