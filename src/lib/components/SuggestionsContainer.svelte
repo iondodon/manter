@@ -3,6 +3,7 @@
   import clis from '../../cli/library/library'
 
   export let suggestions = []
+  export let currentLineText = ''
 
   afterUpdate(() => {
     updateDisplyMode()
@@ -43,7 +44,7 @@
   }
 </script>
 
-{#if suggestions.length > 0 && suggestions[0] !== clis}
+{#if suggestions.length > 0 && suggestions[0] !== clis && currentLineText.endsWith(' ')}
   <ol id="suggestions-container">
     {#each suggestions as suggestion}
       {#if suggestion.suggestions}

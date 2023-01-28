@@ -128,7 +128,7 @@
     let lineIndex = terminalInterface.buffer.active.cursorY + scrolledRows
     let line = terminalInterface.buffer.active.getLine(lineIndex)
     let text = line.translateToString(true)
-    
+
     while (line.isWrapped) {
       line = terminalInterface.buffer.active.getLine(--lineIndex)
       const currentLineText = line.translateToString(true)
@@ -155,7 +155,8 @@
     const currentLineText = getTextOnCursorLine()
     const suggestions = getSuggestions(currentLineText)
     sessionContext['suggestions'] = suggestions
-    SessionContextStore.update(() => sessionContext)
+    sessionContext['currentLineText'] = currentLineText
+    SessionContextStore.update((_prevSessionContext) => sessionContext)
 
     return true
   }
@@ -235,7 +236,8 @@
 <div id="terminal" />
 <SuggestionsContainer
   bind:this={sessionContext['suggestionsContainer']} 
-  suggestions={sessionContext['suggestions']} 
+  suggestions={sessionContext['suggestions']}
+  currentLineText={sessionContext['currentLineText']}
 />
 
 <style lang="scss">
