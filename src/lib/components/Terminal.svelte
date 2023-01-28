@@ -153,8 +153,6 @@
     sessionContext['suggestions'] = suggestions
     SessionContextStore.update(() => sessionContext)
 
-    sessionContext['suggestionsContainer'].update()
-
     return true
   }
 

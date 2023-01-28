@@ -1,11 +1,16 @@
 <script lang="ts">
+  import { afterUpdate, beforeUpdate, onMount } from 'svelte';
   import clis from '../../cli/library/library'
 
   export let suggestions = []
 
+  afterUpdate(() => {
+    updateDisplyMode()
+  })
+
   const DISTANCE_FROM_CURSOR_PX = 5
 
-  export const update = () => {
+  export const updateDisplyMode = () => {
     const suggestionsContainerElement = document.getElementById('suggestions-container')
 
     if (!suggestionsContainerElement) {
