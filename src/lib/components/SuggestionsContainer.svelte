@@ -6,6 +6,7 @@
   export let lineText = ''
 
   afterUpdate(() => {
+    console.log('afterUpdate')
     updateDisplyMode()
   })
 
@@ -25,6 +26,11 @@
     suggestionsContainerElement.style.display = 'block'
 
     const cursorElement = document.getElementsByClassName('xterm-helper-textarea')[0]
+
+    if (!cursorElement) {
+      return
+    }
+
     const cursorRect = cursorElement.getBoundingClientRect()
   
     const suggestionsContainerHeight = suggestionsContainerElement.clientHeight
