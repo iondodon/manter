@@ -2,7 +2,7 @@
 
 const getSuggestions = (input) => {
     let next: any = [clis];
-    let words = input.trim().split(" ");
+    let words = input.trim().split(" ").filter(word => word.length > 0)
     
     for (const word of words) {
 

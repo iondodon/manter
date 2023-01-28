@@ -59,12 +59,8 @@
     const terminalHeight = terminal.clientHeight
     const terminalWidth = terminal.clientWidth
 
-    const xtermElement = document.getElementsByClassName(
-      'xterm'
-    )[0] as HTMLElement
-    const xtermViewPortElement = document.getElementsByClassName(
-      'xterm-viewport'
-    )[0] as HTMLElement
+    const xtermElement = document.getElementsByClassName('xterm')[0] as HTMLElement
+    const xtermViewPortElement = document.getElementsByClassName('xterm-viewport')[0] as HTMLElement
 
     xtermElement.style.height = `${terminalHeight}px`
     xtermElement.style.width = `${terminalWidth}px`
@@ -128,10 +124,18 @@
   const getTextOnCursorLine = () => {
     // @ts-ignore
     const scrolledRows = terminalInterface.buffer.active._buffer.ydisp
-    const lineIndex = terminalInterface.buffer.active.cursorY + scrolledRows
-    const currentLine = terminalInterface.buffer.active.getLine(lineIndex)
-    const currentLineText = currentLine.translateToString(true)
-    return currentLineText
+
+    let lineIndex = terminalInterface.buffer.active.cursorY + scrolledRows
+    let line = terminalInterface.buffer.active.getLine(lineIndex)
+    let text = line.translateToString(true)
+    
+    while (line.isWrapped) {
+      line = terminalInterface.buffer.active.getLine(--lineIndex)
+      const currentLineText = line.translateToString(true)
+      text = currentLineText + text
+    }
+
+    return text
   }
   
   const termInterfaceHandleKeyEvents = (evt) => {

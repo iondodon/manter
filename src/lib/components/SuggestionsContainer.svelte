@@ -10,7 +10,7 @@
 
   const DISTANCE_FROM_CURSOR_PX = 5
 
-  export const updateDisplyMode = () => {
+  const updateDisplyMode = () => {
     const suggestionsContainerElement = document.getElementById('suggestions-container')
 
     if (!suggestionsContainerElement) {
