@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { afterUpdate, beforeUpdate, onMount } from 'svelte';
+  import { afterUpdate } from 'svelte';
   import clis from '../../cli/library/library'
 
   export let suggestions = []
   export let lineText = ''
 
   afterUpdate(() => {
-    console.log('afterUpdate')
     updateDisplyMode()
   })
 

@@ -127,7 +127,7 @@
 
     let lineIndex = terminalInterface.buffer.active.cursorY + scrolledRows
     let line = terminalInterface.buffer.active.getLine(lineIndex)
-    let text = line.translateToString(true)
+    let text = line.translateToString(true, 0, terminalInterface.buffer.active.cursorX)
 
     while (line.isWrapped) {
       line = terminalInterface.buffer.active.getLine(--lineIndex)
