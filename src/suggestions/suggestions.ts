@@ -2,14 +2,12 @@ import clis from "../cli/library/library";
 import { getByScript } from "../suggestions/GetByScript";
 
 export const resolveDynamicGroups = async (suggestions, sessionContext) => {
-  const resolved = [];
   for (const suggestion of suggestions) {
     if (suggestion.script) {
       const dynamicSuggestions = await getByScript(suggestion, sessionContext);
       suggestion["suggestions"] = dynamicSuggestions;
     }
   }
-  return resolved;
 };
 
 export const getSuggestions = (sessionContext) => {
