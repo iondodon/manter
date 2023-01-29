@@ -8,7 +8,7 @@
   import { onMount } from 'svelte'
   import { SessionContextStore } from '../stores/stores'
   import { BANNER } from '../../banner'
-  import getSuggestions from '../../suggestions/suggestions';
+  import { getSuggestions } from '../../suggestions/suggestions';
   import SuggestionsContainer from './SuggestionsContainer.svelte';
 
   export let sessionContext: object
@@ -121,7 +121,7 @@
     }
   }
 
-  const getTextOnCursorLine = () => {
+  const getTypedText = () => {
     // @ts-ignore
     const scrolledRows = terminalInterface.buffer.active._buffer.ydisp
 
@@ -152,10 +152,12 @@
       return false
     }
 
-    const lineText = getTextOnCursorLine()
-    const suggestions = getSuggestions(lineText)
-    sessionContext['suggestions'] = suggestions
+    const lineText = getTypedText()
     sessionContext['lineText'] = lineText
+    SessionContextStore.update((_prevSessionContext) => sessionContext)
+
+    const suggestions = getSuggestions(sessionContext)
+    sessionContext['suggestions'] = suggestions
     SessionContextStore.update((_prevSessionContext) => sessionContext)
 
     return true
@@ -238,6 +240,7 @@
   bind:this={sessionContext['suggestionsContainer']} 
   suggestions={sessionContext['suggestions']}
   lineText={sessionContext['lineText']}
+  sessionContext={sessionContext}
 />
 
 <style lang="scss">

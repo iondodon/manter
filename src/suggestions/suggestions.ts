@@ -1,49 +1,55 @@
-  import clis  from '../cli/library/library'
+import clis from "../cli/library/library";
+import { getByScript } from "../suggestions/GetByScript";
 
-const getSuggestions = (input) => {
-    let next: any = [clis];
-    let words = input.trim().split(" ").filter(word => word.length > 0)
-    
-    for (const word of words) {
+export const resolveDynamicGroups = async (suggestions, sessionContext) => {
+  const resolved = [];
+  for (const suggestion of suggestions) {
+    if (suggestion.script) {
+      const dynamicSuggestions = await getByScript(suggestion, sessionContext);
+      suggestion["suggestions"] = dynamicSuggestions;
+    }
+  }
+  return resolved;
+};
 
-      let found = false
-      for (const item of next) {
+export const getSuggestions = (sessionContext) => {
+  let next: any = [clis];
+  let words = sessionContext["lineText"]
+    .trim()
+    .split(" ")
+    .filter((word) => word.length > 0);
 
-        if (item.suggestions) {
-          // in a group
-          for (const suggestion of item.suggestions) {
-            if (suggestion.regex.test(word)) {
-              if (suggestion.next)
-                next = suggestion.next()
-              else if(item.next) 
-                next = item.next()
-              else next = []
-              found = true
-              break
-            }
-          }
-        } else if (item.regex) {
-          // single suggestion
-          const suggestion = item
+  for (const word of words) {
+    let found = false;
+    for (const item of next) {
+      if (item.suggestions) {
+        for (const suggestion of item.suggestions) {
           if (suggestion.regex.test(word)) {
-            if (suggestion.next)
-              next = suggestion.next()
-            else next = []
-            found = true
-            break
+            if (suggestion.next) next = suggestion.next();
+            else if (item.next) next = item.next();
+            else next = [];
+            found = true;
+            break;
           }
-        } else {
-          console.log("yoklmn")
         }
-
-        if (found) {
-          break
+      } else if (item.regex) {
+        // single suggestion
+        const suggestion = item;
+        if (suggestion.regex.test(word)) {
+          if (suggestion.next) next = suggestion.next();
+          else next = [];
+          found = true;
+          break;
         }
+      } else {
+        console.log("yoklmn");
       }
 
+      if (found) {
+        break;
+      }
     }
-
-    return next;
   }
 
-  export default getSuggestions
+  return next;
+};

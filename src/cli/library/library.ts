@@ -1,34 +1,70 @@
-import type { Group, Suggestion } from "./contract"
+import type { DynamicGroup, Group, Suggestion } from "./contract";
 
 const filesOrFolders: Suggestion = {
-  name: 'file or folder',
+  name: "file or folder",
   regex: /^.*$/,
-  next: () => [filesOrFolders]
-}
-
+  next: () => [filesOrFolders],
+};
 
 const lsOptions: Group = {
   suggestions: [
     {
-      name: '-a',
-      regex: /^-a$/
+      name: "-a",
+      regex: /^-a$/,
     },
     {
-      name: '-l',
-      regex: /^-l$/
-    }
+      name: "-l",
+      regex: /^-l$/,
+    },
   ],
-  next: () => [lsOptions, filesOrFolders]
-}
+  next: () => [lsOptions, filesOrFolders],
+};
+
+const cdFolders: DynamicGroup = {
+  suggestions: [
+    {
+      name: "folder",
+      regex: /^.*$/,
+      next: () => [cdFolders],
+    },
+  ],
+  script: "ls -d */",
+  postProcessor: (line) => {
+    return {
+      name: line,
+      regex: new RegExp("^" + line + "$"),
+      next: () => [cdFolders],
+    };
+  },
+};
+
+const cdOptions: Group = {
+  suggestions: [
+    {
+      name: "-a",
+      regex: /^-a$/,
+    },
+    {
+      name: "-l",
+      regex: /^-l$/,
+    },
+  ],
+  next: () => [cdOptions, cdFolders],
+};
 
 const clis: Group = {
   suggestions: [
     {
-      name: 'ls',
+      name: "ls",
       regex: /^ls$/,
-      next: () => [lsOptions, filesOrFolders]
-    }
-  ]
-}
+      next: () => [lsOptions, filesOrFolders],
+    },
+    {
+      name: "cd",
+      regex: /^cd$/,
+      next: () => [cdOptions, cdFolders],
+    },
+  ],
+};
 
-export default clis
+export default clis;

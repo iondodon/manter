@@ -1,11 +1,14 @@
 <script lang="ts">
+  import { resolveDynamicGroups }  from '../../suggestions/suggestions';
   import { afterUpdate } from 'svelte';
   import clis from '../../cli/library/library'
 
   export let suggestions = []
   export let lineText = ''
+  export let sessionContext: object
 
-  afterUpdate(() => {
+  afterUpdate(async () => {
+    await resolveDynamicGroups(suggestions, sessionContext)
     updateDisplyMode()
   })
 
