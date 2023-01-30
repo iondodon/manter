@@ -2,13 +2,16 @@
   import { resolveDynamicGroups }  from '../../suggestions/suggestions';
   import { afterUpdate } from 'svelte';
   import clis from '../../cli/library/library'
+  import { IS_UNIX } from '../config/config';
 
   export let suggestions = []
   export let lineText = ''
   export let sessionContext: object
 
   afterUpdate(async () => {
-    await resolveDynamicGroups(suggestions, sessionContext)
+    if (IS_UNIX) {
+      await resolveDynamicGroups(suggestions, sessionContext)
+    }
     updateDisplyMode()
   })
 
@@ -90,11 +93,10 @@
 
   .suggestions-group {
     list-style: none;
-    color: aqua;
   }
 
   .suggestion {
-    cursor: pointer;
     border: 1px solid rgb(74, 74, 74);
+    color: bisque;
   }
 </style>
