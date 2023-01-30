@@ -51,18 +51,29 @@ Build the installer with `npm run tauri build`.
 
 The installer that has been built will be for the operating system that you are using. The terminal can be built for Linux, MacOS and Windows.
 
-## PROMPT_COMMAND script
+## user_scripts
 
-This script is run every time the prompt appears and is used to display information in the bottom bar.
+The scripts are executed each time the prompt appears and they are used to display information in the bottom bar.
 
-The script should be placed in the `~/.manter.json` file with the `prompt_command_script` key. On Windows, the file is located in `C:\Users\{username}\.manter.json`. On MacOS, the file is located in `/Users/{username}/.manter.json`. On Linux, the file is located in `/home/{username}/.manter.json`.
+The scripts should be placed in the `~/.manter.json` file under the `user_scripts` key.
 
-All scripts should be in a json format as presented in the example below.
+`.manter.json` location:
+
+- On Windows - `C:\Users\{username}\.manter.json`
+- On MacOS - `/Users/{username}/.manter.json`
+- On Linux - `/home/{username}/.manter.json`
+
+All scripts should be in a JSON format as presented in the example below.
 
 ```json
 {
   "default_login_user": "ion",
-  "prompt_command_script": "{ \"cwd\": \"$(pwd)\", \"git\": { \"currentBranch\" : \"$(git rev-parse --abbrev-ref HEAD 2> /dev/null )\" } }"
+  "user_scripts": {
+    "cwd": "$(pwd)",
+    "git": {
+      "currentBranch": "$(git rev-parse --abbrev-ref HEAD 2> /dev/null )"
+    }
+  }
 }
 ```
 
