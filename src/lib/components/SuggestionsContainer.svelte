@@ -79,9 +79,13 @@
     position: absolute;
     display: none;
     max-width: 300px;
+    max-height: 120px;
+    overflow: scroll;
     background-color: rgb(160, 32, 32);
     border: 1px solid rgb(92, 24, 24);
     list-style: none;
+    z-index: 3;
+    background-color: black;
   }
 
   .suggestions-group {

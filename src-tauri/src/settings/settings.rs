@@ -1,7 +1,7 @@
 use std::{path::Path, fs::{self, OpenOptions}, io::Write};
 
 use mt_logger::{mt_log, Level};
-use serde_json::{Value, Map, json};
+use serde_json::{Value, Map};
 
 
 #[tauri::command]

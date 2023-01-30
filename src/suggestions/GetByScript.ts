@@ -15,7 +15,7 @@ function executeScript(
 ): Promise<{ code: any; res: any[] }> {
   const script = dynamicGroup["script"];
 
-  const cwd = "/home/";
+  const cwd = sessionContext["scriptResult"]["cwd"];
   let res = [];
 
   child = null;
