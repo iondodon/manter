@@ -7,7 +7,9 @@
 
 <div id="bottom-bar">
   <div id="context-status">
-    {JSON.stringify(sessionContext['scriptResult'])}
+    {#if sessionContext['scriptResult'] && sessionContext['scriptResult']['user_scripts']}
+      {JSON.stringify(sessionContext['scriptResult']['user_scripts'])}
+    {/if}
   </div>
 </div>
 

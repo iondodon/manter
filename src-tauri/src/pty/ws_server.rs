@@ -6,6 +6,7 @@ use futures::stream::{SplitSink, SplitStream};
 use mt_logger::*;
 use portable_pty::{Child, CommandBuilder, native_pty_system, PtyPair, PtySize};
 use serde::Deserialize;
+use serde_json::{Value, json};
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::{accept_async, WebSocketStream};
 use tokio_tungstenite::tungstenite::Message;
@@ -152,15 +153,22 @@ async fn accept_connection(stream: TcpStream) {
     let user = settings.get("default_login_user").unwrap();
     let user = user.as_str().unwrap();
 
-    // if there is a 'script' in the settings
-    let prompt_command_scripts = if settings.contains_key("prompt_command_script") {
-      let script = settings.get("prompt_command_script").unwrap();
-      let script = script.to_string();
-      script
-    } else {String::new()};
-    let prompt_command_scripts = format!(r#"echo -en "\033]0; [manter] {} \a""#, prompt_command_scripts);
+    let user_scripts = if settings.contains_key("user_scripts") {
+      settings.get("user_scripts").unwrap()
+    } else {
+      &Value::Null
+    };
+    
+    let scripts = json!({
+      "cwd": "$(pwd)",
+      "user_scripts": user_scripts
+    });
+    let scripts = scripts.to_string();
+    let scripts_str = serde_json::to_string(&scripts).unwrap();
 
-    mt_log!(Level::Info, "prompt_command_scripts= {}", prompt_command_scripts);
+    mt_log!(Level::Info, "scripts={}", scripts_str);
+
+    let prompt_command_scripts = format!(r#"echo -en "\033]0; [manter] "{}" \a""#, scripts_str);
 
     let mut cmd = CommandBuilder::new("su");
     cmd.env("PROMPT_COMMAND", prompt_command_scripts);
