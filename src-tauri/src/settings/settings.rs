@@ -1,7 +1,7 @@
 use std::{path::Path, fs::{self, OpenOptions}, io::Write};
 
 use mt_logger::{mt_log, Level};
-use serde_json::{Value, Map};
+use serde_json::{Value, Map, json};
 
 
 #[tauri::command]
@@ -46,13 +46,15 @@ pub fn check_settings_file() {
   let mut settings_json_object = Map::new();
   settings_json_object.insert("default_login_user".to_string(), Value::String(default_user));
 
-  if cfg!(target_os = "linux") {
-    let prompt_command_script = r#"{ "cwd": "$(pwd)", "git": { "currentBranch" : "$(git rev-parse --abbrev-ref HEAD 2> /dev/null )" } }"#;
-    settings_json_object.insert("user_scripts".to_string(), Value::String(prompt_command_script.to_string()));
+  let user_scripts = if cfg!(target_os = "linux") {
+    r#"{ "cwd": "$(pwd)", "git": { "currentBranch" : "$(git rev-parse --abbrev-ref HEAD 2> /dev/null )" } }"#
   } else if cfg!(target_os = "macos") {
-    let prompt_command_script = r#"{ "cwd": "$(pwd)" }"#;
-    settings_json_object.insert("user_scripts".to_string(), Value::String(prompt_command_script.to_string()));
-  }
+    r#"{ "cwd": "$(pwd)" }"#
+  } else {
+    r#"{}"#
+  };
+
+  settings_json_object.insert("user_scripts".to_string(), serde_json::from_str(user_scripts).unwrap());
   
   let settings_json_object = serde_json::to_string(&settings_json_object).unwrap();
   
