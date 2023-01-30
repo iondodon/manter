@@ -80,12 +80,12 @@
     display: none;
     max-width: 300px;
     max-height: 120px;
-    overflow: scroll;
-    background-color: rgb(160, 32, 32);
-    border: 1px solid rgb(92, 24, 24);
+    overflow-y: scroll;
+    overflow-x: hidden;
     list-style: none;
     z-index: 3;
-    background-color: black;
+    border: 1px solid rgb(84, 84, 84);
+    background-color: rgba(0, 0, 0, 0.608);
   }
 
   .suggestions-group {
@@ -95,6 +95,6 @@
 
   .suggestion {
     cursor: pointer;
-    border: 1px solid rgb(92, 24, 24);
+    border: 1px solid rgb(74, 74, 74);
   }
 </style>
