@@ -6,15 +6,47 @@
 
   export let suggestions = []
   export let sessionContext: object
+  
+  let selectedIndex = 0
+  let totalSuggestions = 0
+
+  const DISTANCE_FROM_CURSOR_PX = 5
 
   afterUpdate(async () => {
     if (IS_UNIX) {
       await resolveDynamicGroups(suggestions, sessionContext)
     }
+
+    setIndexes()
     updateDisplyMode()
   })
 
-  const DISTANCE_FROM_CURSOR_PX = 5
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown") {
+      selectedIndex = selectedIndex + 1 > totalSuggestions - 1 ? 0 : selectedIndex + 1
+    }
+    if (event.key === "ArrowUp") {
+      selectedIndex = selectedIndex - 1 < 0 ? totalSuggestions - 1 : selectedIndex - 1
+    }
+  })
+
+  const setIndexes = () => {
+    let cumulativeIndex = -1
+
+    for (const suggestion of suggestions) {
+      if (suggestion.suggestions) {
+        for (const subSuggestion of suggestion.suggestions) {
+          cumulativeIndex++
+          subSuggestion['index'] = cumulativeIndex
+        }
+      } else {
+        cumulativeIndex++
+        suggestion['index'] = cumulativeIndex
+      }
+    }
+
+    totalSuggestions = cumulativeIndex + 1
+  }
 
   const updateDisplyMode = () => {
     const suggestionsContainerElement = document.getElementById('suggestions-container')
@@ -22,12 +54,6 @@
     if (!suggestionsContainerElement) {
       return
     }
-    
-    if (false) { // TODO: special cases
-      suggestionsContainerElement.style.display = 'none'
-    }
-
-    suggestionsContainerElement.style.display = 'block'
 
     const cursorElement = document.getElementsByClassName('xterm-helper-textarea')[0]
 
@@ -61,14 +87,14 @@
         <li>
           <ol class="suggestions-group">
             {#each suggestion.suggestions as subSuggestion}
-              <li class="suggestion">
+              <li class={subSuggestion['index'] == selectedIndex ? "selected-suggestion" : "suggestion"} >
                 <span>{subSuggestion.name}</span>
               </li>
             {/each}
           </ol>
         </li>
       {:else}
-        <li class="suggestion">
+        <li class={suggestion['index'] == selectedIndex ? "selected-suggestion" : "suggestion"}>
           <span>{suggestion.name}</span>
         </li>
       {/if}
@@ -79,7 +105,6 @@
 <style lang="scss">
   #suggestions-container {
     position: absolute;
-    display: none;
     max-width: 300px;
     max-height: 120px;
     overflow-y: scroll;
@@ -87,7 +112,11 @@
     list-style: none;
     z-index: 3;
     border: 1px solid rgb(84, 84, 84);
-    background-color: rgba(0, 0, 0, 0.608);
+    background-color: rgb(36, 36, 36);
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: rgb(36, 36, 36);
   }
 
   .suggestions-group {
@@ -97,5 +126,11 @@
   .suggestion {
     border: 1px solid rgb(74, 74, 74);
     color: bisque;
+  }
+
+  .selected-suggestion {
+    border: 1px solid rgb(74, 74, 74);
+    background-color: rgb(126, 126, 126);
+    color: white;
   }
 </style>

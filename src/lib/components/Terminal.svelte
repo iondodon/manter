@@ -10,6 +10,7 @@
   import { BANNER } from '../../banner'
   import { getSuggestions } from '../../suggestions/suggestions';
   import SuggestionsContainer from './SuggestionsContainer.svelte';
+  import clis from '../../cli/library/library';
 
   export let sessionContext: object
   export let terminalInterface: Terminal
@@ -23,6 +24,12 @@
       setUser()
     }
   })
+
+  const suggestionsAreShown = () => {
+    return sessionContext['suggestions'].length > 0 
+            && sessionContext['suggestions'][0] !== clis 
+            && sessionContext['lineText'].endsWith(' ')
+  }
 
   const setUser = async () => {
     const settings = (await invoke('get_settings')) as string
@@ -139,8 +146,20 @@
   }
   
   const termInterfaceHandleKeyEvents = (evt) => {
-    if (evt.type === 'keydown') {
-      return
+    if (suggestionsAreShown() && evt.key === 'ArrowUp') {
+      return false
+    }
+
+    if (suggestionsAreShown() && evt.key === 'ArrowDown') {
+      return false
+    }
+
+    if (suggestionsAreShown() && evt.key === 'Enter') {
+      return false
+    }
+
+    if (suggestionsAreShown() && evt.key === 'Escape') {
+      return false
     }
 
     if (evt.ctrlKey && evt.key === '=') {
@@ -149,6 +168,7 @@
       fitAddon.fit()
       return false
     }
+
     if (evt.ctrlKey && evt.key === '-') {
       terminalInterface.options.fontSize -= 1
       sendProposedSizeToPty()
@@ -156,12 +176,13 @@
       return false
     }
 
-    const lineText = getTypedText()
-    sessionContext['lineText'] = lineText
-    const suggestions = getSuggestions(sessionContext)
-    sessionContext['suggestions'] = suggestions
-
-    SessionContextStore.update((_prevSessionContext) => sessionContext)
+    // if (evt.type === 'keydoup') {
+      const lineText = getTypedText()
+      sessionContext['lineText'] = lineText
+      const suggestions = getSuggestions(sessionContext)
+      sessionContext['suggestions'] = suggestions
+      SessionContextStore.update((_prevSessionContext) => sessionContext)
+    // }
 
     return true
   }
