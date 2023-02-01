@@ -19,7 +19,8 @@
           user: "",
           suggestions: [],
           scriptResult: {},
-          suggestionsContainer: null
+          suggestionsContainer: null,
+          lineText: ""
         },
         terminalInterface: null,
         ptyWebSocket: null,

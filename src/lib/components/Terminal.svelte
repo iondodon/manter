@@ -139,6 +139,10 @@
   }
   
   const termInterfaceHandleKeyEvents = (evt) => {
+    if (evt.type === 'keydown') {
+      return
+    }
+
     if (evt.ctrlKey && evt.key === '=') {
       terminalInterface.options.fontSize += 1
       sendProposedSizeToPty()
@@ -154,10 +158,9 @@
 
     const lineText = getTypedText()
     sessionContext['lineText'] = lineText
-    SessionContextStore.update((_prevSessionContext) => sessionContext)
-
     const suggestions = getSuggestions(sessionContext)
     sessionContext['suggestions'] = suggestions
+
     SessionContextStore.update((_prevSessionContext) => sessionContext)
 
     return true
@@ -239,7 +242,6 @@
 <SuggestionsContainer
   bind:this={sessionContext['suggestionsContainer']} 
   suggestions={sessionContext['suggestions']}
-  lineText={sessionContext['lineText']}
   sessionContext={sessionContext}
 />
 

@@ -5,7 +5,6 @@
   import { IS_UNIX } from '../config/config';
 
   export let suggestions = []
-  export let lineText = ''
   export let sessionContext: object
 
   afterUpdate(async () => {
@@ -55,7 +54,7 @@
   }
 </script>
 
-{#if suggestions.length > 0 && suggestions[0] !== clis && lineText.endsWith(' ')}
+{#if suggestions.length > 0 && suggestions[0] !== clis && sessionContext['lineText'].endsWith(' ')}
   <ol id="suggestions-container">
     {#each suggestions as suggestion}
       {#if suggestion.suggestions}
