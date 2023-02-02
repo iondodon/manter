@@ -17,6 +17,8 @@
   export let ptyWebSocket: WebSocket
   export let fitAddon: FitAddon
 
+  let suggestionsSelectedIndex = 0
+
   onMount(() => {
     openDomTerminalInterface()
 
@@ -176,13 +178,14 @@
       return false
     }
 
-    // if (evt.type === 'keydoup') {
+    if (evt.type === 'keyup') {
       const lineText = getTypedText()
       sessionContext['lineText'] = lineText
       const suggestions = getSuggestions(sessionContext)
       sessionContext['suggestions'] = suggestions
+      suggestionsSelectedIndex = 0
       SessionContextStore.update((_prevSessionContext) => sessionContext)
-    // }
+    }
 
     return true
   }
@@ -264,6 +267,7 @@
   bind:this={sessionContext['suggestionsContainer']} 
   suggestions={sessionContext['suggestions']}
   sessionContext={sessionContext}
+  bind:selectedIndex={suggestionsSelectedIndex}
 />
 
 <style lang="scss">

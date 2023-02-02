@@ -20,7 +20,8 @@
           suggestions: [],
           scriptResult: {},
           suggestionsContainer: null,
-          lineText: ""
+          lineText: "",
+          suggestionsSelectedIndex: 0,
         },
         terminalInterface: null,
         ptyWebSocket: null,

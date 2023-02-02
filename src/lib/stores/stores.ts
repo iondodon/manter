@@ -12,6 +12,7 @@ export const TerminalsStore = writable([
       scriptResult: {},
       suggestionsContainer: null,
       lineText: "",
+      suggestionsSelectedIndex: 0,
     },
     terminalInterface: null,
     ptyWebSocket: null,

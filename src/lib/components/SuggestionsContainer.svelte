@@ -6,8 +6,8 @@
 
   export let suggestions = []
   export let sessionContext: object
+  export let selectedIndex = 0
   
-  let selectedIndex = 0
   let totalSuggestions = 0
 
   const DISTANCE_FROM_CURSOR_PX = 5
