@@ -146,6 +146,25 @@
 
     return text
   }
+
+  const getSuggestionByIndex = (index) => {
+    for(const suggestion of sessionContext['suggestions']) {
+      if (suggestion.suggestions) {
+        for (const subSuggestion of suggestion.suggestions) {
+          if (subSuggestion.index == index) {
+            return subSuggestion
+          }
+        }
+      } else {
+        if (suggestion.index == index) {
+          return suggestion
+        }
+      }
+    }
+
+    console.log('Suggestion not found for index ' + index)
+    return null
+  }
   
   const termInterfaceHandleKeyEvents = (evt) => {
     if (suggestionsAreShown() && evt.key === 'ArrowUp') {
@@ -157,6 +176,14 @@
     }
 
     if (suggestionsAreShown() && evt.key === 'Enter') {
+
+      if (evt.type == 'keyup') {
+        const selectedSuggestion = getSuggestionByIndex(suggestionsSelectedIndex)
+        terminalInterface.paste(selectedSuggestion['name'])
+        sessionContext['suggestions'] = []
+        suggestionsSelectedIndex = 0
+      }
+      
       return false
     }
 
@@ -204,6 +231,28 @@
     
   }
 
+  const writePtyIncomingToTermInterface = (evt) => {
+    if (!(evt.data instanceof ArrayBuffer)) {
+      alert('unknown data type ' + evt.data)
+      return
+    }
+    const dataString: string = arrayBufferToString(evt.data.slice(1))
+    terminalInterface.write(dataString)
+    return dataString
+  }
+
+  const handlePtyWsClose = (_evt) => {
+    terminalInterface.write('Terminal session terminated')
+    terminalInterface.dispose()
+    console.log('websocket closes from backend side')
+  }
+
+  const handlePtyWsError = (evt) => {
+    if (typeof console.log == 'function') {
+      console.log('ws error', evt)
+    }
+  }
+
   const setupNewTerminalInterface = () => {
     terminalInterface = new Terminal({
       cursorBlink: true,
@@ -233,38 +282,13 @@
     displayWelcomePage()
   }
 
-  const writePtyIncomingToTermInterface = (evt) => {
-    if (!(evt.data instanceof ArrayBuffer)) {
-      alert('unknown data type ' + evt.data)
-      return
-    }
-    const dataString: string = arrayBufferToString(evt.data.slice(1))
-    terminalInterface.write(dataString)
-    return dataString
-  }
-
-  const handlePtyWsClose = (_evt) => {
-    terminalInterface.write('Terminal session terminated')
-    terminalInterface.dispose()
-    console.log('websocket closes from backend side')
-  }
-
-  const handlePtyWsError = (evt) => {
-    if (typeof console.log == 'function') {
-      console.log('ws error', evt)
-    }
-  }
-
   const newTerminalSession = async () => {
     ptyWebSocket = new WebSocket(PTY_WS_ADDRESS)
     ptyWebSocket.binaryType = 'arraybuffer'
-
-    ptyWebSocket.onopen = async (_evt) => {
-      setupNewTerminalInterface()
-      ptyWebSocket.onmessage = writePtyIncomingToTermInterface
-      ptyWebSocket.onclose = (evt) => handlePtyWsClose(evt)
-      ptyWebSocket.onerror = (evt) => handlePtyWsError(evt)
-    }
+    ptyWebSocket.onmessage = writePtyIncomingToTermInterface
+    ptyWebSocket.onclose = (evt) => handlePtyWsClose(evt)
+    ptyWebSocket.onerror = (evt) => handlePtyWsError(evt)
+    ptyWebSocket.onopen = async (_evt) => setupNewTerminalInterface()
   }
 
   if (ptyWebSocket == null) {
