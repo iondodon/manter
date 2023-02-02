@@ -62,12 +62,26 @@
 
 <ol id="tabs">
   {#each terminals as terminal, index}
-    <li class="tab" id="{terminal['uuid'] === activeTermUUID? 'selected-tab' : ''}" on:click={() => setActive(terminal['uuid'])}>
+    <li class="tab" 
+        id="{terminal['uuid'] === activeTermUUID? 'selected-tab' : ''}" 
+        on:click={() => setActive(terminal['uuid'])}
+        on:keypress={() => setActive(terminal['uuid'])}
+    >
       <div class="tab-text">Terminal {index}</div>
-      <div class="close-tab-button" on:click={() => closeTerminal(terminal['uuid'])}>x</div>
+      <div class="close-tab-button" 
+        on:click={() => closeTerminal(terminal['uuid'])}
+        on:keypress={() => closeTerminal(terminal['uuid'])}
+      >
+        x
+      </div>
     </li>
   {/each}
-  <li class="tab" on:click={addNewTerminal}><span>+</span></li>
+  <li class="tab" 
+    on:click={addNewTerminal}
+    on:keypress={addNewTerminal}
+  >
+    <span>+</span>
+  </li>
 </ol>
 
 <style lang="scss">
