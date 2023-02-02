@@ -160,18 +160,28 @@
       return false
     }
 
-    if (suggestionsAreShown() && evt.key === 'Escape') {
+    if (evt.key === 'Escape') {
+      if (sessionContext['suggestions'].length > 0) {
+        sessionContext['suggestions'] = []
+        console.log('Escape key pressed - suggestions cleared')
+        return false
+      }
+      if (evt.type == 'keydown') {
+        console.log('Escape key pressed')
+        return true
+      }
+      console.log('Escape key released')
       return false
     }
 
-    if (evt.ctrlKey && evt.key === '=') {
+    if (evt.type === 'keyup' && evt.ctrlKey && evt.key === '=') {
       terminalInterface.options.fontSize += 1
       sendProposedSizeToPty()
       fitAddon.fit()
       return false
     }
 
-    if (evt.ctrlKey && evt.key === '-') {
+    if (evt.type === 'keyup' && evt.ctrlKey && evt.key === '-') {
       terminalInterface.options.fontSize -= 1
       sendProposedSizeToPty()
       fitAddon.fit()
