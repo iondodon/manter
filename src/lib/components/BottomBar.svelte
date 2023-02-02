@@ -24,7 +24,7 @@
 
   #context-status {
     flex: 1;
-    font-size: 8px;
+    font-size: 12px;
     line-height: 40px;
     padding: 0 20px;
   }
