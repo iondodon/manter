@@ -4,7 +4,7 @@
 # Manter
 
 <p align="center">
-  <img src="example.png" />
+  <img src="demo.gif" />
 </p>
 
 This project aims to create a terminal with functionalities that improve the experience of using terminals. Examples of useful functionalities would be autocomplete suggestion, showing the current branch of a project, prepared scripts that can be reused, and others. You can come up with your ideas. The project uses technologies such as Svelte on the front-end, which offers flexibility regarding the implementation of the interface. On the back-end side, the most important part is the PTY. All the back end is implemented in Rust. The basic framework of the project is Tauri.
