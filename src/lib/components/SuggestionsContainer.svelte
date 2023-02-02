@@ -112,7 +112,7 @@
     position: absolute;
     max-width: 300px;
     max-height: 120px;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     list-style: none;
     z-index: 3;

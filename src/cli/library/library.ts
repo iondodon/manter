@@ -52,6 +52,32 @@ const cdOptions: Group = {
   next: () => [cdOptions, cdFolders],
 };
 
+const branchNames: DynamicGroup = {
+  suggestions: [
+    {
+      name: "branch",
+      regex: /^.*$/,
+    },
+  ],
+  script: "git for-each-ref --format='%(refname:short)' refs/heads/",
+  postProcessor: (line) => {
+    return {
+      name: line,
+      regex: new RegExp("^" + line + "$"),
+    };
+  },
+};
+
+const gitSubCommands: Group = {
+  suggestions: [
+    {
+      name: "checkout",
+      regex: /^checkout$/,
+      next: () => [branchNames],
+    },
+  ],
+};
+
 const clis: Group = {
   suggestions: [
     {
@@ -63,6 +89,11 @@ const clis: Group = {
       name: "cd",
       regex: /^cd$/,
       next: () => [cdOptions, cdFolders],
+    },
+    {
+      name: "git",
+      regex: /^git$/,
+      next: () => [gitSubCommands],
     },
   ],
 };
