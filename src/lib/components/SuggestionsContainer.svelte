@@ -77,6 +77,11 @@
     } else {
       suggestionsContainerElement.style.left = `${cursorRect.right + DISTANCE_FROM_CURSOR_PX}px`
     }
+
+    const selectedSuggestionElement = document.querySelector('.selected-suggestion');
+    if (selectedSuggestionElement) {
+      selectedSuggestionElement.scrollIntoView({block: "nearest"});
+    }
   }
 </script>
 
