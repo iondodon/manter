@@ -2,6 +2,7 @@
   import { resolveDynamicGroups }  from '../../suggestions/suggestions';
   import clis from '../../cli/library/library'
   import { IS_UNIX } from '../config/config';
+  import { afterUpdate } from 'svelte';
 
   const DISTANCE_FROM_CURSOR_PX = 5
 
@@ -22,8 +23,11 @@
 
     selectedIndex = 0
     setIndexes()
-    changeContainerPosition()
   })()
+
+  afterUpdate(() => {
+    updateContainerDisplay()
+  })
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "ArrowDown") {
@@ -52,7 +56,7 @@
     totalSuggestions = cumulativeIndex + 1
   }
 
-  const changeContainerPosition = () => {
+  const updateContainerDisplay = () => {
     const suggestionsContainerElement = document.getElementById('suggestions-container')
 
     if (!suggestionsContainerElement) {
