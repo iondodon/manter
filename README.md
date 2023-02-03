@@ -19,7 +19,7 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 [For Linux](https://drive.google.com/file/d/1eJ0A8LfonLoU88k0uHWI9B7OgMSRrapW/view?usp=share_link)
 
-[For MacOS](https://drive.google.com/file/d/18qUd4hjXZ9uw9tr7thZa1eKY25XHpxqh/view?usp=share_linkß)
+[For MacOS](https://drive.google.com/file/d/1r_klMy8ZW2VwZb1xJELUhNv5sHqHfBzV/view?usp=share_link)
 
 [For Windows](https://drive.google.com/file/d/1z91rs_LmJ1d6qTiv4kYABO7WW8bNcYMV/view?usp=share_link)
 
