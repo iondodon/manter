@@ -17,7 +17,7 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 ## Download the installer
 
-[For Linux](https://drive.google.com/file/d/10pmaz8LY0j3ZchBijYRbOsIrP1v4wozo/view?usp=share_link)
+[For Linux](https://drive.google.com/file/d/1eJ0A8LfonLoU88k0uHWI9B7OgMSRrapW/view?usp=share_link)
 
 [For MacOS](https://drive.google.com/file/d/18qUd4hjXZ9uw9tr7thZa1eKY25XHpxqh/view?usp=share_linkß)
 
