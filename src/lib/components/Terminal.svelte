@@ -297,10 +297,7 @@
 </script>
 
 <div id="terminal" />
-<SuggestionsContainer
-  sessionContext={sessionContext}
-  bind:selectedIndex={suggestionsSelectedIndex}
-/>
+<SuggestionsContainer sessionContext={sessionContext} bind:selectedIndex={suggestionsSelectedIndex} />
 
 <style lang="scss">
   #terminal {
