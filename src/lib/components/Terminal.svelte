@@ -257,8 +257,8 @@
     terminalInterface = new Terminal({
       cursorBlink: true,
       cursorStyle: 'bar',
-      fontSize: 18,
-      cursorWidth: 10,
+      fontSize: 16,
+      cursorWidth: 8,
     })
     fitAddon = new FitAddon()
     terminalInterface.loadAddon(fitAddon)

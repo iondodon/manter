@@ -9,23 +9,27 @@
   export let selectedIndex = 0
   
   let totalSuggestions = 0
+  let shouldResolveDynamicGroups = false
 
   const DISTANCE_FROM_CURSOR_PX = 5
 
   afterUpdate(async () => {
-    if (IS_UNIX) {
+    if (IS_UNIX && shouldResolveDynamicGroups) {
       await resolveDynamicGroups(suggestions, sessionContext)
     }
 
+    shouldResolveDynamicGroups = true
     setIndexes()
     updateDisplyMode()
   })
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "ArrowDown") {
+      shouldResolveDynamicGroups = false
       selectedIndex = selectedIndex + 1 > totalSuggestions - 1 ? 0 : selectedIndex + 1
     }
     if (event.key === "ArrowUp") {
+      shouldResolveDynamicGroups = false
       selectedIndex = selectedIndex - 1 < 0 ? totalSuggestions - 1 : selectedIndex - 1
     }
   })
