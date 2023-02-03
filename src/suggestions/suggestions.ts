@@ -1,8 +1,8 @@
 import clis from "../cli/library/library";
 import { getByScript } from "../suggestions/GetByScript";
 
-export const resolveDynamicGroups = async (suggestions, sessionContext) => {
-  for (const suggestion of suggestions) {
+export const resolveDynamicGroups = async (sessionContext) => {
+  for (const suggestion of sessionContext["suggestions"]) {
     if (suggestion.script) {
       try {
         suggestion["suggestions"] = await getByScript(

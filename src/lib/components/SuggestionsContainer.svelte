@@ -1,35 +1,31 @@
 <script lang="ts">
   import { resolveDynamicGroups }  from '../../suggestions/suggestions';
-  import { afterUpdate } from 'svelte';
   import clis from '../../cli/library/library'
   import { IS_UNIX } from '../config/config';
 
-  export let suggestions = []
-  export let sessionContext: object
+  export let sessionContext
   export let selectedIndex = 0
   
   let totalSuggestions = 0
-  let shouldResolveDynamicGroups = false
-
   const DISTANCE_FROM_CURSOR_PX = 5
 
-  afterUpdate(async () => {
-    if (IS_UNIX && shouldResolveDynamicGroups) {
-      await resolveDynamicGroups(suggestions, sessionContext)
+  $: (async () => {
+    if (IS_UNIX) {
+      await resolveDynamicGroups(sessionContext)
     }
 
-    shouldResolveDynamicGroups = true
+    console.log(sessionContext['suggestions'])
+
+    selectedIndex = 0
     setIndexes()
-    updateDisplyMode()
-  })
+    changePosition()
+  })()
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "ArrowDown") {
-      shouldResolveDynamicGroups = false
       selectedIndex = selectedIndex + 1 > totalSuggestions - 1 ? 0 : selectedIndex + 1
     }
     if (event.key === "ArrowUp") {
-      shouldResolveDynamicGroups = false
       selectedIndex = selectedIndex - 1 < 0 ? totalSuggestions - 1 : selectedIndex - 1
     }
   })
@@ -37,7 +33,7 @@
   const setIndexes = () => {
     let cumulativeIndex = -1
 
-    for (const suggestion of suggestions) {
+    for (const suggestion of sessionContext['suggestions']) {
       if (suggestion.suggestions) {
         for (const subSuggestion of suggestion.suggestions) {
           cumulativeIndex++
@@ -52,7 +48,7 @@
     totalSuggestions = cumulativeIndex + 1
   }
 
-  const updateDisplyMode = () => {
+  const changePosition = () => {
     const suggestionsContainerElement = document.getElementById('suggestions-container')
 
     if (!suggestionsContainerElement) {
@@ -89,9 +85,9 @@
   }
 </script>
 
-{#if suggestions.length > 0 && suggestions[0] !== clis && sessionContext['lineText'].endsWith(' ')}
+{#if sessionContext['suggestions'].length > 0 && sessionContext['suggestions'][0] !== clis && sessionContext['lineText'].endsWith(' ')}
   <ol id="suggestions-container">
-    {#each suggestions as suggestion}
+    {#each sessionContext['suggestions'] as suggestion}
       {#if suggestion.suggestions}
         <li>
           <ol class="suggestions-group">

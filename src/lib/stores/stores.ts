@@ -3,6 +3,21 @@ import { v4 as uuidv4 } from "uuid";
 
 const FIRST_TERM_UUID = uuidv4();
 
+export type TerminalData = {
+  uuid: string;
+  sessionContext: {
+    user: string;
+    suggestions: any[];
+    scriptResult: any;
+    suggestionsContainer: any;
+    lineText: string;
+    suggestionsSelectedIndex: number;
+  };
+  terminalInterface: any;
+  ptyWebSocket: any;
+  fitAddon: any;
+};
+
 export const TerminalsStore = writable([
   {
     uuid: FIRST_TERM_UUID,

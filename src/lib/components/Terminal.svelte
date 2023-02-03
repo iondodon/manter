@@ -298,8 +298,6 @@
 
 <div id="terminal" />
 <SuggestionsContainer
-  bind:this={sessionContext['suggestionsContainer']} 
-  suggestions={sessionContext['suggestions']}
   sessionContext={sessionContext}
   bind:selectedIndex={suggestionsSelectedIndex}
 />
