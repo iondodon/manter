@@ -3,22 +3,26 @@
   import clis from '../../cli/library/library'
   import { IS_UNIX } from '../config/config';
 
+  const DISTANCE_FROM_CURSOR_PX = 5
+
   export let sessionContext
   export let selectedIndex = 0
   
   let totalSuggestions = 0
-  const DISTANCE_FROM_CURSOR_PX = 5
+  let suggestions = []
+  let lineText = ''
 
   $: (async () => {
     if (IS_UNIX) {
       await resolveDynamicGroups(sessionContext)
     }
 
-    console.log(sessionContext['suggestions'])
+    suggestions = sessionContext['suggestions']
+    lineText = sessionContext['lineText']
 
     selectedIndex = 0
     setIndexes()
-    changePosition()
+    changeContainerPosition()
   })()
 
   document.addEventListener("keydown", (event) => {
@@ -48,7 +52,7 @@
     totalSuggestions = cumulativeIndex + 1
   }
 
-  const changePosition = () => {
+  const changeContainerPosition = () => {
     const suggestionsContainerElement = document.getElementById('suggestions-container')
 
     if (!suggestionsContainerElement) {
@@ -85,9 +89,9 @@
   }
 </script>
 
-{#if sessionContext['suggestions'].length > 0 && sessionContext['suggestions'][0] !== clis && sessionContext['lineText'].endsWith(' ')}
+{#if suggestions.length > 0 && suggestions[0] !== clis && lineText.endsWith(' ')}
   <ol id="suggestions-container">
-    {#each sessionContext['suggestions'] as suggestion}
+    {#each suggestions as suggestion}
       {#if suggestion.suggestions}
         <li>
           <ol class="suggestions-group">
