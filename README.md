@@ -21,7 +21,7 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 [For MacOS](https://drive.google.com/file/d/1r_klMy8ZW2VwZb1xJELUhNv5sHqHfBzV/view?usp=share_link)
 
-[For Windows](https://drive.google.com/file/d/1z91rs_LmJ1d6qTiv4kYABO7WW8bNcYMV/view?usp=share_link)
+[For Windows](https://drive.google.com/file/d/1D2GiYtIJZ5KYJlFNk2eHLcg9bDFqjG0-/view?usp=share_link)
 
 ## Community
 
