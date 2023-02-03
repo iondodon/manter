@@ -215,9 +215,9 @@
       return false
     }
 
-    if (evt.type === 'keyup') {
-      const lineText = getTypedText()
-      sessionContext['lineText'] = lineText
+    const lineText = getTypedText()
+    sessionContext['lineText'] = lineText
+    if (evt.type === 'keyup' && lineText.endsWith(' ')) {
       const suggestions = getSuggestions(sessionContext)
       sessionContext['suggestions'] = suggestions
       suggestionsSelectedIndex = 0

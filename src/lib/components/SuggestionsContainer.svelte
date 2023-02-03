@@ -14,7 +14,7 @@
   let lineText = ''
 
   $: (async () => {
-    if (IS_UNIX) {
+    if (IS_UNIX && sessionContext['lineText'].endsWith(' ')) {
       await resolveDynamicGroups(sessionContext)
     }
 
