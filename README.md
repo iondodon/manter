@@ -9,6 +9,8 @@
 
 This project aims to create a terminal with functionalities that improve the experience of using terminals. Examples of useful functionalities would be autocomplete suggestion, showing the current branch of a project, prepared scripts that can be reused, and others. You can come up with your ideas. The project uses technologies such as Svelte on the front-end, which offers flexibility regarding the implementation of the interface. On the back-end side, the most important part is the PTY. All the back end is implemented in Rust. The basic framework of the project is Tauri.
 
+At the moment the terminal has suggestions only for some commands (cd, ls). To support more commands it is needed to add them in the Manter's "library" located at `src/cli/library/library.ts`. It is possible to have custom script based suggestions. For example if we write in the terminal “git checkout” and after we press Space, a dropdown will appear with all available branches.
+
 A good analogy to understand the purpose of this project is the following - traditional terminals are like simple code editors while this terminal is like an IDE.
 
 Anyone is welcome to contribute to this project with and ideas. Imagine the terminal you would like to use. Feel free to open any issue with suggestions and bugs.
