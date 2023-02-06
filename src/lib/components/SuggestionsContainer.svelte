@@ -18,7 +18,7 @@
       await resolveDynamicGroups(sessionContext)
     }
 
-    suggestions = sessionContext['suggestions']
+    suggestions = sessionContext['filteredSuggestions']
     lineText = sessionContext['lineText']
 
     selectedIndex = 0
@@ -41,7 +41,7 @@
   const setIndexes = () => {
     let cumulativeIndex = -1
 
-    for (const suggestion of sessionContext['suggestions']) {
+    for (const suggestion of suggestions) {
       if (suggestion.suggestions) {
         for (const subSuggestion of suggestion.suggestions) {
           cumulativeIndex++
@@ -93,7 +93,7 @@
   }
 </script>
 
-{#if suggestions.length > 0 && suggestions[0] !== clis && lineText.endsWith(' ')}
+{#if suggestions.length > 0 && suggestions[0] !== clis}
   <ol id="suggestions-container">
     {#each suggestions as suggestion}
       {#if suggestion.suggestions}
@@ -112,6 +112,9 @@
         </li>
       {/if}
     {/each}
+    <li class="suggestion">
+          <span>Esc. to close</span>
+    </li>
   </ol>
 {/if}
 

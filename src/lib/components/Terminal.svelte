@@ -29,8 +29,7 @@
 
   const suggestionsAreShown = () => {
     return sessionContext['suggestions'].length > 0 
-            && sessionContext['suggestions'][0] !== clis 
-            && sessionContext['lineText'].endsWith(' ')
+            && sessionContext['suggestions'][0] !== clis
   }
 
   const setUser = async () => {
@@ -148,7 +147,7 @@
   }
 
   const getSuggestionByIndex = (index) => {
-    for(const suggestion of sessionContext['suggestions']) {
+    for(const suggestion of sessionContext['filteredSuggestions']) {
       if (suggestion.suggestions) {
         for (const subSuggestion of suggestion.suggestions) {
           if (subSuggestion.index == index) {
@@ -165,6 +164,40 @@
     console.log('Suggestion not found for index ' + index)
     return null
   }
+
+  const getLastWord = () => {
+    return sessionContext['lineText']
+      .split(' ')
+      .map((word) => word.trim())
+      .filter((word) => word.length > 0)
+      .pop()
+  }
+
+  const filterSuggestions = (sessionContext) => {
+    const suggestions = sessionContext['suggestions']
+    const lastWord = getLastWord()
+
+    return suggestions.map((suggestion) => {
+      if (suggestion.suggestions) {
+        const filteredSubSuggestions = suggestion.suggestions.filter((subSuggestion) => {
+          return subSuggestion.name.startsWith(lastWord)
+        })
+
+        return {
+          ...suggestion,
+          suggestions: filteredSubSuggestions
+        }
+      } else {
+        return suggestion
+      }
+    }).filter((suggestion) => {
+      if (suggestion.suggestions) {
+        return suggestion.suggestions.length > 0
+      } else {
+        return suggestion.name.startsWith(lastWord)
+      }
+    })
+  }
   
   const termInterfaceHandleKeyEvents = (evt) => {
     if (suggestionsAreShown() && evt.key === 'ArrowUp') {
@@ -179,8 +212,14 @@
 
       if (evt.type == 'keyup') {
         const selectedSuggestion = getSuggestionByIndex(suggestionsSelectedIndex)
-        terminalInterface.paste(selectedSuggestion['name'])
+
+        if (selectedSuggestion) {
+          const lastWord = getLastWord()
+          terminalInterface.paste(selectedSuggestion.name.replace(lastWord, ''))
+        }
+
         sessionContext['suggestions'] = []
+        sessionContext['filteredSuggestions'] = []
         suggestionsSelectedIndex = 0
       }
       
@@ -188,8 +227,9 @@
     }
 
     if (evt.key === 'Escape') {
-      if (sessionContext['suggestions'].length > 0) {
+      if (sessionContext['filteredSuggestions'].length > 0) {
         sessionContext['suggestions'] = []
+        sessionContext['filteredSuggestions'] = []
         console.log('Escape key pressed - suggestions cleared')
         return false
       }
@@ -215,11 +255,18 @@
       return false
     }
 
-    const lineText = getTypedText()
-    sessionContext['lineText'] = lineText
-    if (evt.type === 'keyup' && lineText.endsWith(' ')) {
-      const suggestions = getSuggestions(sessionContext)
-      sessionContext['suggestions'] = suggestions
+    if (evt.type === 'keyup') {
+      const lineText = getTypedText()
+      sessionContext['lineText'] = lineText
+      
+      if (lineText.endsWith(' ')) {
+        const suggestions = getSuggestions(sessionContext)
+        sessionContext['suggestions'] = suggestions
+        sessionContext['filteredSuggestions'] = suggestions
+      } else {
+        sessionContext['filteredSuggestions'] = filterSuggestions(sessionContext)
+      }
+
       suggestionsSelectedIndex = 0
       SessionContextStore.update((_prevSessionContext) => sessionContext)
     }

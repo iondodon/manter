@@ -18,10 +18,10 @@
         sessionContext: {
           user: "",
           suggestions: [],
+          filteredSuggestions: [],
           scriptResult: {},
           suggestionsContainer: null,
-          lineText: "",
-          suggestionsSelectedIndex: 0,
+          lineText: ""
         },
         terminalInterface: null,
         ptyWebSocket: null,
