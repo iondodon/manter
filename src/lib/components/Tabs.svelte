@@ -19,7 +19,7 @@
           user: "",
           suggestions: [],
           filteredSuggestions: [],
-          scriptResult: {},
+          prompt_command_result: {},
           suggestionsContainer: null,
           lineText: ""
         },

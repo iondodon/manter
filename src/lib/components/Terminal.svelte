@@ -105,7 +105,7 @@
         alert('Error parsing JSON from prompt_command_script\n' + e.message)
         return
       }
-      sessionContext['scriptResult'] = promptUpdatedData
+      sessionContext['prompt_command_result'] = promptUpdatedData
       SessionContextStore.update(() => sessionContext)
       return
     }
