@@ -10,7 +10,7 @@
   export let selectedIndex = 0
   
   let totalSuggestions = 0
-  let suggestions = []
+  let filteredSuggestions = []
   let lineText = ''
 
   $: (async () => {
@@ -18,7 +18,7 @@
       await resolveDynamicGroups(sessionContext)
     }
 
-    suggestions = sessionContext['filteredSuggestions']
+    filteredSuggestions = sessionContext['filteredSuggestions']
     lineText = sessionContext['lineText']
 
     selectedIndex = 0
@@ -41,7 +41,7 @@
   const setIndexes = () => {
     let cumulativeIndex = -1
 
-    for (const suggestion of suggestions) {
+    for (const suggestion of filteredSuggestions) {
       if (suggestion.suggestions) {
         for (const subSuggestion of suggestion.suggestions) {
           cumulativeIndex++
@@ -93,9 +93,9 @@
   }
 </script>
 
-{#if suggestions.length > 0 && suggestions[0] !== clis}
+{#if filteredSuggestions.length > 0 && filteredSuggestions[0] !== clis}
   <ol id="suggestions-container">
-    {#each suggestions as suggestion}
+    {#each filteredSuggestions as suggestion}
       {#if suggestion.suggestions}
         <li>
           <ol class="suggestions-group">

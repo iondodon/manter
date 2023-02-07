@@ -15,7 +15,7 @@ function executeScript(
 ): Promise<{ code: any; res: any[] }> {
   const script = dynamicGroup["script"];
 
-  const cwd = sessionContext["scriptResult"]["cwd"];
+  const cwd = sessionContext["prompt_command_result"]["cwd"];
   let res = [];
 
   child = null;
