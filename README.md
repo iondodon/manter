@@ -21,7 +21,7 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 - [Linux (.deb)](https://drive.google.com/file/d/1CWcPVBI56b2RRRfuEHAIZBCG_sUyAguW/view?usp=share_link)
 
-- [MacOS (.dmg)](https://drive.google.com/file/d/1etu4LqLQ8-A_vZTMhZGHTThdsul_0q91/view?usp=share_link)
+- [MacOS (.dmg)](https://drive.google.com/file/d/1McWslmwcMJ4KSB7QJGSQtlyk7Paboe4-/view?usp=share_link)
 
 - [Windows (.msi)](https://drive.google.com/file/d/1lPJuIZtIEj-hJl1Bms2tebqrPZ18eM0C/view?usp=share_link)
 
