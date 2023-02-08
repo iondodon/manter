@@ -37,12 +37,20 @@
         tabNameElement.replaceWith(tabNameInput)
         tabNameInput.focus()
 
+        const replaceInputWithName = () => {
+          const newTabName = tabNameInput.value
+          tabNameInput.replaceWith(tabNameElement)
+          tabNameElement.textContent = newTabName
+        }
+
         tabNameInput.addEventListener('keydown', (event) => {
           if (event.key === 'Enter' || event.key === 'Escape') {
-            const newTabName = tabNameInput.value
-            tabNameInput.replaceWith(tabNameElement)
-            tabNameElement.textContent = newTabName
+            replaceInputWithName()
           }
+        })
+
+        tabNameInput.addEventListener('blur', () => {
+          replaceInputWithName()
         })
       })
     })
