@@ -5,6 +5,7 @@
   import {onMount} from 'svelte'
   import {ActiveTermUUIDStore, TerminalsStore} from './lib/stores/stores'
   import {NIL as NIL_UUID} from 'uuid'
+  import Home from './lib/components/Home.svelte';
 
   let terminals = []
   let activeTerminalUUID = NIL_UUID
@@ -19,16 +20,22 @@
 
 <main>
   <Tabs/>
-  {#each terminals as terminal}
-    {#if terminal['uuid'] === activeTerminalUUID}
-      <Terminal
-        bind:sessionContext={terminal['sessionContext']}
-        bind:terminalInterface={terminal['terminalInterface']}
-        bind:ptyWebSocket={terminal['ptyWebSocket']}
-        bind:fitAddon={terminal['fitAddon']}
-      />
-    {/if}
-  {/each}
+
+  {#if terminals.length === 0}
+    <Home/>
+  {:else}
+    {#each terminals as terminal}
+      {#if terminal['uuid'] === activeTerminalUUID}
+        <Terminal
+          bind:sessionContext={terminal['sessionContext']}
+          bind:terminalInterface={terminal['terminalInterface']}
+          bind:ptyWebSocket={terminal['ptyWebSocket']}
+          bind:fitAddon={terminal['fitAddon']}
+        />
+      {/if}
+    {/each}
+  {/if}
+
   <BottomBar/>
 </main>
 

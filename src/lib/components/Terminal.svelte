@@ -349,9 +349,7 @@
 <style lang="scss">
   #terminal {
     width: 100%;
-
     height: calc(100vh - 80px);
-
     background-color: black;
     overflow: hidden;
   }
