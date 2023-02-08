@@ -1,6 +1,7 @@
 <script lang="ts">
   import {ActiveTermUUIDStore, SessionContextStore, TerminalsStore} from '../stores/stores'
   import {NIL as NIL_UUID, v4 as uuidv4} from 'uuid'
+  import { afterUpdate } from 'svelte';
 
   let terminals = []
   let activeTermUUID = NIL_UUID
@@ -9,6 +10,47 @@
   TerminalsStore.subscribe(updatedTerminals => terminals = updatedTerminals)
   ActiveTermUUIDStore.subscribe(updatedActiveTerminalUUID => activeTermUUID = updatedActiveTerminalUUID)
   SessionContextStore.subscribe(newSessionContext => sessionContext = newSessionContext)
+
+  const handleChangeTabName = () => {
+    const tabsElements = document.querySelectorAll('.tab');
+    tabsElements.forEach(tabElement => {
+      tabElement.addEventListener('dblclick', () => {
+        const tabNameElement = tabElement.querySelector('.tab-name')
+
+        if (!tabNameElement) {
+          return
+        }
+
+        const tabName = tabNameElement.textContent
+
+        const tabNameInput = document.createElement('input')
+        tabNameInput.value = tabName
+        tabNameInput.style.width = '100%'
+        tabNameInput.style.height = '100%'
+        tabNameInput.style.border = 'none'
+        tabNameInput.style.outline = 'none'
+        tabNameInput.style.fontSize = '14px'
+        tabNameInput.style.color = '#fff'
+        tabNameInput.style.backgroundColor = 'transparent'
+        tabNameInput.style.borderBottom = '1px solid #fff'
+
+        tabNameElement.replaceWith(tabNameInput)
+        tabNameInput.focus()
+
+        tabNameInput.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === 'Escape') {
+            const newTabName = tabNameInput.value
+            tabNameInput.replaceWith(tabNameElement)
+            tabNameElement.textContent = newTabName
+          }
+        })
+      })
+    })
+  }
+
+  afterUpdate(() => {
+    handleChangeTabName()
+  })
 
   const addNewTerminal = () => {
     const NEW_TERM_UUID = uuidv4()
@@ -53,7 +95,7 @@
     const isSure = await confirm("Are you sure you want to close this tab?")
     if(!isSure) {
       return
-    } 
+    }
     let termToClose = getTerminalByUuid(termUUID)
     termToClose['ptyWebSocket'].close()
     TerminalsStore.update(terminals => terminals.filter(term => term['uuid'] != termUUID))
@@ -63,24 +105,20 @@
 
 <ol id="tabs">
   {#each terminals as terminal, index}
-    <li class="tab" 
-        id="{terminal['uuid'] === activeTermUUID? 'selected-tab' : ''}" 
+    <li class="tab" id="{terminal['uuid'] === activeTermUUID? 'selected-tab' : ''}" 
         on:click={() => setActive(terminal['uuid'])}
         on:keypress={() => setActive(terminal['uuid'])}
     >
-      <div class="tab-text">Terminal {index}</div>
+      <div class="tab-name">New Session</div>
       <div class="close-tab-button" 
-        on:click={() => closeTerminal(terminal['uuid'])}
-        on:keypress={() => closeTerminal(terminal['uuid'])}
+        on:click={() => closeTerminal(terminal['uuid'])} 
+        on:keypress={() => closeTerminal(terminal['uuid'])} 
       >
         x
       </div>
     </li>
   {/each}
-  <li class="tab" 
-    on:click={addNewTerminal}
-    on:keypress={addNewTerminal}
-  >
+  <li class="tab" on:click={addNewTerminal} on:keypress={addNewTerminal}>
     <span>+</span>
   </li>
 </ol>
@@ -116,7 +154,7 @@
     color: #fff;
   }
 
-  .tab-text {
+  .tab-name {
     flex: 1;
     font-size: 14px;
     line-height: 40px;
