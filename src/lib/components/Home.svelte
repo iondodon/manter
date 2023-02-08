@@ -4,7 +4,7 @@
 
 <div id="home">
   <div id="detail">
-    <span>Manter v. 0.1.0 GPL v.3 licensed</span>
+    <span>Manter v.0.1.0 GPL v.3 licensed</span>
     <br>
     <span>* + to create a new session</span>
     <span>* Double click on tab to change its name</span>

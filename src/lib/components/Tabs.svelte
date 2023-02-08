@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {ActiveTermUUIDStore, SessionContextStore, TerminalsStore} from '../stores/stores'
+  import {ActiveTermUUIDStore, ActiveSessionContextStore, TerminalsStore} from '../stores/stores'
   import {NIL as NIL_UUID, v4 as uuidv4} from 'uuid'
   import { afterUpdate } from 'svelte';
 
@@ -9,7 +9,7 @@
 
   TerminalsStore.subscribe(updatedTerminals => terminals = updatedTerminals)
   ActiveTermUUIDStore.subscribe(updatedActiveTerminalUUID => activeTermUUID = updatedActiveTerminalUUID)
-  SessionContextStore.subscribe(newSessionContext => sessionContext = newSessionContext)
+  ActiveSessionContextStore.subscribe(newSessionContext => sessionContext = newSessionContext)
 
   const handleChangeTabName = () => {
     const tabsElements = document.querySelectorAll('.tab');
@@ -87,7 +87,7 @@
     ActiveTermUUIDStore.update(_prevActiveTermUUID => newActiveTermUUID)
 
     const newActiveTerm = getTerminalByUuid(newActiveTermUUID)
-    SessionContextStore.update(_prevSessionContext => newActiveTerm['sessionContext'])
+    ActiveSessionContextStore.update(_prevSessionContext => newActiveTerm['sessionContext'])
   }
 
   const getTerminalByUuid = (termUuid) => {

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import {SessionContextStore} from "../stores/stores"
+  import {ActiveSessionContextStore} from "../stores/stores"
 
   let sessionContext = {}
-  SessionContextStore.subscribe(updatesSessionContext => sessionContext = updatesSessionContext)
+  ActiveSessionContextStore.subscribe(updatesSessionContext => sessionContext = updatesSessionContext)
 </script>
 
 <div id="bottom-bar">

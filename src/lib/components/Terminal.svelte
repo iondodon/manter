@@ -6,7 +6,7 @@
   import { arrayBufferToString } from '../utils/utils'
   import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
-  import { SessionContextStore } from '../stores/stores'
+  import { ActiveSessionContextStore } from '../stores/stores'
   import { BANNER } from '../../banner'
   import { getSuggestions } from '../../suggestions/suggestions';
   import SuggestionsContainer from './SuggestionsContainer.svelte';
@@ -106,7 +106,7 @@
         return
       }
       sessionContext['prompt_command_result'] = promptUpdatedData
-      SessionContextStore.update(() => sessionContext)
+      ActiveSessionContextStore.update(() => sessionContext)
       return
     }
     document.title = title
@@ -268,7 +268,7 @@
       }
 
       suggestionsSelectedIndex = 0
-      SessionContextStore.update((_prevSessionContext) => sessionContext)
+      ActiveSessionContextStore.update((_prevSessionContext) => sessionContext)
     }
 
     return true
