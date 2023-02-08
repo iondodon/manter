@@ -10,7 +10,7 @@
     <span>* Double click on tab to change its name</span>
     <br>
     <span>
-      <a href="https://github.com/iondodon/manter" target="_blank">Contribute to project development</a>
+      <a href="https://github.com/iondodon/manter" target="_blank" rel="noreferrer">Contribute to project development</a>
     </span>
   </div>
 </div>
