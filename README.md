@@ -23,7 +23,7 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 - [MacOS (.dmg)](https://drive.google.com/file/d/1McWslmwcMJ4KSB7QJGSQtlyk7Paboe4-/view?usp=share_link)
 
-- [Windows (.msi)](https://drive.google.com/file/d/1lPJuIZtIEj-hJl1Bms2tebqrPZ18eM0C/view?usp=share_link)
+- [Windows (.msi)](https://drive.google.com/file/d/1USanMUPaialTV_5BnXb3HCtJ0nJNlYoP/view?usp=share_link)
 
 ## Community
 
