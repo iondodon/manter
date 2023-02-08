@@ -19,7 +19,7 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 ## Download the installer
 
-- [Linux (.deb)](https://drive.google.com/file/d/1-0GrZG5TgqbdAtPG0pNTiBW55lEDdy-8/view?usp=share_link)
+- [Linux (.deb)](https://drive.google.com/file/d/1CWcPVBI56b2RRRfuEHAIZBCG_sUyAguW/view?usp=share_link)
 
 - [MacOS (.dmg)](https://drive.google.com/file/d/1etu4LqLQ8-A_vZTMhZGHTThdsul_0q91/view?usp=share_link)
 
