@@ -6,18 +6,20 @@ windows_subsystem = "windows"
 extern crate serde_json;
 
 use mt_logger::*;
-
 use pty::ws_server::pty_serve;
 use settings::settings::{check_settings_file, get_settings};
+use config::config::configure;
 
 mod pty;
 mod settings;
+mod config;
 
 
 #[tokio::main]
 async fn main() {
   mt_new!(None, Level::Info, OutputStream::Both);
 
+  configure();
   check_settings_file();
 
   std::thread::spawn(|| {
