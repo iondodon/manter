@@ -1,12 +1,21 @@
-use std::{path::Path, fs::OpenOptions, io::{BufReader, BufWriter, Write, Read}};
+use std::{path::Path, fs::OpenOptions, io::{BufReader, BufWriter, Write, Read}, env};
 
 pub fn configure() {
-  if cfg!(target_os = "macos") {
-    update_rc_file(".zshrc.rs")
+  if cfg!(target_os = "macos") || cfg!(target_os = "linux") {
+    match env::var("SHELL") {
+        Ok(shell) => update_rc_file(&shell),
+        Err(e) => panic!("Failed to get the shell: {}", e),
+    }
   }
 }
 
-fn update_rc_file(rc_file_name: &str) {
+fn update_rc_file(shell: &str) {
+  let rc_file_name = match shell {
+      "zsh" => ".zshrc",
+      "bash" => ".bashrc",
+      _ => panic!("Shell not supported"),
+  };
+
   let home_dir = dirs::home_dir().unwrap();
   let home_dir = home_dir.to_str().unwrap();
 
