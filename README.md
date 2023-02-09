@@ -75,4 +75,4 @@ All scripts should be in a JSON format as presented in the example below.
 
 ## License
 
-Manter is licensed under the [GPLv3](https://github.com/iondodon/manter/blob/main/LICENCE.txt).
+Manter is licensed under [GPLv3](https://github.com/iondodon/manter/blob/main/LICENCE.txt).
