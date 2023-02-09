@@ -4,7 +4,7 @@ use mt_logger::{mt_log, Level};
 
 const CONFIG_SCRIPTS_MACOS: &str = r#"
 prmptcmd() { eval "$PROMPT_COMMAND" }
-precmd_functions=(prmptcmd)
+precmd_functions+=(prmptcmd)
 "#;
 
 pub fn configure() {
