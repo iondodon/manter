@@ -18,8 +18,8 @@ pub fn configure() {
 
 fn update_rc_file(shell: &str) {
   let rc_file_name = match shell {
-    "zsh" => ".zshrc",
-    "bash" => return,
+    "/bin/zsh" => ".zshrc",
+    "/bin/bash" => return,
     _ => panic!("Shell not supported"),
   };
 
@@ -36,7 +36,7 @@ fn update_rc_file(shell: &str) {
 
   create_config_scripts_file();
   let config_scripts_file = format!("{}/.manter.sh", home_dir);
-  let script = format!("source {}", config_scripts_file);
+  let script = format!("\n source {} \n", config_scripts_file);
   write_if_not_present_in_file(&rc_file, &script);
 }
 
