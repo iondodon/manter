@@ -36,7 +36,8 @@ fn update_rc_file(shell: &str) {
 
   create_config_scripts_file();
   let config_scripts_file = format!("{}/.manter.sh", home_dir);
-  write_if_not_present_in_file(&rc_file, &config_scripts_file).unwrap();
+  let script = format!("source {}", config_scripts_file);
+  write_if_not_present_in_file(&rc_file, &script);
 }
 
 fn create_config_scripts_file() {
@@ -66,22 +67,21 @@ fn create_config_scripts_file() {
   }
 }
 
-fn write_if_not_present_in_file(file_path: &str, text: &str) -> std::io::Result<()> {
-  let file = OpenOptions::new().read(true).open(file_path)?;
+fn write_if_not_present_in_file(file_path: &str, text: &str) {
+  let file = OpenOptions::new().read(true).open(file_path).unwrap();
   let mut reader = BufReader::new(file);
 
   let mut contents = String::new();
-  reader.read_to_string(&mut contents)?;
+  reader.read_to_string(&mut contents).unwrap();
 
   if contents.contains(text) {
-    return Ok(());
+    return;
   }
 
-  let file = OpenOptions::new().append(true).open(file_path)?;
+  let file = OpenOptions::new().append(true).open(file_path).unwrap();
   let mut writer = BufWriter::new(file);
 
-  writer.write_all(text.as_bytes())?;
-  writer.flush()?;
+  writer.write_all(text.as_bytes()).unwrap();
+  writer.flush().unwrap();
 
-  Ok(())
 }
