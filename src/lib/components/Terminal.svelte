@@ -226,6 +226,15 @@
       return false
     }
 
+    if (evt.ctrlKey && evt.key === 'v') {
+      if (evt.type == 'keydown') {
+        navigator.clipboard.readText().then((text) => {
+          console.log('Pasting text: ' + text)
+        })
+      }
+      return false
+    }
+
     if (evt.key === 'Escape') {
       if (sessionContext['filteredSuggestions'].length > 0) {
         sessionContext['suggestions'] = []
