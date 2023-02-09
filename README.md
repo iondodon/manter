@@ -17,13 +17,7 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 ### Read about the implementation detail in the project's [WIKI](https://github.com/iondodon/manter/wiki) .
 
-## Download the installer
-
-- [Linux (.deb)](https://drive.google.com/file/d/1CWcPVBI56b2RRRfuEHAIZBCG_sUyAguW/view?usp=share_link)
-
-- [MacOS (.dmg)](https://drive.google.com/file/d/1McWslmwcMJ4KSB7QJGSQtlyk7Paboe4-/view?usp=share_link)
-
-- [Windows (.msi)](https://drive.google.com/file/d/1USanMUPaialTV_5BnXb3HCtJ0nJNlYoP/view?usp=share_link)
+## Download the installer from the [releases section](https://github.com/iondodon/manter/releases) 
 
 ## Community
 
