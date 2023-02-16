@@ -1,3 +1,4 @@
+use std::env;
 use std::io::{Read, Write};
 
 use bytes::BytesMut;
@@ -150,8 +151,9 @@ async fn accept_connection(stream: TcpStream) {
     cmd
   } else {
     let settings = get_settings();
-    let user = settings.get("default_login_user").unwrap();
-    let user = user.as_str().unwrap();
+    let user_default_shell = env::var("SHELL").unwrap();
+
+    mt_log!(Level::Info, "user_default_shell={}", user_default_shell);
 
     let user_scripts = if settings.contains_key("user_scripts") {
       settings.get("user_scripts").unwrap()
@@ -170,10 +172,10 @@ async fn accept_connection(stream: TcpStream) {
 
     let prompt_command_scripts = format!(r#"echo -en "\033]0; [manter] "{}" \a""#, scripts_str);
 
-    let mut cmd = CommandBuilder::new("su");
+    let mut cmd = CommandBuilder::new(user_default_shell);
     cmd.env("PROMPT_COMMAND", prompt_command_scripts);
     cmd.env("TERM", TERM);
-    cmd.args(["-m", user]);
+    cmd.args(["-i"]);
     cmd
   };
 

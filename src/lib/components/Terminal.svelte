@@ -4,7 +4,6 @@
   import 'xterm/css/xterm.css'
   import { IS_UNIX, IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString } from '../utils/utils'
-  import { invoke } from '@tauri-apps/api/tauri'
   import { onMount } from 'svelte'
   import { ActiveSessionContextStore } from '../stores/stores'
   import { BANNER } from '../../banner'
@@ -21,20 +20,11 @@
 
   onMount(() => {
     openDomTerminalInterface()
-
-    if (IS_UNIX) {
-      setUser()
-    }
   })
 
   const suggestionsAreShown = () => {
     return sessionContext['suggestions'].length > 0 
             && sessionContext['suggestions'][0] !== clis
-  }
-
-  const setUser = async () => {
-    const settings = (await invoke('get_settings')) as string
-    sessionContext['user'] = settings['default_login_user']
   }
 
   const openDomTerminalInterface = () => {
@@ -116,7 +106,6 @@
     if (IS_UNIX) {
       terminalInterface.write(BANNER)
       terminalInterface.write("\r\n")
-      terminalInterface.write("User: " + sessionContext['user'] + "\r\n")
     }
   }
 

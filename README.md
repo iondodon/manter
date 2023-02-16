@@ -17,7 +17,7 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 ### Read about the implementation detail in the project's [WIKI](https://github.com/iondodon/manter/wiki) .
 
-## Download the installer from the [releases section](https://github.com/iondodon/manter/releases) 
+## Download the installer from the [releases section](https://github.com/iondodon/manter/releases)
 
 ## Community
 
@@ -31,9 +31,9 @@ Anyone is welcome to contribute to this project with and ideas. Imagine the term
 
 _First off, thank you for considering contributing to Manter. It’s people like you that can make Manter a great tool._
 
-1. install the latest LTS NodeJS
+1. install NodeJS v18.4.0
 
-2. install the latest LTS Rust
+2. install Rust v.1.67.1
 
 3. clone the repository
 
