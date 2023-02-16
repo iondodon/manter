@@ -54,29 +54,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb07d2053ccdbe10e2af2995a2f116c1330396493dc1269f6a91d0ae82e19704"
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bytes",
- "dirs",
- "env_logger",
- "futures",
- "futures-util",
- "mt_logger",
- "portable-pty",
- "reqwest",
- "serde",
- "serde_derive",
- "serde_json",
- "tauri",
- "tauri-build",
- "tokio",
- "tokio-tungstenite",
- "whoami",
-]
-
-[[package]]
 name = "atk"
 version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1661,6 +1638,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "62bb907fe88d54d8d9ce32a3cceab4218ed2f6b7d35617cafe9adf84e43919cb"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "manter"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "bytes",
+ "dirs",
+ "env_logger",
+ "futures",
+ "futures-util",
+ "mt_logger",
+ "portable-pty",
+ "reqwest",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tokio",
+ "tokio-tungstenite",
+ "whoami",
 ]
 
 [[package]]

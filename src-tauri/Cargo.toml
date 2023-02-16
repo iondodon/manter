@@ -1,13 +1,13 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
-default-run = "app"
+name = "manter"
+version = "0.1.1"
+description = "Integrated Terminal Environment"
+authors = ["Ion Dodon"]
+license = "GPL v.3.0"
+repository = "https://github.com/iondodon/manter"
+default-run = "manter"
 edition = "2021"
-rust-version = "1.57"
+rust-version = "1.67.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
