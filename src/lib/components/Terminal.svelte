@@ -6,7 +6,6 @@
   import { arrayBufferToString } from '../utils/utils'
   import { onMount } from 'svelte'
   import { ActiveSessionContextStore } from '../stores/stores'
-  import { BANNER } from '../../banner'
   import { getSuggestions } from '../../suggestions/suggestions';
   import SuggestionsContainer from './SuggestionsContainer.svelte';
   import clis from '../../cli/library/library';
@@ -100,13 +99,6 @@
       return
     }
     document.title = title
-  }
-
-  const displayWelcomePage = () => {
-    if (IS_UNIX) {
-      terminalInterface.write(BANNER)
-      terminalInterface.write("\r\n")
-    }
   }
 
   const getTypedText = () => {
@@ -314,8 +306,6 @@
     if (IS_WINDOWS) {
       terminalInterface.options.windowsMode = true
     }
-
-    displayWelcomePage()
   }
 
   const newTerminalSession = async () => {

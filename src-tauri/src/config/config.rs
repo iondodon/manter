@@ -2,9 +2,14 @@ use std::{path::Path, fs::OpenOptions, io::{BufReader, BufWriter, Write, Read}, 
 
 use mt_logger::{mt_log, Level};
 
-const CONFIG_SCRIPTS_MACOS: &str = r#"
+const CONFIG_SCRIPTS_ZSH: &str = r#"
 prmptcmd() { eval "$PROMPT_COMMAND" }
 precmd_functions+=(prmptcmd)
+trap "echo The shell session has terminated." EXIT
+"#;
+
+const CONFIG_SCRIPTS_BASH: &str = r#"
+trap "echo The shell session has terminated." EXIT
 "#;
 
 pub fn configure() {
@@ -17,9 +22,9 @@ pub fn configure() {
 }
 
 fn update_rc_file(shell: &str) {
-  let rc_file_name = match shell {
-    "/bin/zsh" => ".zshrc",
-    "/bin/bash" => return,
+  let (rc_file_name, config_scripts) = match shell {
+    "/bin/zsh" => (".zshrc", CONFIG_SCRIPTS_ZSH),
+    "/bin/bash" => (".bashrc", CONFIG_SCRIPTS_BASH),
     _ => panic!("Shell not supported"),
   };
 
@@ -34,13 +39,13 @@ fn update_rc_file(shell: &str) {
     panic!("rc file not found");
   }
 
-  create_config_scripts_file();
+  create_config_scripts_file(config_scripts);
   let config_scripts_file = format!("{}/.manter.sh", home_dir);
   let script = format!("\nsource {}\n", config_scripts_file);
   write_if_not_present_in_file(&rc_file, &script);
 }
 
-fn create_config_scripts_file() {
+fn create_config_scripts_file(config_scripts: &str) {
   let home_dir = dirs::home_dir().unwrap();
   let home_dir = home_dir.to_str().unwrap();
   let config_scripts_file = format!("{}/.manter.sh", home_dir);
@@ -60,7 +65,7 @@ fn create_config_scripts_file() {
 
   match config_scripts_file {
     Ok(mut file) => {
-      file.write_all(CONFIG_SCRIPTS_MACOS.as_bytes()).unwrap();
+      file.write_all(config_scripts.as_bytes()).unwrap();
       file.flush().unwrap();
     }
     Err(e) => panic!("Failed to create config scripts file: {}", e),
