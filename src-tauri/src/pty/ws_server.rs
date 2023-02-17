@@ -3,13 +3,12 @@ use std::io::{Read, Write};
 
 use bytes::BytesMut;
 use futures::{SinkExt, StreamExt};
-use futures::stream::{SplitSink, SplitStream};
 use mt_logger::*;
-use portable_pty::{Child, CommandBuilder, native_pty_system, PtyPair, PtySize};
+use portable_pty::{CommandBuilder, native_pty_system, PtySize};
 use serde::Deserialize;
 use serde_json::{Value, json};
 use tokio::net::{TcpListener, TcpStream};
-use tokio_tungstenite::{accept_async, WebSocketStream};
+use tokio_tungstenite::accept_async;
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::settings::settings::get_settings;
