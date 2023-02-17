@@ -32,93 +32,9 @@ struct WindowSize {
   pub pixel_height: u16,
 }
 
-
-async fn feed_client_from_pty(
-  mut pty_reader: Box<dyn Read + Send>,
-  mut ws_sender: SplitSink<WebSocketStream<TcpStream>, Message>,
-) {
-  let mut buffer = BytesMut::with_capacity(1024);
-  buffer.resize(1024, 0u8);
-  loop {
-    buffer[0] = 0u8;
-    let mut tail = &mut buffer[1..];
-
-    match pty_reader.read(&mut tail) {
-      Ok(0) => {
-        // EOF
-        mt_log!(Level::Info, "0 bytes read from pty. EOF.");
-        break;
-      }
-      Ok(n) => {
-        if n == 0 { // this may be redundant because of Ok(0), but not sure
-          break;
-        }
-        let mut data_to_send = Vec::with_capacity(n + 1);
-        data_to_send.extend_from_slice(&buffer[..n + 1]);
-        let message = Message::Binary(data_to_send);
-        ws_sender.send(message).await.unwrap();
-      }
-      Err(e) => {
-        mt_log!(Level::Error, "Error reading from pty: {}", e);
-        mt_log!(Level::Error, "PTY child process may be closed.");
-        break;
-      }
-    }
-  }
-
-  mt_log!(Level::Info, "PTY child process killed.");
-}
-
-async fn feed_pty_from_ws(
-  mut ws_receiver: SplitStream<WebSocketStream<TcpStream>>,
-  mut pty_writer: Box<dyn Write + Send>,
-  pty_pair: PtyPair,
-  mut pty_child_process: Box<dyn Child + Send + Sync>,
-) {
-  while let Some(message) = ws_receiver.next().await {
-    let message = message.unwrap();
-    match message {
-      Message::Binary(msg) => {
-        let msg_bytes = msg.as_slice();
-        match msg_bytes[0] {
-          0 => {
-            if msg_bytes.len().gt(&0) {
-              pty_writer.write_all(&msg_bytes[1..]).unwrap();
-            }
-          }
-          1 => {
-            let resize_msg: WindowSize =
-              serde_json::from_slice(&msg_bytes[1..]).unwrap();
-            let pty_size = PtySize {
-              rows: resize_msg.rows,
-              cols: resize_msg.cols,
-              pixel_width: resize_msg.pixel_width,
-              pixel_height: resize_msg.pixel_height,
-            };
-            pty_pair.master.resize(pty_size).unwrap();
-          }
-          _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
-        }
-      }
-      Message::Close(_) => {
-        mt_log!(Level::Info, "Closing the websocket connection...");
-
-        mt_log!(Level::Info, "Killing PTY child process...");
-        pty_child_process.kill().unwrap();
-
-        mt_log!(Level::Info, "Breakes the loop. This will terminate the ws socket thread and the ws will close");
-        break;
-      }
-      _ => mt_log!(Level::Error, "Unknown received data type"),
-    }
-  }
-
-  mt_log!(Level::Info, "The Websocket was closed and the thread for WS listening will end soon.");
-}
-
-async fn accept_connection(stream: TcpStream) {
+async fn handle_client(stream: TcpStream) {
   let ws_stream = accept_async(stream).await.expect("Failed to accept");
-  let (ws_sender, ws_receiver) = ws_stream.split();
+  let (mut ws_sender, mut ws_receiver) = ws_stream.split();
 
   let pty_system = native_pty_system();
   let pty_pair = pty_system
@@ -179,19 +95,88 @@ async fn accept_connection(stream: TcpStream) {
     cmd
   };
 
-  let pty_child_process = pty_pair.slave.spawn_command(cmd).unwrap();
+  let mut pty_child_process = pty_pair.slave.spawn_command(cmd).unwrap();
 
-  let pty_reader = pty_pair.master.try_clone_reader().unwrap();
-  let pty_writer = pty_pair.master.try_clone_writer().unwrap();
+  let mut pty_reader = pty_pair.master.try_clone_reader().unwrap();
+  let mut pty_writer = pty_pair.master.try_clone_writer().unwrap();
 
-  std::thread::spawn(|| {
+
+  std::thread::spawn(move || {
     let rt = tokio::runtime::Runtime::new().unwrap();
     rt.block_on(async {
-      feed_client_from_pty(pty_reader, ws_sender).await;
+      let mut buffer = BytesMut::with_capacity(1024);
+      buffer.resize(1024, 0u8);
+      loop {
+        buffer[0] = 0u8;
+        let mut tail = &mut buffer[1..];
+
+        match pty_reader.read(&mut tail) {
+          Ok(0) => {
+            // EOF
+            mt_log!(Level::Info, "0 bytes read from pty. EOF.");
+            break;
+          }
+          Ok(n) => {
+            if n == 0 { // this may be redundant because of Ok(0), but not sure
+              break;
+            }
+            let mut data_to_send = Vec::with_capacity(n + 1);
+            data_to_send.extend_from_slice(&buffer[..n + 1]);
+            let message = Message::Binary(data_to_send);
+            ws_sender.send(message).await.unwrap();
+          }
+          Err(e) => {
+            mt_log!(Level::Error, "Error reading from pty: {}", e);
+            mt_log!(Level::Error, "PTY child process may be closed.");
+            break;
+          }
+        }
+      }
+
+      mt_log!(Level::Info, "PTY child process killed.");
     })
   });
 
-  feed_pty_from_ws(ws_receiver, pty_writer, pty_pair, pty_child_process).await;
+
+  while let Some(message) = ws_receiver.next().await {
+    let message = message.unwrap();
+    match message {
+      Message::Binary(msg) => {
+        let msg_bytes = msg.as_slice();
+        match msg_bytes[0] {
+          0 => {
+            if msg_bytes.len().gt(&0) {
+              pty_writer.write_all(&msg_bytes[1..]).unwrap();
+            }
+          }
+          1 => {
+            let resize_msg: WindowSize =
+              serde_json::from_slice(&msg_bytes[1..]).unwrap();
+            let pty_size = PtySize {
+              rows: resize_msg.rows,
+              cols: resize_msg.cols,
+              pixel_width: resize_msg.pixel_width,
+              pixel_height: resize_msg.pixel_height,
+            };
+            pty_pair.master.resize(pty_size).unwrap();
+          }
+          _ => mt_log!(Level::Error, "Unknown command {}", msg_bytes[0]),
+        }
+      }
+      Message::Close(_) => {
+        mt_log!(Level::Info, "Closing the websocket connection...");
+
+        mt_log!(Level::Info, "Killing PTY child process...");
+        pty_child_process.kill().unwrap();
+
+        mt_log!(Level::Info, "Breakes the loop. This will terminate the ws socket thread and the ws will close");
+        break;
+      }
+      _ => mt_log!(Level::Error, "Unknown received data type"),
+    }
+  }
+
+  mt_log!(Level::Info, "The Websocket was closed and the thread for WS listening will end soon.");
 }
 
 pub async fn pty_serve() {
@@ -208,7 +193,7 @@ pub async fn pty_serve() {
     std::thread::spawn(|| {
       let rt = tokio::runtime::Runtime::new().unwrap();
       rt.block_on(async {
-        accept_connection(stream).await;
+        handle_client(stream).await;
       });
     });
   }
