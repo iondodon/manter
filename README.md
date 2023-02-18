@@ -15,7 +15,7 @@ A good analogy to understand the purpose of this project is the following - trad
 
 Anyone is welcome to contribute to this project with and ideas. Imagine the terminal you would like to use. Feel free to open any issue with suggestions and bugs.
 
-### Read about the implementation detail in the project's [WIKI](https://github.com/iondodon/manter/wiki) .
+### Read about how to add more suggestions in the project's [WIKI](https://github.com/iondodon/manter/wiki).
 
 ## Download the installer from the [releases section](https://github.com/iondodon/manter/releases)
 
