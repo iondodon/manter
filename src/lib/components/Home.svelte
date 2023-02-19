@@ -4,10 +4,10 @@
 
 <div id="home">
   <div id="detail">
-    <span>Manter v.0.1.0 GPL v.3 licensed</span>
+    <span>Manter v.0.1.2 GPLv.3 licensed</span>
     <br>
-    <span>* + to create a new session</span>
-    <span>* Double click on tab to change its name</span>
+    <span>Press + to create a new session</span>
+    <span>Double click on tab to change its name</span>
     <br>
     <span>
       <a href="https://github.com/iondodon/manter" target="_blank" rel="noreferrer">Contribute to project development</a>
