@@ -107,7 +107,7 @@
           </ol>
         </li>
       {:else}
-        <li class={suggestion['index'] == selectedIndex ? "selected-suggestion" : "suggestion"}>
+        <li class={suggestion['index'] == selectedIndex ? "selected-suggestion" : "independent-suggestion"}>
           <span>{suggestion.name}</span>
         </li>
       {/if}
@@ -139,6 +139,13 @@
     border-left: 2px solid rgb(0, 139, 28);
     margin-bottom: 10px;
     list-style: none;
+  }
+
+  .independent-suggestion {
+    border: 1px solid rgb(74, 74, 74);
+    border-left: 2px solid rgb(0, 139, 28);
+    padding-left: 5px;
+    color: bisque;
   }
 
   .suggestion {
