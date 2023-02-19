@@ -113,7 +113,7 @@
       {/if}
     {/each}
     <li class="suggestion">
-          <span>Esc. to close</span>
+      <span>Esc. to close</span>
     </li>
   </ol>
 {/if}
@@ -136,15 +136,19 @@
   }
 
   .suggestions-group {
+    border-left: 2px solid rgb(0, 139, 28);
+    margin-bottom: 10px;
     list-style: none;
   }
 
   .suggestion {
     border: 1px solid rgb(74, 74, 74);
+    padding-left: 5px;
     color: bisque;
   }
 
   .selected-suggestion {
+    padding-left: 5px;
     border: 1px solid rgb(74, 74, 74);
     background-color: rgb(126, 126, 126);
     color: white;
