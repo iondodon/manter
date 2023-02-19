@@ -91,6 +91,13 @@
       selectedSuggestionElement.scrollIntoView({block: "nearest"});
     }
   }
+
+  const getFormattedNames = (names: string | string[]) => {
+    if (typeof names === 'string') {
+      return names
+    }
+    return names.join(', ')
+  }
 </script>
 
 {#if filteredSuggestions.length > 0 && filteredSuggestions[0] !== clis}
@@ -101,14 +108,14 @@
           <ol class="suggestions-group">
             {#each suggestion.suggestions as subSuggestion}
               <li class={subSuggestion['index'] == selectedIndex ? "selected-suggestion" : "suggestion"} >
-                <span>{subSuggestion.name}</span>
+                <span>{getFormattedNames(subSuggestion.names)}</span>
               </li>
             {/each}
           </ol>
         </li>
       {:else}
         <li class={suggestion['index'] == selectedIndex ? "selected-suggestion" : "independent-suggestion"}>
-          <span>{suggestion.name}</span>
+          <span>{getFormattedNames(suggestion.names)}</span>
         </li>
       {/if}
     {/each}

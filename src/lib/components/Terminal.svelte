@@ -145,6 +145,20 @@
       .pop()
   }
 
+  const oneNamesStartsWith = (names: string | string[], word) => {
+    if (typeof names === 'string') {
+      names = [names]
+    }
+
+    for (const name of names) {
+      if (name.startsWith(word)) {
+        return true
+      }
+    }
+
+    return false
+  }
+
   const filterSuggestions = (sessionContext) => {
     const suggestions = sessionContext['suggestions']
     const lastWord = getLastWord()
@@ -152,7 +166,7 @@
     return suggestions.map((suggestion) => {
       if (suggestion.suggestions) {
         const filteredSubSuggestions = suggestion.suggestions.filter((subSuggestion) => {
-          return subSuggestion.name.startsWith(lastWord)
+          return oneNamesStartsWith(subSuggestion.names, lastWord)
         })
 
         return {
@@ -166,7 +180,7 @@
       if (suggestion.suggestions) {
         return suggestion.suggestions.length > 0
       } else {
-        return suggestion.name.startsWith(lastWord)
+        return oneNamesStartsWith(suggestion.names, lastWord)
       }
     })
   }
@@ -187,7 +201,22 @@
 
         if (selectedSuggestion) {
           const lastWord = getLastWord()
-          terminalInterface.paste(selectedSuggestion.name.replace(lastWord, ''))
+
+          if (typeof selectedSuggestion.names === 'string') {
+            selectedSuggestion.names = [selectedSuggestion.names]
+          }
+          let foundMatch = false
+          for (const name of selectedSuggestion.names) {
+            if (name.startsWith(lastWord)) {
+              terminalInterface.paste(name.replace(lastWord, ''))
+              foundMatch = true
+              break
+            }
+          }
+
+          if (!foundMatch) {
+            terminalInterface.paste(selectedSuggestion.names[0])
+          }
         }
 
         sessionContext['suggestions'] = []

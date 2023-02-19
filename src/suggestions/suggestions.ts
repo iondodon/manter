@@ -17,6 +17,20 @@ export const resolveDynamicGroups = async (sessionContext) => {
   }
 };
 
+const matchesRegex = (regexes: RegExp | RegExp[], word: string) => {
+  if (!Array.isArray(regexes)) {
+    regexes = [regexes];
+  }
+
+  for (const regex of regexes) {
+    if (regex.test(word)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 export const getSuggestions = (sessionContext) => {
   let next: any = [clis];
   let words = sessionContext["lineText"]
@@ -29,7 +43,7 @@ export const getSuggestions = (sessionContext) => {
     for (const item of next) {
       if (item.suggestions) {
         for (const suggestion of item.suggestions) {
-          if (suggestion.regex.test(word)) {
+          if (matchesRegex(suggestion.regex, word)) {
             if (suggestion.next) next = suggestion.next();
             else if (item.next) next = item.next();
             else next = [];
@@ -40,7 +54,7 @@ export const getSuggestions = (sessionContext) => {
       } else if (item.regex) {
         // single suggestion
         const suggestion = item;
-        if (suggestion.regex.test(word)) {
+        if (matchesRegex(suggestion.regex, word)) {
           if (suggestion.next) next = suggestion.next();
           else next = [];
           found = true;

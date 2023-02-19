@@ -9,7 +9,7 @@ export type DynamicGroup = Group & {
 };
 
 export type Suggestion = {
-  name: string;
-  regex: RegExp;
+  names: string | string[];
+  regex: RegExp | RegExp[];
   next?: () => (Group | Suggestion)[];
 };

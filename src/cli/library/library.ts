@@ -1,7 +1,7 @@
 import type { DynamicGroup, Group, Suggestion } from "./contract";
 
 const filesOrFolders: Suggestion = {
-  name: "file or folder",
+  names: "file or folder",
   regex: /^.*$/,
   next: () => [filesOrFolders],
 };
@@ -9,11 +9,11 @@ const filesOrFolders: Suggestion = {
 const lsOptions: Group = {
   suggestions: [
     {
-      name: "-a",
+      names: "-a",
       regex: /^-a$/,
     },
     {
-      name: "-l",
+      names: "-l",
       regex: /^-l$/,
     },
   ],
@@ -23,7 +23,7 @@ const lsOptions: Group = {
 const cdFolders: DynamicGroup = {
   suggestions: [
     {
-      name: "folder",
+      names: "folder",
       regex: /^.*$/,
       next: () => [cdFolders],
     },
@@ -31,7 +31,7 @@ const cdFolders: DynamicGroup = {
   script: "ls -d */",
   postProcessor: (line) => {
     return {
-      name: line,
+      names: line,
       regex: new RegExp("^" + line + "$"),
       next: () => [cdFolders],
     };
@@ -41,12 +41,12 @@ const cdFolders: DynamicGroup = {
 const cdOptions: Group = {
   suggestions: [
     {
-      name: "-a",
-      regex: /^-a$/,
+      names: ["-a", "--all"],
+      regex: [/^-a$/, /^--all$/],
     },
     {
-      name: "-l",
-      regex: /^-l$/,
+      names: ["-l", "--long"],
+      regex: [/^-l$/, /^--long$/],
     },
   ],
   next: () => [cdOptions, cdFolders],
@@ -55,14 +55,14 @@ const cdOptions: Group = {
 const branchNames: DynamicGroup = {
   suggestions: [
     {
-      name: "branch",
+      names: "branch",
       regex: /^.*$/,
     },
   ],
   script: "git for-each-ref --format='%(refname:short)' refs/heads/",
   postProcessor: (line) => {
     return {
-      name: line,
+      names: line,
       regex: new RegExp("^" + line + "$"),
     };
   },
@@ -71,7 +71,7 @@ const branchNames: DynamicGroup = {
 const gitSubCommands: Group = {
   suggestions: [
     {
-      name: "checkout",
+      names: "checkout",
       regex: /^checkout$/,
       next: () => [branchNames],
     },
@@ -81,17 +81,17 @@ const gitSubCommands: Group = {
 const clis: Group = {
   suggestions: [
     {
-      name: "ls",
+      names: "ls",
       regex: /^ls$/,
       next: () => [lsOptions, filesOrFolders],
     },
     {
-      name: "cd",
+      names: "cd",
       regex: /^cd$/,
       next: () => [cdOptions, cdFolders],
     },
     {
-      name: "git",
+      names: "git",
       regex: /^git$/,
       next: () => [gitSubCommands],
     },
