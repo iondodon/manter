@@ -2,7 +2,7 @@
   import { Terminal } from 'xterm'
   import { FitAddon } from 'xterm-addon-fit'
   import 'xterm/css/xterm.css'
-  import { IS_UNIX, IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
+  import { IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString } from '../utils/utils'
   import { onMount } from 'svelte'
   import { ActiveSessionContextStore } from '../stores/stores'
