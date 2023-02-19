@@ -104,15 +104,23 @@
     if(!isSure) {
       return
     }
+
     let termToClose = getTerminalByUuid(termUUID)
     termToClose['ptyWebSocket'].close()
-    TerminalsStore.update(terminals => terminals.filter(term => term['uuid'] != termUUID))
-    ActiveTermUUIDStore.update(_prevActiveTermUUID => terminals[0]['uuid'])
+    
+    await TerminalsStore.update(terminals => terminals.filter(term => term['uuid'] != termUUID))
+    
+    for(const term of terminals) {
+      if (term['uuid']) {
+        setActive(term['uuid'])
+        return
+      }
+    }
   }
 </script>
 
 <ol id="tabs">
-  {#each terminals as terminal, index}
+  {#each terminals as terminal, _index}
     <li class="tab" id="{terminal['uuid'] === activeTermUUID? 'selected-tab' : ''}" 
         on:click={() => setActive(terminal['uuid'])}
         on:keypress={() => setActive(terminal['uuid'])}
