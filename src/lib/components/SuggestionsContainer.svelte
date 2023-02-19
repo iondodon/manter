@@ -128,7 +128,7 @@
 <style lang="scss">
   #suggestions-container {
     position: absolute;
-    max-width: 300px;
+    max-width: 400px;
     max-height: 120px;
     overflow-y: auto;
     overflow-x: hidden;
