@@ -145,7 +145,7 @@
       .pop()
   }
 
-  const oneNamesStartsWith = (names: string | string[], word) => {
+  const atLeastOneNameStartsWith = (names: string | string[], word) => {
     if (typeof names === 'string') {
       names = [names]
     }
@@ -166,7 +166,7 @@
     return suggestions.map((suggestion) => {
       if (suggestion.suggestions) {
         const filteredSubSuggestions = suggestion.suggestions.filter((subSuggestion) => {
-          return oneNamesStartsWith(subSuggestion.names, lastWord)
+          return atLeastOneNameStartsWith(subSuggestion.names, lastWord)
         })
 
         return {
@@ -180,7 +180,7 @@
       if (suggestion.suggestions) {
         return suggestion.suggestions.length > 0
       } else {
-        return oneNamesStartsWith(suggestion.names, lastWord)
+        return atLeastOneNameStartsWith(suggestion.names, lastWord)
       }
     })
   }
@@ -234,6 +234,18 @@
         })
       }
       return false
+    }
+
+    if (evt.ctrlKey && evt.key === 'c') {
+      if (evt.type == 'keydown') {
+        if (terminalInterface.hasSelection()) {
+          const selectedText = terminalInterface.getSelection()
+          navigator.clipboard.writeText(selectedText).then(() => {
+            console.log('Copied text to clipboard: ' + selectedText)
+          })
+          return false
+        }
+      }
     }
 
     if (evt.key === 'Escape') {
