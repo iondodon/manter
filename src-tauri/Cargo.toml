@@ -1,6 +1,6 @@
 [package]
 name = "manter"
-version = "0.1.2"
+version = "0.1.3"
 description = "Integrated Terminal Environment"
 authors = ["Ion Dodon"]
 license = "GPL v.3.0"
