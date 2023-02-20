@@ -243,6 +243,7 @@
           navigator.clipboard.writeText(selectedText).then(() => {
             console.log('Copied text to clipboard: ' + selectedText)
           })
+          terminalInterface.clearSelection()
           return false
         }
       }
