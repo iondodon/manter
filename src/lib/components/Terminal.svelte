@@ -210,6 +210,7 @@
           for (const name of selectedSuggestion.names) {
             if (name.startsWith(lastWord)) {
               terminalInterface.paste(name.replace(lastWord, ''))
+              terminalInterface.paste('')
               foundMatch = true
               break
             }
@@ -217,6 +218,7 @@
 
           if (!foundMatch) {
             terminalInterface.paste(selectedSuggestion.names[0])
+            terminalInterface.paste('')
           }
         }
 
@@ -229,9 +231,9 @@
     }
 
     if (evt.ctrlKey && evt.key === 'v') {
-      if (evt.type == 'keydown') {
-        console.log('Pasting text')
-      }
+      terminalInterface.paste('')
+      terminalInterface.clearSelection()
+      // suppress ctrl+v in favor of xterm's paste
       return false
     }
 
@@ -324,6 +326,9 @@
       cursorStyle: 'block',
       fontSize: 16,
       cursorWidth: 8,
+      fontFamily: 'monospace',
+      rows: 24,
+      cols: 80
     })
     fitAddon = new FitAddon()
     terminalInterface.loadAddon(fitAddon)
