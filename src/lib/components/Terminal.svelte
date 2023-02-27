@@ -4,6 +4,7 @@
   import { CanvasAddon } from 'xterm-addon-canvas'
   import { WebglAddon } from 'xterm-addon-webgl'
   import { LigaturesAddon } from 'xterm-addon-ligatures'
+  import { Unicode11Addon } from 'xterm-addon-unicode11'
   import 'xterm/css/xterm.css'
   import { IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString, webglIsSupported } from '../utils/utils'
@@ -342,6 +343,11 @@
     terminalInterface.loadAddon(fitAddon)
 
     setRenderingMode()
+
+    const unicode11Addon = new Unicode11Addon();
+    terminalInterface.loadAddon(unicode11Addon);
+    // activate the new version
+    terminalInterface.unicode.activeVersion = '11';
 
     terminalInterface.attachCustomKeyEventHandler((evt) => termInterfaceHandleKeyEvents(evt))
     terminalInterface.onKey((evt) => {})
