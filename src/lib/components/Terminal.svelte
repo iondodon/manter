@@ -2,14 +2,16 @@
   import { Terminal } from 'xterm'
   import { FitAddon } from 'xterm-addon-fit'
   import { CanvasAddon } from 'xterm-addon-canvas'
+  import { WebglAddon } from 'xterm-addon-webgl'
   import 'xterm/css/xterm.css'
   import { IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
-  import { arrayBufferToString } from '../utils/utils'
+  import { arrayBufferToString, webglIsSupported } from '../utils/utils'
   import { onMount } from 'svelte'
   import { ActiveSessionContextStore } from '../stores/stores'
   import { getSuggestions } from '../../suggestions/suggestions';
   import SuggestionsContainer from './SuggestionsContainer.svelte';
   import clis from '../../cli/library/library';
+  import { invoke } from '@tauri-apps/api';
 
   export let sessionContext: object
   export let terminalInterface: Terminal
@@ -333,8 +335,7 @@
     fitAddon = new FitAddon()
     terminalInterface.loadAddon(fitAddon)
 
-    const canvasAddon = new CanvasAddon()
-    terminalInterface.loadAddon(canvasAddon)
+    setRenderingMode()
 
     terminalInterface.attachCustomKeyEventHandler((evt) => termInterfaceHandleKeyEvents(evt))
     terminalInterface.onKey((evt) => {})
@@ -360,6 +361,28 @@
     ptyWebSocket.onclose = (evt) => handlePtyWsClose(evt)
     ptyWebSocket.onerror = (evt) => handlePtyWsError(evt)
     ptyWebSocket.onopen = async (_evt) => setupNewTerminalInterface()
+  }
+
+  const setRenderingMode = async () => {
+    const settings = (await invoke('get_settings')) as string
+
+    if (settings['useWebGL']) {
+      console.log('Trying to use WebGL')
+      
+      if(webglIsSupported()) {
+        const webglAddon = new WebglAddon()
+        webglAddon.onContextLoss(e => {
+          webglAddon.dispose();
+        })
+        terminalInterface.loadAddon(webglAddon)
+        return
+      }
+
+      alert('WebGL is not supported. Falling back to canvas rendering. \n You can turn off WebGL in settings.')
+    }
+
+    const canvasAddon = new CanvasAddon()
+    terminalInterface.loadAddon(canvasAddon)
   }
 
   if (ptyWebSocket == null) {
