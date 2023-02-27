@@ -54,6 +54,9 @@ pub fn check_settings_file() {
   };
 
   settings_json_object.insert("user_scripts".to_string(), serde_json::from_str(user_scripts).unwrap());
+
+  // webgl disabled by default
+  settings_json_object.insert("useWebGL".to_string(), Value::String(false.to_string()));
   
   let settings_json_object = serde_json::to_string(&settings_json_object).unwrap();
   

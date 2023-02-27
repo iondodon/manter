@@ -3,6 +3,7 @@
   import { FitAddon } from 'xterm-addon-fit'
   import { CanvasAddon } from 'xterm-addon-canvas'
   import { WebglAddon } from 'xterm-addon-webgl'
+  import { LigaturesAddon } from 'xterm-addon-ligatures'
   import 'xterm/css/xterm.css'
   import { IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString, webglIsSupported } from '../utils/utils'
@@ -34,6 +35,10 @@
       return
     }
     terminalInterface.open(document.getElementById('terminal'))
+
+    const ligaturesAddon = new LigaturesAddon()
+    terminalInterface.loadAddon(ligaturesAddon)
+
     sendProposedSizeToPty()
     adjustDomTerminalElementSize()
     terminalInterface.focus()
@@ -330,7 +335,8 @@
       cursorWidth: 8,
       fontFamily: 'monospace',
       rows: 24,
-      cols: 80
+      cols: 80,
+      allowProposedApi: true
     })
     fitAddon = new FitAddon()
     terminalInterface.loadAddon(fitAddon)
