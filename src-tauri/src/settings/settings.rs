@@ -42,7 +42,7 @@ pub fn check_settings_file() {
 
 
   let default_user = whoami::username();
-  let mut settings_json_object = Map::new();
+  let mut settings_json_object: Map<String, Value> = Map::new();
   settings_json_object.insert("default_login_user".to_string(), Value::String(default_user));
 
   let user_scripts = if cfg!(target_os = "linux") {
@@ -56,7 +56,7 @@ pub fn check_settings_file() {
   settings_json_object.insert("user_scripts".to_string(), serde_json::from_str(user_scripts).unwrap());
 
   // webgl disabled by default
-  settings_json_object.insert("useWebGL".to_string(), Value::String(false.to_string()));
+  settings_json_object.insert("useWebGL".to_string(), Value::Bool(false));
   
   let settings_json_object = serde_json::to_string(&settings_json_object).unwrap();
   
