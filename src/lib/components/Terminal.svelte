@@ -5,6 +5,7 @@
   import { WebglAddon } from 'xterm-addon-webgl'
   import { LigaturesAddon } from 'xterm-addon-ligatures'
   import { Unicode11Addon } from 'xterm-addon-unicode11'
+  import { WebLinksAddon } from 'xterm-addon-web-links'
   import 'xterm/css/xterm.css'
   import { IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString, webglIsSupported } from '../utils/utils'
@@ -14,6 +15,7 @@
   import SuggestionsContainer from './SuggestionsContainer.svelte';
   import clis from '../../cli/library/library';
   import { invoke } from '@tauri-apps/api';
+  import { open } from '@tauri-apps/api/shell'
 
   export let sessionContext: object
   export let terminalInterface: Terminal
@@ -348,6 +350,12 @@
     terminalInterface.loadAddon(unicode11Addon);
     // activate the new version
     terminalInterface.unicode.activeVersion = '11';
+
+    const webLinksAddon = new WebLinksAddon((evt, uri) => {
+      evt.preventDefault()
+      open(uri)
+    })
+    terminalInterface.loadAddon(webLinksAddon)
 
     terminalInterface.attachCustomKeyEventHandler((evt) => termInterfaceHandleKeyEvents(evt))
     terminalInterface.onKey((evt) => {})
