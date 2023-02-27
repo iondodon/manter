@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Terminal } from 'xterm'
   import { FitAddon } from 'xterm-addon-fit'
+  import { CanvasAddon } from 'xterm-addon-canvas'
   import 'xterm/css/xterm.css'
   import { IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString } from '../utils/utils'
@@ -229,9 +230,7 @@
 
     if (evt.ctrlKey && evt.key === 'v') {
       if (evt.type == 'keydown') {
-        navigator.clipboard.readText().then((text) => {
-          console.log('Pasting text: ' + text)
-        })
+        console.log('Pasting text')
       }
       return false
     }
@@ -239,10 +238,6 @@
     if (evt.ctrlKey && evt.key === 'c') {
       if (evt.type == 'keydown') {
         if (terminalInterface.hasSelection()) {
-          const selectedText = terminalInterface.getSelection()
-          navigator.clipboard.writeText(selectedText).then(() => {
-            console.log('Copied text to clipboard: ' + selectedText)
-          })
           terminalInterface.clearSelection()
           return false
         }
@@ -326,12 +321,15 @@
   const setupNewTerminalInterface = () => {
     terminalInterface = new Terminal({
       cursorBlink: true,
-      cursorStyle: 'bar',
+      cursorStyle: 'block',
       fontSize: 16,
       cursorWidth: 8,
     })
     fitAddon = new FitAddon()
     terminalInterface.loadAddon(fitAddon)
+
+    const canvasAddon = new CanvasAddon()
+    terminalInterface.loadAddon(canvasAddon)
 
     terminalInterface.attachCustomKeyEventHandler((evt) => termInterfaceHandleKeyEvents(evt))
     terminalInterface.onKey((evt) => {})
