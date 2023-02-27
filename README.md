@@ -69,7 +69,8 @@ All scripts should be in a JSON format as presented in the example below.
     "git": {
       "currentBranch": "$(git rev-parse --abbrev-ref HEAD 2> /dev/null )"
     }
-  }
+  },
+  "useWebGL": false
 }
 ```
 
