@@ -31,18 +31,22 @@ fn update_rc_file(shell: &str) {
   let home_dir = dirs::home_dir().unwrap();
   let home_dir = home_dir.to_str().unwrap();
 
-  let rc_file = format!("{}/{}", home_dir, rc_file_name);
+  let rc_file_path_str = format!("{}/{}", home_dir, rc_file_name);
 
-  let rc_file_path = Path::new(&rc_file);
+  let rc_file_path = Path::new(&rc_file_path_str);
 
   if !rc_file_path.exists() {
-    panic!("rc file not found");
+    let _rc_file = OpenOptions::new()
+      .read(true)
+      .write(true)
+      .create(true)
+      .open(rc_file_path);
   }
 
   create_config_scripts_file(config_scripts);
   let config_scripts_file = format!("{}/.manter.sh", home_dir);
   let script = format!("\nsource {}\n", config_scripts_file);
-  write_if_not_present_in_file(&rc_file, &script);
+  write_if_not_present_in_file(&rc_file_path_str, &script);
 }
 
 fn create_config_scripts_file(config_scripts: &str) {
