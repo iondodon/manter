@@ -62,8 +62,6 @@
     } else if(addons['canvasAddon']) {
       console.log('activating canvas addon')
       addons['canvasAddon'].activate(terminalInterface)
-    } else {
-      console.log('Rendering addon not found')
     }
   }
 
