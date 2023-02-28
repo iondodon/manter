@@ -97,7 +97,7 @@ async fn handle_client(stream: TcpStream) {
   let mut pty_child_process = pty_pair.slave.spawn_command(cmd).unwrap();
 
   let mut pty_reader = pty_pair.master.try_clone_reader().unwrap();
-  let mut pty_writer = pty_pair.master.try_clone_writer().unwrap();
+  let mut pty_writer = pty_pair.master.take_writer().unwrap();
 
 
   std::thread::spawn(move || {
