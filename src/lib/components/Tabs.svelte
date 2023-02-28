@@ -75,7 +75,7 @@
         },
         terminalInterface: null,
         ptyWebSocket: null,
-        fitAddon: null
+        addons: {}
       })
       return terminals
     })

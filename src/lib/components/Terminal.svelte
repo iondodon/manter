@@ -9,7 +9,7 @@
   import 'xterm/css/xterm.css'
   import { IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString, webglIsSupported } from '../utils/utils'
-  import { onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
   import { ActiveSessionContextStore } from '../stores/stores'
   import { getSuggestions } from '../../suggestions/suggestions';
   import SuggestionsContainer from './SuggestionsContainer.svelte';
@@ -20,12 +20,22 @@
   export let sessionContext: object
   export let terminalInterface: Terminal
   export let ptyWebSocket: WebSocket
-  export let fitAddon: FitAddon
+  export let addons: object
 
   let suggestionsSelectedIndex = 0
 
   onMount(() => {
     openDomTerminalInterface()
+  })
+
+  onDestroy(() => {
+    if (addons['webglAddon']) {
+      console.log('disposing webgl addon')
+      addons['webglAddon'].dispose()
+    } else {
+      console.log('disposing canvas addon')
+      addons['canvasAddon'].dispose()
+    }
   })
 
   const suggestionsAreShown = () => {
@@ -39,16 +49,26 @@
     }
     terminalInterface.open(document.getElementById('terminal'))
 
-    const ligaturesAddon = new LigaturesAddon()
-    terminalInterface.loadAddon(ligaturesAddon)
+    addons['ligaturesAddon'] = new LigaturesAddon()
+    terminalInterface.loadAddon(addons['ligaturesAddon'])
 
     sendProposedSizeToPty()
     adjustDomTerminalElementSize()
     terminalInterface.focus()
+
+    if (addons['webglAddon']) {
+      console.log('activating webgl addon')
+      addons['webglAddon'].activate(terminalInterface)
+    } else if(addons['canvasAddon']) {
+      console.log('activating canvas addon')
+      addons['canvasAddon'].activate(terminalInterface)
+    } else {
+      console.log('Rendering addon not found')
+    }
   }
 
   const sendProposedSizeToPty = () => {
-    const proposedSize = fitAddon.proposeDimensions()
+    const proposedSize = addons['fitAddon'].proposeDimensions()
     const resizeData = {
       cols: proposedSize.cols,
       rows: proposedSize.rows,
@@ -61,7 +81,7 @@
   }
 
   const adjustDomTerminalElementSize = () => {
-    fitAddon.fit()
+    addons['fitAddon'].fit()
 
     const terminal = document.getElementById('terminal') as HTMLElement
     const terminalHeight = terminal.clientHeight
@@ -274,14 +294,14 @@
     if (evt.type === 'keyup' && evt.ctrlKey && evt.key === '=') {
       terminalInterface.options.fontSize += 1
       sendProposedSizeToPty()
-      fitAddon.fit()
+      addons['fitAddon'].fit()
       return false
     }
 
     if (evt.type === 'keyup' && evt.ctrlKey && evt.key === '-') {
       terminalInterface.options.fontSize -= 1
       sendProposedSizeToPty()
-      fitAddon.fit()
+      addons['fitAddon'].fit()
       return false
     }
 
@@ -335,27 +355,25 @@
       cursorBlink: true,
       cursorStyle: 'block',
       fontSize: 16,
-      cursorWidth: 8,
-      fontFamily: 'monospace',
       rows: 24,
       cols: 80,
       allowProposedApi: true
     })
-    fitAddon = new FitAddon()
-    terminalInterface.loadAddon(fitAddon)
+    addons['fitAddon'] = new FitAddon()
+    terminalInterface.loadAddon(addons['fitAddon'])
 
     setRenderingMode()
 
-    const unicode11Addon = new Unicode11Addon();
-    terminalInterface.loadAddon(unicode11Addon);
+    addons['unicode11Addon'] = new Unicode11Addon();
+    terminalInterface.loadAddon(addons['unicode11Addon']);
     // activate the new version
     terminalInterface.unicode.activeVersion = '11';
 
-    const webLinksAddon = new WebLinksAddon((evt, uri) => {
+    addons['webLinksAddon'] = new WebLinksAddon((evt, uri) => {
       evt.preventDefault()
       open(uri)
     })
-    terminalInterface.loadAddon(webLinksAddon)
+    terminalInterface.loadAddon(addons['webLinksAddon'])
 
     terminalInterface.attachCustomKeyEventHandler((evt) => termInterfaceHandleKeyEvents(evt))
     terminalInterface.onKey((evt) => {})
@@ -390,19 +408,19 @@
       console.log('Trying to use WebGL')
       
       if(webglIsSupported()) {
-        const webglAddon = new WebglAddon()
-        webglAddon.onContextLoss(e => {
-          webglAddon.dispose();
+        addons['webglAddon'] = new WebglAddon()
+        addons['webglAddon'].onContextLoss(e => {
+          addons['webglAddon'].dispose();
         })
-        terminalInterface.loadAddon(webglAddon)
+        terminalInterface.loadAddon(addons['webglAddon'])
         return
       }
 
       alert('WebGL is not supported. Falling back to canvas rendering. \n You can turn off WebGL in settings.')
     }
 
-    const canvasAddon = new CanvasAddon()
-    terminalInterface.loadAddon(canvasAddon)
+    addons['canvasAddon'] = new CanvasAddon()
+    terminalInterface.loadAddon(addons['canvasAddon'])
   }
 
   if (ptyWebSocket == null) {

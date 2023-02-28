@@ -30,7 +30,7 @@
           bind:sessionContext={terminal['sessionContext']}
           bind:terminalInterface={terminal['terminalInterface']}
           bind:ptyWebSocket={terminal['ptyWebSocket']}
-          bind:fitAddon={terminal['fitAddon']}
+          bind:addons={terminal['addons']}
         />
       {/if}
     {/each}
