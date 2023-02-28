@@ -1,16 +1,21 @@
 <script lang="ts">
   import {ActiveSessionContextStore} from "../stores/stores"
+  import Search from "./Search.svelte"
 
   let sessionContext = {}
   ActiveSessionContextStore.subscribe(updatesSessionContext => sessionContext = updatesSessionContext)
 </script>
 
 <div id="bottom-bar">
-  <div id="context-status">
-    {#if sessionContext['prompt_command_result'] && sessionContext['prompt_command_result']['user_scripts']}
-      {JSON.stringify(sessionContext['prompt_command_result']['user_scripts'])}
-    {/if}
-  </div>
+  {#if sessionContext['searchIsOn']}
+    <Search />
+  {:else}
+    <div id="context-status">
+      {#if sessionContext['prompt_command_result'] && sessionContext['prompt_command_result']['user_scripts']}
+        {JSON.stringify(sessionContext['prompt_command_result']['user_scripts'])}
+      {/if}
+    </div>
+  {/if}
 </div>
 
 <style lang="scss">

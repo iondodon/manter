@@ -8,6 +8,8 @@
     <br>
     <span>Press + to create a new session</span>
     <span>Double click on tab to change its name</span>
+    <span>Ctrl+C and Ctrl+V for copy and paste</span>
+    <span>Ctrl+F for search</span>
     <br>
     <span>
       <a href="https://github.com/iondodon/manter" target="_blank" rel="noreferrer">Contribute to project development</a>

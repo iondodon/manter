@@ -71,7 +71,8 @@
           filteredSuggestions: [],
           prompt_command_result: {},
           suggestionsContainer: null,
-          lineText: ""
+          lineText: "",
+          searchIsOn: false,
         },
         terminalInterface: null,
         ptyWebSocket: null,

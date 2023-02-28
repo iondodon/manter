@@ -6,15 +6,16 @@
   import { LigaturesAddon } from 'xterm-addon-ligatures'
   import { Unicode11Addon } from 'xterm-addon-unicode11'
   import { WebLinksAddon } from 'xterm-addon-web-links'
+  import { SearchAddon } from 'xterm-addon-search'
   import 'xterm/css/xterm.css'
   import { IS_WINDOWS, PTY_WS_ADDRESS } from '../config/config'
   import { arrayBufferToString, webglIsSupported } from '../utils/utils'
   import { onDestroy, onMount } from 'svelte'
   import { ActiveSessionContextStore } from '../stores/stores'
-  import { getSuggestions } from '../../suggestions/suggestions';
-  import SuggestionsContainer from './SuggestionsContainer.svelte';
-  import clis from '../../cli/library/library';
-  import { invoke } from '@tauri-apps/api';
+  import { getSuggestions } from '../../suggestions/suggestions'
+  import SuggestionsContainer from './SuggestionsContainer.svelte'
+  import clis from '../../cli/library/library'
+  import { invoke } from '@tauri-apps/api'
   import { open } from '@tauri-apps/api/shell'
 
   export let sessionContext: object
@@ -274,6 +275,13 @@
       }
     }
 
+    if (evt.ctrlKey && evt.key === 'f') {
+      if (evt.type == 'keyup') {
+        sessionContext['searchIsOn'] = !sessionContext['searchIsOn']
+        // ActiveSessionContextStore.update(() => sessionContext)
+      }
+    }
+
     if (evt.key === 'Escape') {
       if (sessionContext['filteredSuggestions'].length > 0) {
         sessionContext['suggestions'] = []
@@ -372,6 +380,9 @@
       open(uri)
     })
     terminalInterface.loadAddon(addons['webLinksAddon'])
+
+    addons['searchAddon'] = new SearchAddon()
+    terminalInterface.loadAddon(addons['searchAddon'])
 
     terminalInterface.attachCustomKeyEventHandler((evt) => termInterfaceHandleKeyEvents(evt))
     terminalInterface.onKey((evt) => {})
