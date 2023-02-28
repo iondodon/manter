@@ -18,13 +18,15 @@
     const { addons } = activeTerminal
     const { searchAddon } = addons
 
+    input = input.trim()
+
     searchAddon.findNext(input)
   }
 
 </script>
 
 <div id="seach-control" >
-  <input type="text" bind:value={input} on:keyup={search} />
+  <input type="text" bind:value={input} on:keyup={search} placeholder="text to search" />
 </div>
 
 <style lang="scss">
