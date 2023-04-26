@@ -2,6 +2,18 @@ use std::{path::Path, fs::OpenOptions, io::{BufReader, BufWriter, Write, Read}, 
 
 use mt_logger::{mt_log, Level};
 
+
+// TODO
+// suggestions and bottom bar info will work only for users default shell
+// becasue of this configuration
+// more work is required to make it work on all shells that are installed on the system
+
+// once a .manter.sh file is create for bash for example, then it will not work for zsh
+// because zsh needs a different approach for execute the scripts when the prompt appears
+
+// this means that when the users switches the shell the prevoius created .manter.sh file might not be of help
+// TODO
+
 const CONFIG_SCRIPTS_ZSH: &str = r#"
 prmptcmd() { eval "$PROMPT_COMMAND" }
 precmd_functions+=(prmptcmd)
