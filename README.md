@@ -7,59 +7,47 @@
   <img src="demo.gif" />
 </p>
 
-This project aims to create a terminal with functionalities that improve the experience of using terminals. Examples of useful functionalities would be autocomplete suggestion, showing the current branch of a project, prepared scripts that can be reused, and others. You can come up with your ideas. The project uses technologies such as Svelte on the front-end, which offers flexibility regarding the implementation of the interface. On the back-end side, the most important part is the PTY. All the back end is implemented in Rust. The basic framework of the project is Tauri.
+Manter is a project aimed at enhancing the terminal experience by offering features such as autocomplete suggestions, current branch display, reusable scripts, and more. The terminal is built with Svelte for front-end flexibility and Rust for back-end performance. The core framework is based on Tauri.
 
-At the moment the terminal has suggestions only for some commands (cd, ls). To support more commands it is needed to add them in the Manter's "library" located at `src/cli/library/library.ts`. It is possible to have custom script based suggestions. For example if we write in the terminal “git checkout” and after we press Space, a dropdown will appear with all available branches.
+Currently, Manter supports limited command suggestions (cd, ls). To expand this library, add commands to `src/cli/library/library.ts`. Custom script-based suggestions are also available, such as listing available branches after typing "git checkout" and pressing Space.
 
-A good analogy to understand the purpose of this project is the following - traditional terminals are like simple code editors while this terminal is like an IDE.
+Think of Manter as an IDE for your terminal, as opposed to traditional terminals that function like simple code editors. Contributions, ideas, and suggestions are welcome - feel free to open issues for suggestions and bugs.
 
-Anyone is welcome to contribute to this project with and ideas. Imagine the terminal you would like to use. Feel free to open any issue with suggestions and bugs.
-
-### Read about how to add more suggestions in the project's [WIKI](https://github.com/iondodon/manter/wiki).
+### Learn how to add more suggestions in the [project's WIKI](https://github.com/iondodon/manter/wiki).
 
 ## Download the installer from the [releases section](https://github.com/iondodon/manter/releases)
 
 ## Community
 
-[Discord server](https://discord.gg/k4FFFPK3ZR)
+[Join our Discord server](https://discord.gg/k4FFFPK3ZR)
 
 ## Contribution
 
 [Contribution guide](https://github.com/iondodon/manter/blob/main/CONTRIBUTING.md)
 
-## Setup local development environment
+## Setting up a local development environment
 
-_First off, thank you for considering contributing to Manter. It’s people like you that can make Manter a great tool._
+_Thank you for considering contributing to Manter. Your support helps make it a great tool._
 
-1. install NodeJS v18.4.0
+1. Install NodeJS v18.4.0
+2. Install Rust v.1.67.1
+3. Clone the repository
+4. Install dependencies with `npm install`
+5. Launch the application in dev environment with `npm run tauri dev`
 
-2. install Rust v.1.67.1
+Keep the application running in the dev environment to see code changes in real-time. If the back-end code changes, the application will restart.
 
-3. clone the repository
-
-4. install the dependencies `npm install`
-
-5. run the application in dev environment `npm run tauri dev`
-
-You can keep the application running in the dev environment and the changes in code will be reflected in the running application. If the back-end code changes, then the application restarts to reflect the changes.
-
-Build the installer with `npm run tauri build`.
-
-The installer that has been built will be for the operating system that you are using. The terminal can be built for Linux, MacOS and Windows.
+Build the installer using `npm run tauri build`. This will create an installer for your current operating system. Manter can be built for Linux, MacOS, and Windows.
 
 ## user_scripts
 
-The scripts are executed each time the prompt appears and they are used to display information in the bottom bar.
+User scripts run each time the prompt appears, displaying information in the bottom bar. Place scripts in the `~/.manter.json` file under the `user_scripts` key. Use the following file locations:
 
-The scripts should be placed in the `~/.manter.json` file under the `user_scripts` key.
+- Windows: `C:\Users\{username}\.manter.json`
+- MacOS: `/Users/{username}/.manter.json`
+- Linux: `/home/{username}/.manter.json`
 
-`.manter.json` location:
-
-- On Windows - `C:\Users\{username}\.manter.json`
-- On MacOS - `/Users/{username}/.manter.json`
-- On Linux - `/home/{username}/.manter.json`
-
-All scripts should be in a JSON format as presented in the example below.
+Format scripts in JSON as shown in the example below.
 
 ```json
 {
@@ -73,6 +61,7 @@ All scripts should be in a JSON format as presented in the example below.
   "useWebGL": false
 }
 ```
+
 
 ## License
 
