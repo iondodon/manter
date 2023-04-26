@@ -60,7 +60,7 @@ Format scripts in JSON as shown in the example below.
   },
   "useWebGL": false
 }
-
+```
 
 ## License
 
